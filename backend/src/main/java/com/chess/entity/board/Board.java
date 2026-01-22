@@ -1,0 +1,176 @@
+package com.chess.entity.board;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import com.chess.entity.base.Color;
+import com.chess.entity.base.Direction;
+import com.chess.entity.base.Position;
+import com.chess.entity.piece.Piece;
+
+public class Board {
+
+    // Matriz 8x8 que representa as casas do tabuleiro e as peças contidas nelas.
+    private final Piece[][] squares;
+
+    // Estado do tabuleiro
+    private final BoardState boardState;
+    
+    // A cor do jogador que tem a vez de jogar nesta posição.
+    private final Color currentPlayer;
+    
+    // Posição alvo para captura en passant, se aplicável.
+    private final Position enPassantTarget;
+
+    // Controle de direitos de roque para ambos os jogadores.
+    private final CastlingControl castlingControl;
+
+    // Posições dos reis para ambos os jogadores.
+    private final Position whiteKingPosition;
+    private final Position blackKingPosition;
+
+    // Mapeamento das posições das peças por cor.
+    private final Map<Color, Set<Position>> piecesPositionsByColor;
+
+    protected Board(BoardBuilder builder) {
+        this.squares = builder.getSquares();
+        this.boardState = builder.getBoardState();
+        this.currentPlayer = builder.getCurrentPlayer();
+        this.enPassantTarget = builder.getEnPassantTarget();
+        this.castlingControl = builder.getCastlingControl();
+        this.whiteKingPosition = builder.getWhiteKingPosition();
+        this.blackKingPosition = builder.getBlackKingPosition();
+        this.piecesPositionsByColor = builder.getPiecesPositionsByColor();
+    }
+
+    /**
+     * Retorna a peça na posição especificada.
+     * 
+     * @param position a posição no tabuleiro.
+     * @return a {@code Piece} na posição, ou {@code null} se a posição estiver vazia.
+      */
+    public Piece getPieceAt(Position position) {
+        Objects.requireNonNull(position, "A posição não pode ser nula");
+
+        return squares[position.getRow()][position.getCol()];
+    }
+
+    /**
+     * Verifica se há uma peça na posição especificada, opcionalmente filtrando pela cor.
+     * 
+     * @param position a posição no tabuleiro.
+     * @param color a cor da peça a ser verificada, ou {@code null} para qualquer cor.
+     * @return {@code true} se houver uma peça na posição (e da cor especificada, se fornecida), {@code false} caso contrário.
+      */
+    public boolean hasPieceAt(Position position, Color color) {
+        Objects.requireNonNull(position, "A posição não pode ser nula");
+
+        Piece piece = getPieceAt(position);
+        boolean hasPiece = piece != null;
+
+        if (color == null) {
+            return hasPiece;
+        } 
+        
+        return hasPiece && piece.getColor().equals(color);
+    }
+
+    /**
+     * Verifica se há uma peça na posição especificada.
+     * 
+     * @param position a posição no tabuleiro.
+     * @return {@code true} se houver uma peça na posição, {@code false} caso contrário.
+      */
+    public boolean hasPieceAt(Position position) {
+        Objects.requireNonNull(position, "A posição não pode ser nula");
+        
+        return hasPieceAt(position, null);
+    }
+
+    public BoardState getBoardState() {
+        return boardState;
+    }
+
+    public Color getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public Position getEnPassantTarget() {
+        return enPassantTarget;
+    }
+
+    public boolean canCastleKingSide(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+        
+        return castlingControl.canCastleKingSide(color);
+    }
+
+    public boolean canCastleQueenSide(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
+        return castlingControl.canCastleQueenSide(color);
+    }
+
+    public Position getKingPosition(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
+        return color.isWhite() ? whiteKingPosition : blackKingPosition;
+    }
+
+    public Set<Position> getPiecesPositions(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
+        return Collections.unmodifiableSet(piecesPositionsByColor.get(color));
+    }
+
+    /**
+     * Verifica se o caminho entre duas posições está livre de peças.
+     * Não considera a posição inicial e final.
+     * 
+     * @param from a posição inicial.
+     * @param to a posição final.
+     * @return {@code true} se o caminho estiver livre, {@code false} caso contrário.
+      */
+    public boolean isPathClear(Position from, Position to) {
+        Objects.requireNonNull(from, "A posição inicial não pode ser nula.");
+        Objects.requireNonNull(to, "A posição final não pode ser nula.");
+
+        Direction dir = Direction.get(from, to);
+        if (dir == null) {
+            return false;
+        }
+
+        while (true) {
+            from = from.getNext(dir);
+            if (from.equals(to)) {
+                break;
+            }
+            if (hasPieceAt(from)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Estado: " + boardState.getDescription() + "\n");
+        sb.append("Jogador atual: " + currentPlayer + "\n\n");
+        for (int row = 0; row < 8; row++) {
+            sb.append(row + 1).append("     ");
+            for (int col = 0; col < 8; col++) {
+                Piece piece = squares[row][col];
+                sb.append(piece != null ? piece.getSymbol() : '.');
+                sb.append(' ');
+            }
+            sb.append('\n');
+        }
+        sb.append("\n      a b c d e f g h");
+        return sb.toString();
+    }
+
+}
