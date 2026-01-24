@@ -1,28 +1,41 @@
 package com.chess.entity.board;
 
+import java.util.Objects;
+
 import com.chess.entity.base.Color;
+import com.chess.entity.base.Position;
+import com.chess.entity.game.Move;
+import com.chess.entity.piece.King;
+import com.chess.entity.piece.Piece;
+import com.chess.entity.piece.Rook;
 
 public class CastlingControl {
-    private final boolean whiteKingMoved;
-    private final boolean blackKingMoved;
+    private final Integer whiteKingCol;
+    private final Integer blackKingCol;
 
-    private final boolean whiteKingSideRookMoved;
-    private final boolean whiteQueenSideRookMoved;
+    private final Integer kingSideWhiteRookCol;
+    private final Integer whiteQueenSideRookCol;
 
-    private final boolean blackKingSideRookMoved;
-    private final boolean blackQueenSideRookMoved;
+    private final Integer blackKingSideRookCol;
+    private final Integer blackQueenSideRookCol;
 
-    // Construtor padrão para o início do jogo (todos os direitos intactos)
-    public static final CastlingControl INIT = new CastlingControl(false, false, false, false, false, false);
+    public static final CastlingControl INIT = new CastlingControl(4, 4, 7, 0, 7, 0);
 
-    public CastlingControl(boolean whiteKingMoved, boolean blackKingMoved, boolean whiteKingSideRookMoved, boolean whiteQueenSideRookMoved, boolean blackKingSideRookMoved, boolean blackQueenSideRookMoved) {
-        this.whiteKingMoved = whiteKingMoved;
-        this.blackKingMoved = blackKingMoved;
-        this.whiteKingSideRookMoved = whiteKingSideRookMoved;
-        this.whiteQueenSideRookMoved = whiteQueenSideRookMoved;
-        this.blackKingSideRookMoved = blackKingSideRookMoved;
-        this.blackQueenSideRookMoved = blackQueenSideRookMoved;
+    public CastlingControl(Integer whiteKingCol, Integer blackKingCol, Integer whiteKingSideRookCol, Integer whiteQueenSideRookCol, Integer blackKingSideRookCol, Integer blackQueenSideRookCol) {
+        this.whiteKingCol = whiteKingCol;
+        this.blackKingCol = blackKingCol;
+        this.kingSideWhiteRookCol = whiteKingSideRookCol;
+        this.whiteQueenSideRookCol = whiteQueenSideRookCol;
+        this.blackKingSideRookCol = blackKingSideRookCol;
+        this.blackQueenSideRookCol = blackQueenSideRookCol;
     }
+
+    public Integer getWhiteKingCol() { return whiteKingCol; }
+    public Integer getBlackKingCol() { return blackKingCol; }
+    public Integer getKingSideWhiteRookCol() { return kingSideWhiteRookCol; }
+    public Integer getWhiteQueenSideRookCol() { return whiteQueenSideRookCol; }
+    public Integer getBlackKingSideRookCol() { return blackKingSideRookCol; }
+    public Integer getBlackQueenSideRookCol() { return blackQueenSideRookCol; }
 
     /**
      * Verifica se o jogador da cor especificada pode realizar o roque do lado do rei.
@@ -32,9 +45,9 @@ public class CastlingControl {
       */
     public boolean canCastleKingSide(Color color) {
         if (color.isWhite())
-            return !whiteKingMoved && !whiteKingSideRookMoved;
+            return whiteKingCol != null && kingSideWhiteRookCol != null;
         else 
-            return !blackKingMoved && !blackKingSideRookMoved;
+            return blackKingCol != null && blackKingSideRookCol != null;
     }
 
     /**
@@ -45,80 +58,82 @@ public class CastlingControl {
       */
     public boolean canCastleQueenSide(Color color) {
         if (color.isWhite())
-            return !whiteKingMoved && !whiteQueenSideRookMoved;
+            return whiteKingCol != null && whiteQueenSideRookCol != null;
         else
-            return !blackKingMoved && !blackQueenSideRookMoved;
+            return blackKingCol != null && blackQueenSideRookCol != null;
     }
 
-    /**
-     * Registra o movimento do rei, atualizando os direitos de roque.
-     * 
-     * @param color a cor do jogador que moveu o rei.
-     * @return um novo objeto {@link CastlingControl} com os direitos atualizados.
-      */
-    public CastlingControl kingMoved(Color color) {
-        if (color.isWhite()) {
-            return new CastlingControl(true, blackKingMoved, whiteKingSideRookMoved, whiteQueenSideRookMoved, blackKingSideRookMoved, blackQueenSideRookMoved);
-        } else {
-            return new CastlingControl(whiteKingMoved, true, whiteKingSideRookMoved, whiteQueenSideRookMoved, blackKingSideRookMoved, blackQueenSideRookMoved);
+    public CastlingControl update(Move move) {
+        Integer nWhiteKingCol = this.whiteKingCol;
+        Integer nBlackKingCol = this.blackKingCol;
+        Integer nSameWhiteKingSideRookCol = this.kingSideWhiteRookCol;
+        Integer nSameWhiteQueenSideRookCol = this.whiteQueenSideRookCol;
+        Integer nSameBlackKingSideRookCol = this.blackKingSideRookCol;
+        Integer nSameBlackQueenSideRookCol = this.blackQueenSideRookCol;
+
+        Piece movedPiece = move.getMovedPiece();
+        Position from = move.getFrom();
+        Position to = move.getTo();
+
+        // 1. Lógica de Movimento (Rei ou Torre moveu)
+        if (movedPiece instanceof King) {
+            if (movedPiece.getColor().isWhite()) {
+                nWhiteKingCol = null;
+            } else {
+                nBlackKingCol = null;
+            }
+        } else if (movedPiece instanceof Rook) {
+            if (movedPiece.getColor().isWhite()) {
+                if (matches(from, 7, nSameWhiteKingSideRookCol)) nSameWhiteKingSideRookCol = null;
+                else if (matches(from, 7, nSameWhiteQueenSideRookCol)) nSameWhiteQueenSideRookCol = null;
+            } else {
+                if (matches(from, 0, nSameBlackKingSideRookCol)) nSameBlackKingSideRookCol = null;
+                else if (matches(from, 0, nSameBlackQueenSideRookCol)) nSameBlackQueenSideRookCol = null;
+            }
         }
+
+        // 2. Lógica de Captura (Torre capturada no local de origem)
+        // Se a posição de destino de qualquer movimento for a casa de uma torre rastreada, o direito é perdido.
+        
+        // Verifica Torres Brancas (linha 7)
+        if (matches(to, 7, nSameWhiteKingSideRookCol)) nSameWhiteKingSideRookCol = null;
+        if (matches(to, 7, nSameWhiteQueenSideRookCol)) nSameWhiteQueenSideRookCol = null;
+
+        // Verifica Torres Pretas (linha 0)
+        if (matches(to, 0, nSameBlackKingSideRookCol)) nSameBlackKingSideRookCol = null;
+        if (matches(to, 0, nSameBlackQueenSideRookCol)) nSameBlackQueenSideRookCol = null;
+
+        return new CastlingControl(nWhiteKingCol, nBlackKingCol, nSameWhiteKingSideRookCol, nSameWhiteQueenSideRookCol, nSameBlackKingSideRookCol, nSameBlackQueenSideRookCol);
     }
 
-    /**
-     * Registra o movimento da torre na ala do rei, atualizando os direitos de roque.
-     * 
-     * @param color a cor do jogador que moveu a torre na ala do rei.
-     * @return um novo objeto {@link CastlingControl} com os direitos atualizados.
-      */
-    public CastlingControl kingSideRookMoved(Color color) {
-        if (color.isWhite()) {
-            return new CastlingControl(whiteKingMoved, blackKingMoved, true, whiteQueenSideRookMoved, blackKingSideRookMoved, blackQueenSideRookMoved);
-        } else {
-            return new CastlingControl(whiteKingMoved, blackKingMoved, whiteKingSideRookMoved, whiteQueenSideRookMoved, true, blackQueenSideRookMoved);
-        }
+    private boolean matches(Position pos, int row, Integer col) {
+        return col != null && pos.getRow() == row && pos.getCol() == col;
     }
 
-    /**
-     * Registra o movimento da torre na ala da dama, atualizando os direitos de roque.
-     * 
-     * @param color a cor do jogador que moveu a torre na ala da dama.
-     * @return um novo objeto {@link CastlingControl} com os direitos atualizados.
-      */
-    public CastlingControl queenSideRookMoved(Color color) {
-        if (color.isWhite()) {
-            return new CastlingControl(whiteKingMoved, blackKingMoved, whiteKingSideRookMoved, true, blackKingSideRookMoved, blackQueenSideRookMoved);
-        } else {
-            return new CastlingControl(whiteKingMoved, blackKingMoved, whiteKingSideRookMoved, whiteQueenSideRookMoved, blackKingSideRookMoved, true);
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CastlingControl that = (CastlingControl) o;
+        return Objects.equals(whiteKingCol, that.whiteKingCol) &&
+                Objects.equals(blackKingCol, that.blackKingCol) &&
+                Objects.equals(kingSideWhiteRookCol, that.kingSideWhiteRookCol) &&
+                Objects.equals(whiteQueenSideRookCol, that.whiteQueenSideRookCol) &&
+                Objects.equals(blackKingSideRookCol, that.blackKingSideRookCol) &&
+                Objects.equals(blackQueenSideRookCol, that.blackQueenSideRookCol);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(whiteKingMoved, blackKingMoved, whiteKingSideRookMoved, whiteQueenSideRookMoved, blackKingSideRookMoved, blackQueenSideRookMoved);
+        return Objects.hash(whiteKingCol, blackKingCol, kingSideWhiteRookCol, whiteQueenSideRookCol, blackKingSideRookCol, blackQueenSideRookCol);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CastlingControl other = (CastlingControl) obj;
-        if (whiteKingMoved != other.whiteKingMoved)
-            return false;
-        if (blackKingMoved != other.blackKingMoved)
-            return false;
-        if (whiteKingSideRookMoved != other.whiteKingSideRookMoved)
-            return false;
-        if (whiteQueenSideRookMoved != other.whiteQueenSideRookMoved)
-            return false;
-        if (blackKingSideRookMoved != other.blackKingSideRookMoved)
-            return false;
-        if (blackQueenSideRookMoved != other.blackQueenSideRookMoved)
-            return false;
-        return true;
+    public String toString() {
+        return "CastlingControl{" +
+                "WK=" + whiteKingCol + ", BK=" + blackKingCol +
+                ", WKR=" + kingSideWhiteRookCol + ", WQR=" + whiteQueenSideRookCol +
+                ", BKR=" + blackKingSideRookCol + ", BQR=" + blackQueenSideRookCol +
+                '}';
     }
-
 }
