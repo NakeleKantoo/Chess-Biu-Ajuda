@@ -44,6 +44,17 @@ public class BoardBuilder {
         piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
     }
 
+    public BoardBuilder(Board board) {
+        this.squares = board.getSquares();
+        this.boardState = board.getBoardState();
+        this.currentPlayer = board.getCurrentPlayer();
+        this.enPassantTarget = board.getEnPassantTarget();
+        this.castlingControl = board.getCastlingControl();
+        this.whiteKingPosition = board.getKingPosition(Color.WHITE);
+        this.blackKingPosition = board.getKingPosition(Color.BLACK);
+        this.piecesPositionsByColor = board.getPiecesPositionsByColor();
+    }
+
     public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
     public BoardState getBoardState() { return boardState; }
     public Color getCurrentPlayer() { return currentPlayer; }
@@ -52,6 +63,11 @@ public class BoardBuilder {
     public Position getWhiteKingPosition() { return whiteKingPosition; }
     public Position getBlackKingPosition() { return blackKingPosition; }
     public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+
+    public void setBoardState(BoardState boardState) { this.boardState = boardState; }
+    public void setCurrentPlayer(Color currentPlayer) { this.currentPlayer = currentPlayer; }
+    public void setEnPassantTarget(Position enPassantTarget) { this.enPassantTarget = enPassantTarget; }
+    public void setCastlingControl(CastlingControl castlingControl) { this.castlingControl = castlingControl; }
 
     /**
      * Configura o tabuleiro com a disposição padrão das peças.
@@ -183,7 +199,5 @@ public class BoardBuilder {
             }
         }
     }
-
-
 
 }

@@ -9,6 +9,7 @@ import com.chess.entity.base.Color;
 import com.chess.entity.base.Direction;
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.Piece;
+import com.chess.utils.CloneUtils;
 
 public class Board {
 
@@ -89,17 +90,12 @@ public class Board {
         return hasPieceAt(position, null);
     }
 
-    public BoardState getBoardState() {
-        return boardState;
-    }
-
-    public Color getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public Position getEnPassantTarget() {
-        return enPassantTarget;
-    }
+    public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
+    public BoardState getBoardState() { return boardState; }
+    public Color getCurrentPlayer() { return currentPlayer; }
+    public Position getEnPassantTarget() { return enPassantTarget; }
+    public CastlingControl getCastlingControl() { return castlingControl; }
+    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
 
     public boolean canCastleKingSide(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
