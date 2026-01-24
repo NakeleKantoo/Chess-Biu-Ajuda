@@ -7,7 +7,9 @@ import java.util.Set;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
+import com.chess.entity.piece.King;
 import com.chess.entity.piece.Piece;
+import com.chess.utils.CloneUtils;
 
 public class BoardBuilder {
     
@@ -42,45 +44,14 @@ public class BoardBuilder {
         piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
     }
 
-    public Piece[][] getSquares() {
-        Piece[][] clonedSquares = new Piece[8][];
-        for (int row = 0; row < 8; row++) {
-            clonedSquares[row] = squares[row].clone();
-        }
-        return clonedSquares;
-    }
-
-    public BoardState getBoardState() {
-        return boardState;
-    }
-
-    public Color getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public Position getEnPassantTarget() {
-        return enPassantTarget;
-    }
-
-    public CastlingControl getCastlingControl() {
-        return castlingControl;
-    }
-
-    public Position getWhiteKingPosition() {
-        return whiteKingPosition;
-    }
-
-    public Position getBlackKingPosition() {
-        return blackKingPosition;
-    }
-
-    public Map<Color, Set<Position>> getPiecesPositionsByColor() {
-        Map<Color, Set<Position>> clonedMap = new HashMap<>();
-        for (Map.Entry<Color, Set<Position>> entry : piecesPositionsByColor.entrySet()) {
-            clonedMap.put(entry.getKey(), new HashSet<>(entry.getValue()));
-        }
-        return clonedMap;
-    }
+    public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
+    public BoardState getBoardState() { return boardState; }
+    public Color getCurrentPlayer() { return currentPlayer; }
+    public Position getEnPassantTarget() { return enPassantTarget; }
+    public CastlingControl getCastlingControl() { return castlingControl; }
+    public Position getWhiteKingPosition() { return whiteKingPosition; }
+    public Position getBlackKingPosition() { return blackKingPosition; }
+    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
 
     /**
      * Configura o tabuleiro com a disposição padrão das peças.
@@ -89,6 +60,10 @@ public class BoardBuilder {
       */
     public Board buildStandard() {
         char[] linePieces = standardLinePieces;
+        squares = new Piece[8][8];
+        piecesPositionsByColor = new HashMap<>();
+        piecesPositionsByColor.put(Color.WHITE, new HashSet<>());
+        piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
 
         setRowPieces(Color.WHITE, 7, linePieces);
         setRowPawns(Color.WHITE, 6);
@@ -99,13 +74,54 @@ public class BoardBuilder {
         this.currentPlayer = Color.WHITE;
         this.enPassantTarget = null;
         this.castlingControl = CastlingControl.INIT;
-        this.whiteKingPosition = Position.at(7, 4);
-        this.blackKingPosition = Position.at(0, 4);
 
         return new Board(this);
     }
 
-    private void setRowPieces(Color color, int row, char[] linePieces) {
+    public Board build() {
+        if (boardState == null) {
+            throw new IllegalStateException("O estado do tabuleiro não foi definido.");
+        }
+        if (currentPlayer == null) {
+            throw new IllegalStateException("O jogador atual não foi definido.");
+        }
+        if (castlingControl == null) {
+            throw new IllegalStateException("O controle de roque não foi definido.");
+        }
+        if (whiteKingPosition == null) {
+            throw new IllegalStateException("A posição do rei branco não foi definida.");
+        }
+        if (blackKingPosition == null) {
+            throw new IllegalStateException("A posição do rei preto não foi definida.");
+        }
+        if (whiteKingPosition.isNear(blackKingPosition)) {
+            throw new IllegalStateException("Os reis não podem estar em posições adjacentes.");
+        }
+        if (hasMoreKings(Color.WHITE)) {
+            throw new IllegalStateException("Mais de um rei branco encontrado.");
+        }
+        if (hasMoreKings(Color.BLACK)) {
+            throw new IllegalStateException("Mais de um rei preto encontrado.");
+        }
+        return new Board(this);
+    }
+
+    private boolean hasMoreKings(Color color) {
+        Set<Position> positions = piecesPositionsByColor.get(color);
+        boolean hasKing = false;
+        for (Position position : positions) {
+            Piece piece = squares[position.getRow()][position.getCol()];
+            if (piece instanceof King) {
+                if (hasKing) {
+                    return true;
+                }
+                hasKing = true;
+            }
+        }
+        return false;
+    }
+
+    public void setRowPieces(Color color, int row, char[] linePieces) {
         for (int col = 0; col < 8; col++) {
             char pieceChar = linePieces[col];
             pieceChar = color.isWhite() ? Character.toUpperCase(pieceChar) : Character.toLowerCase(pieceChar);
@@ -117,7 +133,7 @@ public class BoardBuilder {
         }
     }
 
-    private void setRowPawns(Color color, int row) {
+    public void setRowPawns(Color color, int row) {
         for (int col = 0; col < 8; col++) {
             char pawnChar = color.isWhite() ? 'P' : 'p';
             
@@ -128,7 +144,7 @@ public class BoardBuilder {
         }
     }
 
-    private void placePiece(Piece piece, Position position) {
+    public void placePiece(Piece piece, Position position) {
         int row = position.getRow();
         int col = position.getCol();
 
@@ -150,7 +166,7 @@ public class BoardBuilder {
         }
     }
 
-    private void removePiece(Position position) {
+    public void removePiece(Position position) {
         int row = position.getRow();
         int col = position.getCol();
 
@@ -158,7 +174,16 @@ public class BoardBuilder {
         if (existingPiece != null) {
             piecesPositionsByColor.get(existingPiece.getColor()).remove(position);
             squares[row][col] = null;
+            if (existingPiece instanceof King) {
+                if (existingPiece.getColor().isWhite()) {
+                    if (position.equals(whiteKingPosition)) whiteKingPosition = null;
+                } else {
+                    if (position.equals(blackKingPosition)) blackKingPosition = null;
+                }
+            }
         }
     }
+
+
 
 }
