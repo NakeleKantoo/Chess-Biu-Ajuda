@@ -57,8 +57,13 @@ public class Move {
     public boolean isCheckmate() { return isCheckmate; }
     public boolean isStalemate() { return isStalemate; }
 
-    @Override
-    public String toString() {
+    /**
+     * Converte o movimento para a notação algébrica padrão do xadrez.
+     * Exemplo: e4, Nf3, O-O, etc.
+     * 
+     * @return a notação algébrica do movimento.
+      */
+    public String toAlgebraicNotation() {
         StringBuilder notation = new StringBuilder();
 
         // Notação para Roque
@@ -113,6 +118,22 @@ public class Move {
         } else if (isCheck) {
             notation.append('+');
         }
+
+        return notation.toString();
+    }
+
+    /**
+     * Converte o movimento para uma notação baseada nas posições de origem e destino.
+     * Exemplo: e2-e4, d7-d5, etc.
+     * 
+     * @return a notação baseada nas posições de origem e destino do movimento.
+      */
+    public String toPositionNotation() {
+        StringBuilder notation = new StringBuilder();
+
+        notation.append(from.toString());
+        notation.append("-");
+        notation.append(to.toString());
 
         return notation.toString();
     }

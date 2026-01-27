@@ -1,5 +1,6 @@
 package com.chess.entity.base;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,8 @@ public class Position {
      * @throws IllegalArgumentException se a notação for nula, vazia ou inválida.
      */
     public static Position at(String string) {
-        if (string == null || string.trim().isEmpty()) {
+        Objects.requireNonNull(string, "Notação de posição não pode ser nula.");
+        if (string.trim().isEmpty()) {
             throw new IllegalArgumentException("Notação de posição não pode ser nula ou vazia.");
         }
 
@@ -97,9 +99,7 @@ public class Position {
      * @return {@code Position} se for possível andar na direção, {@code null} se não
       */
     public Position getNext(Direction direction) {
-        if (direction == null) {
-            throw new IllegalArgumentException("Direção não pode ser nula.");
-        }
+        Objects.requireNonNull(direction, "A direção não pode ser nula.");
 
         // Soma os valores do vetor com as coordenadas da posição
         int row = this.getRow() + direction.getX();

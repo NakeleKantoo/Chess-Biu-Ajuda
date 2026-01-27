@@ -3,11 +3,14 @@ package com.chess.entity.board;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
+import com.chess.entity.piece.King;
 import com.chess.entity.piece.Piece;
+import com.chess.utils.CloneUtils;
 
 public class BoardBuilder {
     
@@ -33,6 +36,12 @@ public class BoardBuilder {
     // Mapeamento das posições das peças por cor.
     private Map<Color, Set<Position>> piecesPositionsByColor;
 
+    // Número do movimento (incrementado após a jogada das pretas).
+    private int fullMoveClock;
+
+    // Contador de meio-movimentos (para a regra dos 50 movimentos).
+    private int halfMoveClock;
+
     public static final char[] standardLinePieces = {'T', 'C', 'B', 'D', 'R', 'B', 'C', 'T'};
 
     public BoardBuilder() {
@@ -40,47 +49,45 @@ public class BoardBuilder {
         this.piecesPositionsByColor = new HashMap<>();
         piecesPositionsByColor.put(Color.WHITE, new HashSet<>());
         piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
+        this.fullMoveClock = 1;
+        this.halfMoveClock = 0;
     }
 
-    public Piece[][] getSquares() {
-        Piece[][] clonedSquares = new Piece[8][];
-        for (int row = 0; row < 8; row++) {
-            clonedSquares[row] = squares[row].clone();
-        }
-        return clonedSquares;
+    public BoardBuilder(Board board) {
+        this.squares = board.getSquares();
+        this.boardState = board.getBoardState();
+        this.currentPlayer = board.getCurrentPlayer();
+        this.enPassantTarget = board.getEnPassantTarget();
+        this.castlingControl = board.getCastlingControl();
+        this.whiteKingPosition = board.getKingPosition(Color.WHITE);
+        this.blackKingPosition = board.getKingPosition(Color.BLACK);
+        this.piecesPositionsByColor = board.getPiecesPositionsByColor();
+        this.fullMoveClock = board.getFullMoveClock();
+        this.halfMoveClock = board.getHalfMoveClock();
     }
 
-    public BoardState getBoardState() {
-        return boardState;
-    }
+    public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
+    public Piece getPieceAt(Position position) { return squares[position.getRow()][position.getCol()]; }
+    public BoardState getBoardState() { return boardState; }
+    public Color getCurrentPlayer() { return currentPlayer; }
+    public Position getEnPassantTarget() { return enPassantTarget; }
+    public CastlingControl getCastlingControl() { return castlingControl; }
+    public Position getWhiteKingPosition() { return whiteKingPosition; }
+    public Position getBlackKingPosition() { return blackKingPosition; }
+    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+    public int getFullMoveClock() { return fullMoveClock; }
+    public int getHalfMoveClock() { return halfMoveClock; }
 
-    public Color getCurrentPlayer() {
-        return currentPlayer;
-    }
+    public void setBoardState(BoardState boardState) { this.boardState = boardState; }
+    public void setCurrentPlayer(Color currentPlayer) { this.currentPlayer = currentPlayer; }
+    public void setEnPassantTarget(Position enPassantTarget) { this.enPassantTarget = enPassantTarget; }
+    public void setCastlingControl(CastlingControl castlingControl) { this.castlingControl = castlingControl; }
+    public void setFullMoveClock(int fullMoveClock) { this.fullMoveClock = fullMoveClock; }
+    public void setHalfMoveClock(int halfMoveClock) { this.halfMoveClock = halfMoveClock; }
 
-    public Position getEnPassantTarget() {
-        return enPassantTarget;
-    }
-
-    public CastlingControl getCastlingControl() {
-        return castlingControl;
-    }
-
-    public Position getWhiteKingPosition() {
-        return whiteKingPosition;
-    }
-
-    public Position getBlackKingPosition() {
-        return blackKingPosition;
-    }
-
-    public Map<Color, Set<Position>> getPiecesPositionsByColor() {
-        Map<Color, Set<Position>> clonedMap = new HashMap<>();
-        for (Map.Entry<Color, Set<Position>> entry : piecesPositionsByColor.entrySet()) {
-            clonedMap.put(entry.getKey(), new HashSet<>(entry.getValue()));
-        }
-        return clonedMap;
-    }
+    public void incrementFullMoveClock() { this.fullMoveClock++; }
+    public void incrementHalfMoveClock() { this.halfMoveClock++; }
+    public void resetHalfMoveClock() { this.halfMoveClock = 0; }
 
     /**
      * Configura o tabuleiro com a disposição padrão das peças.
@@ -89,6 +96,10 @@ public class BoardBuilder {
       */
     public Board buildStandard() {
         char[] linePieces = standardLinePieces;
+        squares = new Piece[8][8];
+        piecesPositionsByColor = new HashMap<>();
+        piecesPositionsByColor.put(Color.WHITE, new HashSet<>());
+        piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
 
         setRowPieces(Color.WHITE, 7, linePieces);
         setRowPawns(Color.WHITE, 6);
@@ -99,13 +110,87 @@ public class BoardBuilder {
         this.currentPlayer = Color.WHITE;
         this.enPassantTarget = null;
         this.castlingControl = CastlingControl.INIT;
-        this.whiteKingPosition = Position.at(7, 4);
-        this.blackKingPosition = Position.at(0, 4);
+        this.fullMoveClock = 1;
+        this.halfMoveClock = 0;
 
         return new Board(this);
     }
 
-    private void setRowPieces(Color color, int row, char[] linePieces) {
+    /**
+     * Constrói um objeto {@code Board} com base no estado atual do construtor.
+     * Verifica se o estado do tabuleiro é válido antes de construir o objeto.
+     * 
+     * @return um objeto {@code Board} representando o tabuleiro configurado.
+     * @throws IllegalStateException se o estado do tabuleiro for inválido.
+      */
+    public Board build() {
+        if (boardState == null) {
+            throw new IllegalStateException("O estado do tabuleiro não foi definido.");
+        }
+        if (currentPlayer == null) {
+            throw new IllegalStateException("O jogador atual não foi definido.");
+        }
+        if (castlingControl == null) {
+            throw new IllegalStateException("O controle de roque não foi definido.");
+        }
+        if (whiteKingPosition == null) {
+            throw new IllegalStateException("A posição do rei branco não foi definida.");
+        }
+        if (blackKingPosition == null) {
+            throw new IllegalStateException("A posição do rei preto não foi definida.");
+        }
+        if (whiteKingPosition.isNear(blackKingPosition)) {
+            throw new IllegalStateException("Os reis não podem estar em posições adjacentes.");
+        }
+        if (hasMoreKings(Color.WHITE)) {
+            throw new IllegalStateException("Mais de um rei branco encontrado.");
+        }
+        if (hasMoreKings(Color.BLACK)) {
+            throw new IllegalStateException("Mais de um rei preto encontrado.");
+        }
+        if (fullMoveClock <= 0) {
+            throw new IllegalStateException("O número do movimento deve ser maior que zero.");
+        }
+        if (halfMoveClock < 0) {
+            throw new IllegalStateException("O contador de meio-movimentos não pode ser negativo.");
+        }
+        return new Board(this);
+    }
+
+    private boolean hasMoreKings(Color color) {
+        Set<Position> positions = piecesPositionsByColor.get(color);
+        boolean hasKing = false;
+        for (Position position : positions) {
+            Piece piece = squares[position.getRow()][position.getCol()];
+            if (piece instanceof King) {
+                if (hasKing) {
+                    return true;
+                }
+                hasKing = true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Configura uma linha do tabuleiro com as peças especificadas.
+     * 
+     * @param color a cor das peças a serem colocadas.
+     * @param row a linha do tabuleiro onde as peças serão colocadas.
+     * @param linePieces um array de caracteres representando as peças na linha.
+      */
+    public void setRowPieces(Color color, int row, char[] linePieces) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+        Objects.requireNonNull(linePieces, "As peças da linha não podem ser nulas.");
+
+        if (row < 0 || row > 7) {
+            throw new IllegalArgumentException("A linha deve estar entre 0 e 7.");
+        }
+        if (linePieces.length != 8) {
+            throw new IllegalArgumentException("O array de peças da linha deve ter exatamente 8 elementos.");
+        }
+
+
         for (int col = 0; col < 8; col++) {
             char pieceChar = linePieces[col];
             pieceChar = color.isWhite() ? Character.toUpperCase(pieceChar) : Character.toLowerCase(pieceChar);
@@ -117,7 +202,19 @@ public class BoardBuilder {
         }
     }
 
-    private void setRowPawns(Color color, int row) {
+    /**
+     * Configura uma linha do tabuleiro com peões da cor especificada.
+     * 
+     * @param color a cor dos peões a serem colocados.
+     * @param row a linha do tabuleiro onde os peões serão colocados.
+      */
+    public void setRowPawns(Color color, int row) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+        
+        if (row < 0 || row > 7) {
+            throw new IllegalArgumentException("A linha deve estar entre 0 e 7.");
+        }
+
         for (int col = 0; col < 8; col++) {
             char pawnChar = color.isWhite() ? 'P' : 'p';
             
@@ -128,7 +225,19 @@ public class BoardBuilder {
         }
     }
 
-    private void placePiece(Piece piece, Position position) {
+    /**
+     * Coloca uma peça na posição especificada no tabuleiro.
+     * Não remove a peça da posição anterior, se aplicável.
+     * Remove a peça existente na posição de destino, se houver.
+     * Atualiza os estados relacionados, como a posição do rei e o mapeamento das posições das peças por cor.
+     * 
+     * @param piece a peça a ser colocada.
+     * @param position a posição onde a peça será colocada.
+      */
+    public void placePiece(Piece piece, Position position) {
+        Objects.requireNonNull(piece, "A peça não pode ser nula.");
+        Objects.requireNonNull(position, "A posição não pode ser nula.");
+
         int row = position.getRow();
         int col = position.getCol();
 
@@ -150,7 +259,15 @@ public class BoardBuilder {
         }
     }
 
-    private void removePiece(Position position) {
+    /**
+     * Remove a peça da posição especificada no tabuleiro.
+     * Atualiza os estados relacionados, como a posição do rei e o mapeamento das posições das peças por cor.
+     * 
+     * @param position a posição da peça a ser removida.
+      */
+    public void removePiece(Position position) {
+        Objects.requireNonNull(position, "A posição não pode ser nula.");
+
         int row = position.getRow();
         int col = position.getCol();
 
@@ -158,6 +275,13 @@ public class BoardBuilder {
         if (existingPiece != null) {
             piecesPositionsByColor.get(existingPiece.getColor()).remove(position);
             squares[row][col] = null;
+            if (existingPiece instanceof King) {
+                if (existingPiece.getColor().isWhite()) {
+                    if (position.equals(whiteKingPosition)) whiteKingPosition = null;
+                } else {
+                    if (position.equals(blackKingPosition)) blackKingPosition = null;
+                }
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import com.chess.entity.base.Color;
 import com.chess.entity.base.Direction;
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.Piece;
+import com.chess.utils.CloneUtils;
 
 public class Board {
 
@@ -34,6 +35,12 @@ public class Board {
     // Mapeamento das posições das peças por cor.
     private final Map<Color, Set<Position>> piecesPositionsByColor;
 
+    // Número do movimento (incrementado após a jogada das pretas).
+    private final int fullMoveClock;
+
+    // Contador de meio-movimentos (para a regra dos 50 movimentos).
+    private final int halfMoveClock;
+
     protected Board(BoardBuilder builder) {
         this.squares = builder.getSquares();
         this.boardState = builder.getBoardState();
@@ -43,6 +50,8 @@ public class Board {
         this.whiteKingPosition = builder.getWhiteKingPosition();
         this.blackKingPosition = builder.getBlackKingPosition();
         this.piecesPositionsByColor = builder.getPiecesPositionsByColor();
+        this.fullMoveClock = builder.getFullMoveClock();
+        this.halfMoveClock = builder.getHalfMoveClock();
     }
 
     /**
@@ -84,22 +93,17 @@ public class Board {
      * @return {@code true} se houver uma peça na posição, {@code false} caso contrário.
       */
     public boolean hasPieceAt(Position position) {
-        Objects.requireNonNull(position, "A posição não pode ser nula");
-        
         return hasPieceAt(position, null);
     }
 
-    public BoardState getBoardState() {
-        return boardState;
-    }
-
-    public Color getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public Position getEnPassantTarget() {
-        return enPassantTarget;
-    }
+    public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
+    public BoardState getBoardState() { return boardState; }
+    public Color getCurrentPlayer() { return currentPlayer; }
+    public Position getEnPassantTarget() { return enPassantTarget; }
+    public CastlingControl getCastlingControl() { return castlingControl; }
+    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+    public int getFullMoveClock() { return fullMoveClock; }
+    public int getHalfMoveClock() { return halfMoveClock; }
 
     public boolean canCastleKingSide(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
