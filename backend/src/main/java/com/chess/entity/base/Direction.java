@@ -1,5 +1,7 @@
 package com.chess.entity.base;
 
+import java.util.Objects;
+
 public class Direction {
     // Valores do vetor direção
     private final int x;
@@ -60,9 +62,8 @@ public class Direction {
      * @throws IllegalArgumentException se as posições de origem ou destino forem nulas.
      */
     public static Direction get(Position from, Position to) {
-        if (from == null || to == null) {
-            throw new IllegalArgumentException("Posições de origem e destino não podem ser nulas.");
-        }
+        Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
+        Objects.requireNonNull(to, "A posição de destino não pode ser nula.");
         
         if (from.equals(to)) {
             return null; // Não há direção se as posições são as mesmas.

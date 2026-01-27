@@ -1,5 +1,7 @@
 package com.chess.entity.game;
 
+import java.util.Objects;
+
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Pawn;
@@ -28,70 +30,125 @@ public class MoveBuilder {
     private boolean isStalemate;
 
     public MoveBuilder(Position from, Position to, Piece movedPiece) {
-        if (from == null || to == null || movedPiece == null) {
-            throw new IllegalArgumentException("Posições e peça movida não podem ser nulas.");
-        }
+        Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
+        Objects.requireNonNull(to, "A posição de destino não pode ser nula.");
+        Objects.requireNonNull(movedPiece, "A peça movida não pode ser nula.");
+
         this.from = from;
         this.to = to;
         this.movedPiece = movedPiece;
     }
 
+    /**
+     * Define a peça capturada no movimento.
+     * 
+     * @param capturedPiece a peça capturada.
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder capturedPiece(Piece capturedPiece) {
-        if (capturedPiece == null) {
-            throw new IllegalArgumentException("Peça capturada não pode ser nula.");
-        }
+        Objects.requireNonNull(capturedPiece, "Peça capturada não pode ser nula.");
+
         this.capturedPiece = capturedPiece;
+
         return this;
     }
 
+    /**
+     * Define a peça de promoção no movimento.
+     * 
+     * @param promotionPiece a peça para a qual o peão será promovido.
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder promotionPiece(Piece promotionPiece) {
-        if (promotionPiece == null) {
-            throw new IllegalArgumentException("Peça de promoção não pode ser nula.");
-        }
+        Objects.requireNonNull(promotionPiece, "Peça de promoção não pode ser nula.");
+
         this.promotionPiece = promotionPiece;
+
         return this;
     }
 
+    /**
+     * Define que o movimento é um roque.
+     * 
+     * @param rookFrom a posição da torre no roque.
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder castling(Position rookFrom) {
-        if (rookFrom == null) {
-            throw new IllegalArgumentException("Posições do roque não podem ser nulas.");
-        }
+        Objects.requireNonNull(rookFrom, "Posição da torre no roque não pode ser nula.");
+
         this.isCastling = true;
         this.rookFrom = rookFrom;
+
         return this;
     }
 
+    /**
+     * Define que o movimento é um en passant.
+     * 
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder enPassant() {
         this.isEnPassant = true;
         return this;
     }
 
+    /**
+     * Define que o movimento necessita de desambiguação pela coluna.
+     * 
+     * @return o próprio construtor para encadeamento de chamadas.
+     */
     public MoveBuilder needColDesambiguation() {
         this.needColDesambiguation = true;
         return this;
     }
 
+    /**
+     * Define que o movimento necessita de desambiguação pela linha.
+     * 
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder needRowDesambiguation() {
         this.needRowDesambiguation = true;
         return this;
     }
 
+    /**
+     * Define que o movimento resulta em xeque.
+     * 
+     * @return o próprio construtor para encadeamento de chamadas.
+     */
     public MoveBuilder check() {
         this.isCheck = true;
         return this;
     }
 
+    /**
+     * Define que o movimento resulta em xeque-mate.
+     * 
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder checkmate() {
         this.isCheckmate = true;
         this.isCheck = true; // Xeque-mate implica xeque
         return this;
     }
 
+    /**
+     * Define que o movimento resulta em empate.
+     * 
+     * @return o próprio construtor para encadeamento de chamadas.
+      */
     public MoveBuilder stalemate() {
         this.isStalemate = true;
         return this;
     }
 
+    /**
+     * Constrói o objeto Move com as configurações definidas.
+     * Valida a consistência interna antes de criar o objeto.
+     * 
+     * @return o objeto {@code Move} construído.
+      */
     public Move build() {
         // Validações de consistência interna
         if (from.equals(to)) {

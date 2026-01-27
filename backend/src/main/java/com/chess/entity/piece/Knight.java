@@ -2,6 +2,7 @@ package com.chess.entity.piece;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.chess.entity.base.*;
 import com.chess.entity.board.Board;
@@ -24,9 +25,9 @@ public class Knight extends Piece {
 
     @Override
     public boolean isAttacking(Board board, Position from, Position to) {
-        if (board == null || from == null || to == null) {
-            throw new IllegalArgumentException("Parâmetros não podem ser nulos");
-        }
+        Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
+        Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
+        Objects.requireNonNull(to, "A posição de destino não pode ser nula.");
 
         // Cálculo dos deslocamentos
         int deltaX = from.getCol() - to.getCol();
@@ -43,9 +44,8 @@ public class Knight extends Piece {
 
     @Override
     public List<Position> getPossibleMoves(Board board, Position from) {
-        if (board == null || from == null) {
-            throw new IllegalArgumentException("Parâmetros não podem ser nulos");
-        }
+        Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
+        Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
 
         List<Position> moves = new ArrayList<>();
 

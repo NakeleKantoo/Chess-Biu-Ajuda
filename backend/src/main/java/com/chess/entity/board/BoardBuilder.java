@@ -3,6 +3,7 @@ package com.chess.entity.board;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.chess.entity.base.Color;
@@ -179,6 +180,17 @@ public class BoardBuilder {
      * @param linePieces um array de caracteres representando as peças na linha.
       */
     public void setRowPieces(Color color, int row, char[] linePieces) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+        Objects.requireNonNull(linePieces, "As peças da linha não podem ser nulas.");
+
+        if (row < 0 || row > 7) {
+            throw new IllegalArgumentException("A linha deve estar entre 0 e 7.");
+        }
+        if (linePieces.length != 8) {
+            throw new IllegalArgumentException("O array de peças da linha deve ter exatamente 8 elementos.");
+        }
+
+
         for (int col = 0; col < 8; col++) {
             char pieceChar = linePieces[col];
             pieceChar = color.isWhite() ? Character.toUpperCase(pieceChar) : Character.toLowerCase(pieceChar);
@@ -197,6 +209,12 @@ public class BoardBuilder {
      * @param row a linha do tabuleiro onde os peões serão colocados.
       */
     public void setRowPawns(Color color, int row) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+        
+        if (row < 0 || row > 7) {
+            throw new IllegalArgumentException("A linha deve estar entre 0 e 7.");
+        }
+
         for (int col = 0; col < 8; col++) {
             char pawnChar = color.isWhite() ? 'P' : 'p';
             
@@ -217,6 +235,9 @@ public class BoardBuilder {
      * @param position a posição onde a peça será colocada.
       */
     public void placePiece(Piece piece, Position position) {
+        Objects.requireNonNull(piece, "A peça não pode ser nula.");
+        Objects.requireNonNull(position, "A posição não pode ser nula.");
+
         int row = position.getRow();
         int col = position.getCol();
 
@@ -245,6 +266,8 @@ public class BoardBuilder {
      * @param position a posição da peça a ser removida.
       */
     public void removePiece(Position position) {
+        Objects.requireNonNull(position, "A posição não pode ser nula.");
+
         int row = position.getRow();
         int col = position.getCol();
 

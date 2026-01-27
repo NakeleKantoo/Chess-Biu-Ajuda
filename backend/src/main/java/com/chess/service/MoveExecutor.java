@@ -1,5 +1,7 @@
 package com.chess.service;
 
+import java.util.Objects;
+
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
@@ -14,7 +16,17 @@ public class MoveExecutor {
 
     BoardBuilder builder;
 
+    /**
+     * Executa um movimento no tabuleiro fornecido e retorna o novo estado do tabuleiro após o movimento.
+     * 
+     * @param board O tabuleiro atual.
+     * @param move O movimento a ser executado.
+     * @return O novo estado do tabuleiro após a execução do movimento.
+      */
     public Board executeMove(Board board, Move move) {
+        Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
+        Objects.requireNonNull(move, "O movimento não pode ser nulo.");
+        
         this.builder = new BoardBuilder(board);
 
         movePiece(move.getFrom(), move.getTo());

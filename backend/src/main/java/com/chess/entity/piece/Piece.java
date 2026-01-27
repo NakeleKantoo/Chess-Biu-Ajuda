@@ -1,6 +1,7 @@
 package com.chess.entity.piece;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.chess.entity.base.*;
 import com.chess.entity.board.Board;
@@ -31,6 +32,8 @@ public abstract class Piece {
      * @throws IllegalArgumentException Se o símbolo for inválido.
       */
     public static Piece create(char symbol) {
+        Objects.requireNonNull(symbol, "O símbolo da peça não pode ser nulo.");
+
         Color color = Character.isUpperCase(symbol) ? Color.WHITE : Color.BLACK;
         switch (Character.toUpperCase(symbol)) {
             case 'P':

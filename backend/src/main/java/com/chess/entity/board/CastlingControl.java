@@ -44,6 +44,8 @@ public class CastlingControl {
      * @return {@code true} se o jogador pode realizar o roque do lado do rei, {@code false} caso contrário.
       */
     public boolean canCastleKingSide(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
         if (color.isWhite())
             return whiteKingCol != null && kingSideWhiteRookCol != null;
         else 
@@ -57,13 +59,23 @@ public class CastlingControl {
      * @return {@code true} se o jogador pode realizar o roque do lado da dama, {@code false} caso contrário.
       */
     public boolean canCastleQueenSide(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
         if (color.isWhite())
             return whiteKingCol != null && whiteQueenSideRookCol != null;
         else
             return blackKingCol != null && blackQueenSideRookCol != null;
     }
 
+    /**
+     * Atualiza o controle de direitos de roque com base no movimento realizado.
+     * 
+     * @param move o movimento realizado.
+     * @return uma nova instância de {@code CastlingControl} refletindo o estado atualizado dos direitos de roque.
+      */
     public CastlingControl update(Move move) {
+        Objects.requireNonNull(move, "O movimento não pode ser nulo.");
+
         Integer nWhiteKingCol = this.whiteKingCol;
         Integer nBlackKingCol = this.blackKingCol;
         Integer nSameWhiteKingSideRookCol = this.kingSideWhiteRookCol;
