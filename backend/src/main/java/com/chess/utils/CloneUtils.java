@@ -1,10 +1,9 @@
 package com.chess.utils;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
@@ -18,16 +17,16 @@ public class CloneUtils {
      * @param piecesPositionsByColor Mapeamento original das posições das peças por cor.
      * @return Uma cópia do mapeamento fornecido.
       */
-    public static Map<Color, Set<Position>> clonePiecesPositionsByColor(Map<Color, Set<Position>> piecesPositionsByColor) {
+    public static Map<Color, List<Position>> clonePiecesPositionsByColor(Map<Color, List<Position>> piecesPositionsByColor) {
         Objects.requireNonNull(piecesPositionsByColor, "O mapeamento das posições das peças por cor não pode ser nulo.");
         if (piecesPositionsByColor.size() != 2) {
             throw new IllegalArgumentException("O mapeamento deve conter exatamente duas entradas para as cores das peças.");
         }
 
-        Map<Color, Set<Position>> clonedMap = new HashMap<>();
+        Map<Color, List<Position>> clonedMap = new HashMap<>();
 
-        for (Map.Entry<Color, Set<Position>> entry : piecesPositionsByColor.entrySet()) {
-            clonedMap.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        for (Map.Entry<Color, List<Position>> entry : piecesPositionsByColor.entrySet()) {
+            clonedMap.put(entry.getKey(), List.copyOf(entry.getValue()));
         }
 
         return clonedMap;

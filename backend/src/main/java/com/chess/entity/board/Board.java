@@ -3,7 +3,7 @@ package com.chess.entity.board;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.List;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Direction;
@@ -33,7 +33,7 @@ public class Board {
     private final Position blackKingPosition;
 
     // Mapeamento das posições das peças por cor.
-    private final Map<Color, Set<Position>> piecesPositionsByColor;
+    private final Map<Color, List<Position>> piecesPositionsByColor;
 
     // Número do movimento (incrementado após a jogada das pretas).
     private final int fullMoveClock;
@@ -101,7 +101,7 @@ public class Board {
     public Color getCurrentPlayer() { return currentPlayer; }
     public Position getEnPassantTarget() { return enPassantTarget; }
     public CastlingControl getCastlingControl() { return castlingControl; }
-    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+    public Map<Color, List<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
     public int getFullMoveClock() { return fullMoveClock; }
     public int getHalfMoveClock() { return halfMoveClock; }
 
@@ -123,10 +123,10 @@ public class Board {
         return color.isWhite() ? whiteKingPosition : blackKingPosition;
     }
 
-    public Set<Position> getPiecesPositions(Color color) {
+    public List<Position> getPiecesPositions(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
 
-        return Collections.unmodifiableSet(piecesPositionsByColor.get(color));
+        return Collections.unmodifiableList(piecesPositionsByColor.get(color));
     }
 
     /**
