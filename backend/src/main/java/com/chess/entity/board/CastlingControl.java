@@ -13,7 +13,7 @@ public class CastlingControl {
     private final Integer whiteKingCol;
     private final Integer blackKingCol;
 
-    private final Integer kingSideWhiteRookCol;
+    private final Integer whiteKingSideRookCol;
     private final Integer whiteQueenSideRookCol;
 
     private final Integer blackKingSideRookCol;
@@ -24,7 +24,7 @@ public class CastlingControl {
     public CastlingControl(Integer whiteKingCol, Integer blackKingCol, Integer whiteKingSideRookCol, Integer whiteQueenSideRookCol, Integer blackKingSideRookCol, Integer blackQueenSideRookCol) {
         this.whiteKingCol = whiteKingCol;
         this.blackKingCol = blackKingCol;
-        this.kingSideWhiteRookCol = whiteKingSideRookCol;
+        this.whiteKingSideRookCol = whiteKingSideRookCol;
         this.whiteQueenSideRookCol = whiteQueenSideRookCol;
         this.blackKingSideRookCol = blackKingSideRookCol;
         this.blackQueenSideRookCol = blackQueenSideRookCol;
@@ -32,7 +32,7 @@ public class CastlingControl {
 
     public Integer getWhiteKingCol() { return whiteKingCol; }
     public Integer getBlackKingCol() { return blackKingCol; }
-    public Integer getKingSideWhiteRookCol() { return kingSideWhiteRookCol; }
+    public Integer getWhiteKingSideRookCol() { return whiteKingSideRookCol; }
     public Integer getWhiteQueenSideRookCol() { return whiteQueenSideRookCol; }
     public Integer getBlackKingSideRookCol() { return blackKingSideRookCol; }
     public Integer getBlackQueenSideRookCol() { return blackQueenSideRookCol; }
@@ -47,7 +47,7 @@ public class CastlingControl {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
 
         if (color.isWhite())
-            return whiteKingCol != null && kingSideWhiteRookCol != null;
+            return whiteKingCol != null && whiteKingSideRookCol != null;
         else 
             return blackKingCol != null && blackKingSideRookCol != null;
     }
@@ -78,7 +78,7 @@ public class CastlingControl {
 
         Integer nWhiteKingCol = this.whiteKingCol;
         Integer nBlackKingCol = this.blackKingCol;
-        Integer nSameWhiteKingSideRookCol = this.kingSideWhiteRookCol;
+        Integer nSameWhiteKingSideRookCol = this.whiteKingSideRookCol;
         Integer nSameWhiteQueenSideRookCol = this.whiteQueenSideRookCol;
         Integer nSameBlackKingSideRookCol = this.blackKingSideRookCol;
         Integer nSameBlackQueenSideRookCol = this.blackQueenSideRookCol;
@@ -129,7 +129,7 @@ public class CastlingControl {
         CastlingControl that = (CastlingControl) o;
         return Objects.equals(whiteKingCol, that.whiteKingCol) &&
                 Objects.equals(blackKingCol, that.blackKingCol) &&
-                Objects.equals(kingSideWhiteRookCol, that.kingSideWhiteRookCol) &&
+                Objects.equals(whiteKingSideRookCol, that.whiteKingSideRookCol) &&
                 Objects.equals(whiteQueenSideRookCol, that.whiteQueenSideRookCol) &&
                 Objects.equals(blackKingSideRookCol, that.blackKingSideRookCol) &&
                 Objects.equals(blackQueenSideRookCol, that.blackQueenSideRookCol);
@@ -137,14 +137,14 @@ public class CastlingControl {
 
     @Override
     public int hashCode() {
-        return Objects.hash(whiteKingCol, blackKingCol, kingSideWhiteRookCol, whiteQueenSideRookCol, blackKingSideRookCol, blackQueenSideRookCol);
+        return Objects.hash(whiteKingCol, blackKingCol, whiteKingSideRookCol, whiteQueenSideRookCol, blackKingSideRookCol, blackQueenSideRookCol);
     }
 
     @Override
     public String toString() {
         return "CastlingControl{" +
                 "WK=" + whiteKingCol + ", BK=" + blackKingCol +
-                ", WKR=" + kingSideWhiteRookCol + ", WQR=" + whiteQueenSideRookCol +
+                ", WKR=" + whiteKingSideRookCol + ", WQR=" + whiteQueenSideRookCol +
                 ", BKR=" + blackKingSideRookCol + ", BQR=" + blackQueenSideRookCol +
                 '}';
     }
