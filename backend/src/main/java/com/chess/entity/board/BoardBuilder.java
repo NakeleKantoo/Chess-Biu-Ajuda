@@ -35,6 +35,12 @@ public class BoardBuilder {
     // Mapeamento das posições das peças por cor.
     private Map<Color, Set<Position>> piecesPositionsByColor;
 
+    // Número do movimento (incrementado após a jogada das pretas).
+    private int fullMoveClock;
+
+    // Contador de meio-movimentos (para a regra dos 50 movimentos).
+    private int halfMoveClock;
+
     public static final char[] standardLinePieces = {'T', 'C', 'B', 'D', 'R', 'B', 'C', 'T'};
 
     public BoardBuilder() {
@@ -42,6 +48,8 @@ public class BoardBuilder {
         this.piecesPositionsByColor = new HashMap<>();
         piecesPositionsByColor.put(Color.WHITE, new HashSet<>());
         piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
+        this.fullMoveClock = 1;
+        this.halfMoveClock = 0;
     }
 
     public BoardBuilder(Board board) {
@@ -53,9 +61,12 @@ public class BoardBuilder {
         this.whiteKingPosition = board.getKingPosition(Color.WHITE);
         this.blackKingPosition = board.getKingPosition(Color.BLACK);
         this.piecesPositionsByColor = board.getPiecesPositionsByColor();
+        this.fullMoveClock = board.getFullMoveClock();
+        this.halfMoveClock = board.getHalfMoveClock();
     }
 
     public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
+    public Piece getPieceAt(Position position) { return squares[position.getRow()][position.getCol()]; }
     public BoardState getBoardState() { return boardState; }
     public Color getCurrentPlayer() { return currentPlayer; }
     public Position getEnPassantTarget() { return enPassantTarget; }
@@ -63,11 +74,19 @@ public class BoardBuilder {
     public Position getWhiteKingPosition() { return whiteKingPosition; }
     public Position getBlackKingPosition() { return blackKingPosition; }
     public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+    public int getFullMoveClock() { return fullMoveClock; }
+    public int getHalfMoveClock() { return halfMoveClock; }
 
     public void setBoardState(BoardState boardState) { this.boardState = boardState; }
     public void setCurrentPlayer(Color currentPlayer) { this.currentPlayer = currentPlayer; }
     public void setEnPassantTarget(Position enPassantTarget) { this.enPassantTarget = enPassantTarget; }
     public void setCastlingControl(CastlingControl castlingControl) { this.castlingControl = castlingControl; }
+    public void setFullMoveClock(int fullMoveClock) { this.fullMoveClock = fullMoveClock; }
+    public void setHalfMoveClock(int halfMoveClock) { this.halfMoveClock = halfMoveClock; }
+
+    public void incrementFullMoveClock() { this.fullMoveClock++; }
+    public void incrementHalfMoveClock() { this.halfMoveClock++; }
+    public void resetHalfMoveClock() { this.halfMoveClock = 0; }
 
     /**
      * Configura o tabuleiro com a disposição padrão das peças.
@@ -90,10 +109,19 @@ public class BoardBuilder {
         this.currentPlayer = Color.WHITE;
         this.enPassantTarget = null;
         this.castlingControl = CastlingControl.INIT;
+        this.fullMoveClock = 1;
+        this.halfMoveClock = 0;
 
         return new Board(this);
     }
 
+    /**
+     * Constrói um objeto {@code Board} com base no estado atual do construtor.
+     * Verifica se o estado do tabuleiro é válido antes de construir o objeto.
+     * 
+     * @return um objeto {@code Board} representando o tabuleiro configurado.
+     * @throws IllegalStateException se o estado do tabuleiro for inválido.
+      */
     public Board build() {
         if (boardState == null) {
             throw new IllegalStateException("O estado do tabuleiro não foi definido.");
@@ -119,6 +147,12 @@ public class BoardBuilder {
         if (hasMoreKings(Color.BLACK)) {
             throw new IllegalStateException("Mais de um rei preto encontrado.");
         }
+        if (fullMoveClock <= 0) {
+            throw new IllegalStateException("O número do movimento deve ser maior que zero.");
+        }
+        if (halfMoveClock < 0) {
+            throw new IllegalStateException("O contador de meio-movimentos não pode ser negativo.");
+        }
         return new Board(this);
     }
 
@@ -137,6 +171,13 @@ public class BoardBuilder {
         return false;
     }
 
+    /**
+     * Configura uma linha do tabuleiro com as peças especificadas.
+     * 
+     * @param color a cor das peças a serem colocadas.
+     * @param row a linha do tabuleiro onde as peças serão colocadas.
+     * @param linePieces um array de caracteres representando as peças na linha.
+      */
     public void setRowPieces(Color color, int row, char[] linePieces) {
         for (int col = 0; col < 8; col++) {
             char pieceChar = linePieces[col];
@@ -149,6 +190,12 @@ public class BoardBuilder {
         }
     }
 
+    /**
+     * Configura uma linha do tabuleiro com peões da cor especificada.
+     * 
+     * @param color a cor dos peões a serem colocados.
+     * @param row a linha do tabuleiro onde os peões serão colocados.
+      */
     public void setRowPawns(Color color, int row) {
         for (int col = 0; col < 8; col++) {
             char pawnChar = color.isWhite() ? 'P' : 'p';
@@ -160,6 +207,15 @@ public class BoardBuilder {
         }
     }
 
+    /**
+     * Coloca uma peça na posição especificada no tabuleiro.
+     * Não remove a peça da posição anterior, se aplicável.
+     * Remove a peça existente na posição de destino, se houver.
+     * Atualiza os estados relacionados, como a posição do rei e o mapeamento das posições das peças por cor.
+     * 
+     * @param piece a peça a ser colocada.
+     * @param position a posição onde a peça será colocada.
+      */
     public void placePiece(Piece piece, Position position) {
         int row = position.getRow();
         int col = position.getCol();
@@ -182,6 +238,12 @@ public class BoardBuilder {
         }
     }
 
+    /**
+     * Remove a peça da posição especificada no tabuleiro.
+     * Atualiza os estados relacionados, como a posição do rei e o mapeamento das posições das peças por cor.
+     * 
+     * @param position a posição da peça a ser removida.
+      */
     public void removePiece(Position position) {
         int row = position.getRow();
         int col = position.getCol();
