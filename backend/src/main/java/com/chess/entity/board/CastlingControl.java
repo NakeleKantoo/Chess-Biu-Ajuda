@@ -43,13 +43,35 @@ public class CastlingControl {
      * @param color a cor do jogador.
      * @return {@code true} se o jogador pode realizar o roque do lado do rei, {@code false} caso contrário.
       */
-    public boolean canCastleKingSide(Color color) {
+    public boolean canCastleKingSide(Board board, Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
+        boolean rightsActive;
+        int row, rookCol;
+        int finalKingCol = 6; // G1/G8
 
-        if (color.isWhite())
-            return whiteKingCol != null && whiteKingSideRookCol != null;
-        else 
-            return blackKingCol != null && blackKingSideRookCol != null;
+        if (color.isWhite()) {
+            rightsActive = whiteKingCol != null && whiteKingSideRookCol != null;
+            row = 7;
+            rookCol = rightsActive ? whiteKingSideRookCol : -1;
+        } else {
+            rightsActive = blackKingCol != null && blackKingSideRookCol != null;
+            row = 0;
+            rookCol = rightsActive ? blackKingSideRookCol : -1;
+        }
+
+        if (!rightsActive) return false;
+        
+        Position kingPos = board.getKingPosition(color);
+        Position rookPos = Position.at(row, rookCol);
+        Position kingDest = Position.at(row, finalKingCol);
+
+        // 1. Caminho Livre: Valida se não há peças entre Rei e Torre (exceto eles mesmos)
+        boolean isPathClear = board.isPathClear(kingPos, rookPos);
+        
+        // 2. Caminho Seguro: Valida se o REi não passa por casa atacada
+        boolean isPathSafe = !board.isPathUnderAttack(kingPos, kingDest, color.opposite());
+
+        return isPathClear && isPathSafe;
     }
 
     /**
@@ -58,13 +80,32 @@ public class CastlingControl {
      * @param color a cor do jogador.
      * @return {@code true} se o jogador pode realizar o roque do lado da dama, {@code false} caso contrário.
       */
-    public boolean canCastleQueenSide(Color color) {
+    public boolean canCastleQueenSide(Board board, Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
+        boolean rightsActive;
+        int row, rookCol;
+        int finalKingCol = 2; // C1/C8
 
-        if (color.isWhite())
-            return whiteKingCol != null && whiteQueenSideRookCol != null;
-        else
-            return blackKingCol != null && blackQueenSideRookCol != null;
+        if (color.isWhite()) {
+            rightsActive = whiteKingCol != null && whiteQueenSideRookCol != null;
+            row = 7;
+            rookCol = rightsActive ? whiteQueenSideRookCol : -1;
+        } else {
+            rightsActive = blackKingCol != null && blackQueenSideRookCol != null;
+            row = 0;
+            rookCol = rightsActive ? blackQueenSideRookCol : -1;
+        }
+        
+        if (!rightsActive) return false;
+
+        Position kingPos = board.getKingPosition(color);
+        Position rookPos = Position.at(row, rookCol);
+        Position kingDest = Position.at(row, finalKingCol);
+
+        boolean isPathClear = board.isPathClear(kingPos, rookPos);
+        boolean isPathSafe = !board.isPathUnderAttack(kingPos, kingDest, color.opposite());
+
+        return isPathClear && isPathSafe;
     }
 
     /**
