@@ -1,5 +1,7 @@
 package com.chess.entity.game;
 
+import java.util.Objects;
+
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;
@@ -136,6 +138,25 @@ public class Move {
         notation.append(to.toString());
 
         return notation.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        Move move = (Move) o;
+        
+        // Apenas campos que o front-end utiliza para identificar o movimento
+        return Objects.equals(from, move.from) &&
+               Objects.equals(to, move.to) &&
+               Objects.equals(promotionPiece, move.promotionPiece);
+    }
+
+    @Override
+    public int hashCode() {
+        // Apenas campos que o front-end utiliza para identificar o movimento
+        return Objects.hash(from, to, promotionPiece);
     }
 
 }
