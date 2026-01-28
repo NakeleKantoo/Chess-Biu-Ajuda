@@ -29,6 +29,24 @@ public class MoveBuilder {
     private boolean isCheckmate;
     private boolean isStalemate;
 
+    public MoveBuilder(Move other) {
+        Objects.requireNonNull(other, "O Move fornecido não pode ser nulo.");
+
+        this.from = other.getFrom();
+        this.to = other.getTo();
+        this.movedPiece = other.getMovedPiece();
+        this.capturedPiece = other.getCapturedPiece();
+        this.promotionPiece = other.getPromotionPiece();
+        this.rookFrom = other.getRookFrom();
+        this.isCastling = other.isCastling();
+        this.isEnPassant = other.isEnPassant();
+        this.needColDesambiguation = other.getColDesambiguation();
+        this.needRowDesambiguation = other.getRowDesambiguation();
+        this.isCheck = other.isCheck();
+        this.isCheckmate = other.isCheckmate();
+        this.isStalemate = other.isStalemate();
+    }
+
     public MoveBuilder(Position from, Position to, Piece movedPiece) {
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
         Objects.requireNonNull(to, "A posição de destino não pode ser nula.");

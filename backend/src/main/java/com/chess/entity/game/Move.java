@@ -53,6 +53,8 @@ public class Move {
     public Position getRookFrom() { return rookFrom; }
     public boolean isCastling() { return isCastling; }
     public boolean isEnPassant() { return isEnPassant; }
+    public boolean getColDesambiguation() { return needColDesambiguation; }
+    public boolean getRowDesambiguation() { return needRowDesambiguation; }
     public boolean isCapture() { return capturedPiece != null; }
     public boolean isPromotion() { return promotionPiece != null; }
     public boolean isCheck() { return isCheck; }
