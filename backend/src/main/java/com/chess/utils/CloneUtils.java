@@ -26,7 +26,8 @@ public class CloneUtils {
         Map<Color, List<Position>> clonedMap = new HashMap<>();
 
         for (Map.Entry<Color, List<Position>> entry : piecesPositionsByColor.entrySet()) {
-            clonedMap.put(entry.getKey(), List.copyOf(entry.getValue()));
+            // Cria uma nova ArrayList para garantir que a lista seja mutável
+            clonedMap.put(entry.getKey(), new java.util.ArrayList<>(entry.getValue()));
         }
 
         return clonedMap;
