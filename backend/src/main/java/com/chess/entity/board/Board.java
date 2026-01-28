@@ -2,6 +2,7 @@ package com.chess.entity.board;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.chess.entity.base.Color;
@@ -125,7 +126,9 @@ public class Board {
     public List<Position> getPiecesPositions(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
 
-        return getPiecesPositionsByColor().get(color);
+        List<Position> positions = piecesPositionsByColor.get(color);
+
+        return new ArrayList<>(positions);
     }
 
     /**
@@ -219,6 +222,18 @@ public class Board {
         }
 
         return true;
+    }
+
+    /**
+     * Verifica se o rei da cor especificada está em xeque.
+     * 
+     * @param color A cor do rei a ser verificado.
+     * @return {@code true} se o rei da cor especificada estiver em xeque, {@code false} caso contrário.
+      */
+    public boolean isInCheck(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
+        return isUnderAttack(getKingPosition(color), color.opposite());
     }
 
     @Override
