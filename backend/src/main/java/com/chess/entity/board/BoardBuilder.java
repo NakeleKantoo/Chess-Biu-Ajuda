@@ -115,6 +115,31 @@ public class BoardBuilder {
         return new Board(this);
     }
 
+    public Board buildTest() {
+        char[] linePieces = standardLinePieces;
+        squares = new Piece[8][8];
+        piecesPositionsByColor.get(Color.WHITE).clear();
+        piecesPositionsByColor.get(Color.BLACK).clear();
+
+        setRowPieces(Color.WHITE, 7, linePieces);
+        setRowPawns(Color.WHITE, 6);
+        setRowPawns(Color.BLACK, 1);
+        setRowPieces(Color.BLACK, 0, linePieces);
+
+        this.boardState = BoardState.IN_PROGRESS;
+        this.currentPlayer = Color.WHITE;
+        this.enPassantTarget = null;
+        this.castlingControl = CastlingControl.INIT;
+        this.fullMoveClock = 1;
+        this.halfMoveClock = 0;
+        
+        removePiece(Position.at("g2"));
+        removePiece(Position.at("g8"));
+        placePiece(Piece.create('P'), Position.at("g7"));
+
+        return new Board(this);
+    }
+
     /**
      * Constrói um objeto {@code Board} com base no estado atual do construtor.
      * Verifica se o estado do tabuleiro é válido antes de construir o objeto.
@@ -137,9 +162,6 @@ public class BoardBuilder {
         }
         if (blackKingPosition == null) {
             throw new IllegalStateException("A posição do rei preto não foi definida.");
-        }
-        if (whiteKingPosition.isNear(blackKingPosition)) {
-            throw new IllegalStateException("Os reis não podem estar em posições adjacentes.");
         }
         if (hasMoreKings(Color.WHITE)) {
             throw new IllegalStateException("Mais de um rei branco encontrado.");
