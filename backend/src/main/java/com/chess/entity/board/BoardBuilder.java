@@ -127,15 +127,14 @@ public class BoardBuilder {
         setRowPieces(Color.BLACK, 0, linePieces);
 
         this.boardState = BoardState.IN_PROGRESS;
-        this.currentPlayer = Color.WHITE;
+        this.currentPlayer = Color.BLACK;
         this.enPassantTarget = null;
         this.castlingControl = CastlingControl.INIT;
         this.fullMoveClock = 1;
         this.halfMoveClock = 0;
         
-        removePiece(Position.at("g2"));
-        removePiece(Position.at("g8"));
-        placePiece(Piece.create('P'), Position.at("g7"));
+        removePiece(Position.at("e2"));
+        placePiece(Piece.create('P'), Position.at("e5"));
 
         return new Board(this);
     }

@@ -1,12 +1,12 @@
-package com.chess.service;
+package com.chess.service.move;
 
 import java.util.List;
 
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
-import com.chess.entity.game.Move;
-import com.chess.entity.game.MoveBuilder;
-import com.chess.entity.game.MoveContext;
+import com.chess.entity.move.Move;
+import com.chess.entity.move.MoveBuilder;
+import com.chess.entity.move.MoveContext;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;

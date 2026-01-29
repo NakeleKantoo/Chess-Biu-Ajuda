@@ -1,10 +1,10 @@
-package com.chess.service;
+package com.chess.service.move;
 
 import com.chess.entity.base.Direction;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.CastlingControl;
-import com.chess.entity.game.MoveBuilder;
+import com.chess.entity.move.MoveBuilder;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;

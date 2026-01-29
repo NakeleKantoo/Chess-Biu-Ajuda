@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
-import com.chess.entity.game.Move;
+import com.chess.entity.move.Move;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Piece;
 import com.chess.entity.piece.Rook;

@@ -1,4 +1,4 @@
-package com.chess.entity.game;
+package com.chess.entity.move;
 
 import java.util.Objects;
 
