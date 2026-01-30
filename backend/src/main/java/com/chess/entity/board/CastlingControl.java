@@ -66,10 +66,10 @@ public class CastlingControl {
         Position kingDest = Position.at(row, finalKingCol);
 
         // 1. Caminho Livre: Valida se não há peças entre Rei e Torre (exceto eles mesmos)
-        boolean isPathClear = board.isPathClear(kingPos, rookPos);
+        boolean isPathClear = BoardAnalyzer.isPathClear(board, kingPos, rookPos);
         
         // 2. Caminho Seguro: Valida se o REi não passa por casa atacada
-        boolean isPathSafe = !board.isPathUnderAttack(kingPos, kingDest, color.opposite());
+        boolean isPathSafe = !BoardAnalyzer.isPathUnderAttack(board, kingPos, kingDest, color.opposite());
 
         return isPathClear && isPathSafe;
     }
@@ -102,8 +102,8 @@ public class CastlingControl {
         Position rookPos = Position.at(row, rookCol);
         Position kingDest = Position.at(row, finalKingCol);
 
-        boolean isPathClear = board.isPathClear(kingPos, rookPos);
-        boolean isPathSafe = !board.isPathUnderAttack(kingPos, kingDest, color.opposite());
+        boolean isPathClear = BoardAnalyzer.isPathClear(board, kingPos, rookPos);
+        boolean isPathSafe = !BoardAnalyzer.isPathUnderAttack(board, kingPos, kingDest, color.opposite());
 
         return isPathClear && isPathSafe;
     }

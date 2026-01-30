@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
+import com.chess.entity.board.BoardAnalyzer;
 import com.chess.entity.move.Move;
 import com.chess.entity.move.MoveBuilder;
 import com.chess.entity.move.MoveContext;
@@ -104,7 +105,7 @@ public class MoveValidator {
         Move move = moveBuilder.build();
         Board newBoard = moveExecutor.executeMove(board, move);
 
-        boolean movePutsOwnKingInCheck = newBoard.isInCheck(board.getCurrentPlayer());
+        boolean movePutsOwnKingInCheck = BoardAnalyzer.isInCheck(newBoard, board.getCurrentPlayer());
 
         if (!movePutsOwnKingInCheck) {
             legalMoves.add(move);

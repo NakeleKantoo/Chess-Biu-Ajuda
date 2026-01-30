@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
+import com.chess.entity.board.BoardAnalyzer;
 import com.chess.entity.move.Move;
 import com.chess.entity.move.MoveBuilder;
 import com.chess.entity.move.MoveContext;
@@ -90,13 +91,13 @@ public class MoveAnnotator {
         MoveValidator validator = new MoveValidator(newBoard);
 
         if (validator.getLegalMoves().isEmpty()) {
-            if (newBoard.isInCheck(newBoard.getCurrentPlayer())) {
+            if (BoardAnalyzer.isInCheck(newBoard, newBoard.getCurrentPlayer())) {
                 moveBuilder.checkmate();
             } else {
                 moveBuilder.stalemate();
             }
         } else {
-            if (newBoard.isInCheck(newBoard.getCurrentPlayer())) {
+            if (BoardAnalyzer.isInCheck(newBoard, newBoard.getCurrentPlayer())) {
                 moveBuilder.check();
             }
         }
