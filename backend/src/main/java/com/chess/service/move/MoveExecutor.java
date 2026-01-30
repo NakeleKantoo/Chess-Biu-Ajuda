@@ -1,4 +1,4 @@
-package com.chess.service;
+package com.chess.service.move;
 
 import java.util.Objects;
 
@@ -8,7 +8,7 @@ import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.board.BoardState;
 import com.chess.entity.board.CastlingControl;
-import com.chess.entity.game.Move;
+import com.chess.entity.move.Move;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;
 

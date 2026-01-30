@@ -8,6 +8,7 @@ import java.util.Objects;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.board.BoardState;
+import com.chess.entity.move.Move;
 
 public class Game {
     

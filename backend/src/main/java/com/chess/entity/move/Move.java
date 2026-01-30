@@ -1,4 +1,6 @@
-package com.chess.entity.game;
+package com.chess.entity.move;
+
+import java.util.Objects;
 
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.Pawn;
@@ -51,6 +53,8 @@ public class Move {
     public Position getRookFrom() { return rookFrom; }
     public boolean isCastling() { return isCastling; }
     public boolean isEnPassant() { return isEnPassant; }
+    public boolean getColDesambiguation() { return needColDesambiguation; }
+    public boolean getRowDesambiguation() { return needRowDesambiguation; }
     public boolean isCapture() { return capturedPiece != null; }
     public boolean isPromotion() { return promotionPiece != null; }
     public boolean isCheck() { return isCheck; }
@@ -136,6 +140,25 @@ public class Move {
         notation.append(to.toString());
 
         return notation.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        Move move = (Move) o;
+        
+        // Apenas campos que o front-end utiliza para identificar o movimento
+        return Objects.equals(from, move.from) &&
+               Objects.equals(to, move.to) &&
+               Objects.equals(promotionPiece, move.promotionPiece);
+    }
+
+    @Override
+    public int hashCode() {
+        // Apenas campos que o front-end utiliza para identificar o movimento
+        return Objects.hash(from, to, promotionPiece);
     }
 
 }

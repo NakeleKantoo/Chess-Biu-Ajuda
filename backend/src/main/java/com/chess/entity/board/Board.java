@@ -1,9 +1,9 @@
 package com.chess.entity.board;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Direction;
@@ -33,7 +33,7 @@ public class Board {
     private final Position blackKingPosition;
 
     // Mapeamento das posições das peças por cor.
-    private final Map<Color, Set<Position>> piecesPositionsByColor;
+    protected final Map<Color, List<Position>> piecesPositionsByColor;
 
     // Número do movimento (incrementado após a jogada das pretas).
     private final int fullMoveClock;
@@ -101,20 +101,20 @@ public class Board {
     public Color getCurrentPlayer() { return currentPlayer; }
     public Position getEnPassantTarget() { return enPassantTarget; }
     public CastlingControl getCastlingControl() { return castlingControl; }
-    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+    public Map<Color, List<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
     public int getFullMoveClock() { return fullMoveClock; }
     public int getHalfMoveClock() { return halfMoveClock; }
 
     public boolean canCastleKingSide(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
         
-        return castlingControl.canCastleKingSide(color);
+        return castlingControl.canCastleKingSide(this, color);
     }
 
     public boolean canCastleQueenSide(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
 
-        return castlingControl.canCastleQueenSide(color);
+        return castlingControl.canCastleQueenSide(this, color);
     }
 
     public Position getKingPosition(Color color) {
@@ -123,40 +123,12 @@ public class Board {
         return color.isWhite() ? whiteKingPosition : blackKingPosition;
     }
 
-    public Set<Position> getPiecesPositions(Color color) {
+    public List<Position> getPiecesPositions(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
 
-        return Collections.unmodifiableSet(piecesPositionsByColor.get(color));
-    }
+        List<Position> positions = piecesPositionsByColor.get(color);
 
-    /**
-     * Verifica se o caminho entre duas posições está livre de peças.
-     * Não considera a posição inicial e final.
-     * 
-     * @param from a posição inicial.
-     * @param to a posição final.
-     * @return {@code true} se o caminho estiver livre, {@code false} caso contrário.
-      */
-    public boolean isPathClear(Position from, Position to) {
-        Objects.requireNonNull(from, "A posição inicial não pode ser nula.");
-        Objects.requireNonNull(to, "A posição final não pode ser nula.");
-
-        Direction dir = Direction.get(from, to);
-        if (dir == null) {
-            return false;
-        }
-
-        while (true) {
-            from = from.getNext(dir);
-            if (from.equals(to)) {
-                break;
-            }
-            if (hasPieceAt(from)) {
-                return false;
-            }
-        }
-
-        return true;
+        return new ArrayList<>(positions);
     }
 
     @Override

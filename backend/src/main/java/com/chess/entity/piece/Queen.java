@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.chess.entity.base.*;
 import com.chess.entity.board.Board;
+import com.chess.entity.board.BoardAnalyzer;
 import com.chess.utils.MoveUtils;
 
 public class Queen extends Piece {
@@ -29,7 +30,7 @@ public class Queen extends Piece {
         if (dir == null) return false;
 
         // Verifica se o caminho está livre de peças
-        boolean isAttacking = board.isPathClear(from, to);
+        boolean isAttacking = BoardAnalyzer.isPathClear(board, from, to);
 
         return isAttacking;
     }

@@ -1,10 +1,10 @@
 package com.chess.entity.board;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
@@ -34,7 +34,7 @@ public class BoardBuilder {
     private Position blackKingPosition;
 
     // Mapeamento das posições das peças por cor.
-    private Map<Color, Set<Position>> piecesPositionsByColor;
+    private Map<Color, List<Position>> piecesPositionsByColor;
 
     // Número do movimento (incrementado após a jogada das pretas).
     private int fullMoveClock;
@@ -47,8 +47,8 @@ public class BoardBuilder {
     public BoardBuilder() {
         this.squares = new Piece[8][8];
         this.piecesPositionsByColor = new HashMap<>();
-        piecesPositionsByColor.put(Color.WHITE, new HashSet<>());
-        piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
+        piecesPositionsByColor.put(Color.WHITE, new ArrayList<>());
+        piecesPositionsByColor.put(Color.BLACK, new ArrayList<>());
         this.fullMoveClock = 1;
         this.halfMoveClock = 0;
     }
@@ -74,7 +74,7 @@ public class BoardBuilder {
     public CastlingControl getCastlingControl() { return castlingControl; }
     public Position getWhiteKingPosition() { return whiteKingPosition; }
     public Position getBlackKingPosition() { return blackKingPosition; }
-    public Map<Color, Set<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
+    public Map<Color, List<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
     public int getFullMoveClock() { return fullMoveClock; }
     public int getHalfMoveClock() { return halfMoveClock; }
 
@@ -97,9 +97,8 @@ public class BoardBuilder {
     public Board buildStandard() {
         char[] linePieces = standardLinePieces;
         squares = new Piece[8][8];
-        piecesPositionsByColor = new HashMap<>();
-        piecesPositionsByColor.put(Color.WHITE, new HashSet<>());
-        piecesPositionsByColor.put(Color.BLACK, new HashSet<>());
+        piecesPositionsByColor.get(Color.WHITE).clear();
+        piecesPositionsByColor.get(Color.BLACK).clear();
 
         setRowPieces(Color.WHITE, 7, linePieces);
         setRowPawns(Color.WHITE, 6);
@@ -112,6 +111,30 @@ public class BoardBuilder {
         this.castlingControl = CastlingControl.INIT;
         this.fullMoveClock = 1;
         this.halfMoveClock = 0;
+
+        return new Board(this);
+    }
+
+    public Board buildTest() {
+        char[] linePieces = standardLinePieces;
+        squares = new Piece[8][8];
+        piecesPositionsByColor.get(Color.WHITE).clear();
+        piecesPositionsByColor.get(Color.BLACK).clear();
+
+        setRowPieces(Color.WHITE, 7, linePieces);
+        setRowPawns(Color.WHITE, 6);
+        setRowPawns(Color.BLACK, 1);
+        setRowPieces(Color.BLACK, 0, linePieces);
+
+        this.boardState = BoardState.IN_PROGRESS;
+        this.currentPlayer = Color.BLACK;
+        this.enPassantTarget = null;
+        this.castlingControl = CastlingControl.INIT;
+        this.fullMoveClock = 1;
+        this.halfMoveClock = 0;
+        
+        removePiece(Position.at("e2"));
+        placePiece(Piece.create('P'), Position.at("e5"));
 
         return new Board(this);
     }
@@ -139,9 +162,6 @@ public class BoardBuilder {
         if (blackKingPosition == null) {
             throw new IllegalStateException("A posição do rei preto não foi definida.");
         }
-        if (whiteKingPosition.isNear(blackKingPosition)) {
-            throw new IllegalStateException("Os reis não podem estar em posições adjacentes.");
-        }
         if (hasMoreKings(Color.WHITE)) {
             throw new IllegalStateException("Mais de um rei branco encontrado.");
         }
@@ -158,7 +178,7 @@ public class BoardBuilder {
     }
 
     private boolean hasMoreKings(Color color) {
-        Set<Position> positions = piecesPositionsByColor.get(color);
+        List<Position> positions = piecesPositionsByColor.get(color);
         boolean hasKing = false;
         for (Position position : positions) {
             Piece piece = squares[position.getRow()][position.getCol()];
