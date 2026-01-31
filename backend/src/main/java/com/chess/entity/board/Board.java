@@ -137,7 +137,7 @@ public class Board {
         sb.append("Estado: " + boardState.getDescription() + "\n");
         sb.append("Jogador atual: " + currentPlayer + "\n\n");
         for (int row = 0; row < 8; row++) {
-            sb.append(row + 1).append("     ");
+            sb.append(8 - row).append("     ");
             for (int col = 0; col < 8; col++) {
                 Piece piece = squares[row][col];
                 sb.append(piece != null ? piece.getSymbol() : '.');
