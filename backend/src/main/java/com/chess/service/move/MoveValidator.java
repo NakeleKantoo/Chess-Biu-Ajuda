@@ -7,9 +7,9 @@ import java.util.Objects;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardAnalyzer;
+import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.move.Move;
 import com.chess.entity.move.MoveBuilder;
-import com.chess.entity.move.MoveContext;
 import com.chess.entity.piece.Piece;
 
 public class MoveValidator {
@@ -18,26 +18,18 @@ public class MoveValidator {
     private final Board board;
     private final List<Move> legalMoves;
 
-    private final MoveContext moveContext;
-
     public static MoveValidator of(Board board) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
 
-        MoveValidator validator = new MoveValidator(board, true);
-        new MoveAnnotator().annotateMoves(validator.moveContext, validator.legalMoves);
+        MoveValidator validator = new MoveValidator(board);
 
         return validator;
     }
 
-    protected MoveValidator(Board board) {
-        this(board, false);
-    }
-
-    private MoveValidator(Board board, boolean createContext) {
+    private MoveValidator(Board board) {
         this.moveExecutor = new MoveExecutor();
         this.board = board;
         this.legalMoves = new ArrayList<>();
-        this.moveContext = createContext ? new MoveContext() : null;
 
         generateLegalMoves();
     }
@@ -127,14 +119,12 @@ public class MoveValidator {
 
     private void addMove(MoveBuilder moveBuilder) {
         Move move = moveBuilder.build();
-        Board newBoard = moveExecutor.executeMove(board, move);
+        BoardBuilder newBoard = moveExecutor.executeMove(board, move);
 
         boolean movePutsOwnKingInCheck = BoardAnalyzer.isInCheck(newBoard, board.getCurrentPlayer());
 
         if (!movePutsOwnKingInCheck) {
             legalMoves.add(move);
-
-            if (moveContext != null) moveContext.addMove(moveBuilder, newBoard);
         }
     }
 

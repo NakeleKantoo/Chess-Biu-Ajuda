@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
+import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.game.Game;
 import com.chess.entity.move.Move;
 import com.chess.entity.piece.Piece;
@@ -58,7 +59,10 @@ public class GameService {
 
         MoveValidator validator = MoveValidator.of(game.getCurrentBoard());
         Move move = validator.createMove(from, to, promotionPiece);
-        Board nextBoard = moveExecutor.executeMove(game.getCurrentBoard(), move);
+        BoardBuilder nextBoardBuilder = moveExecutor.executeMove(game.getCurrentBoard(), move);
+
+        // Validar estado do BoardBuilder e instanciar Board
+        Board nextBoard = nextBoardBuilder.build();
 
         game.commitMove(move, nextBoard);
     }
