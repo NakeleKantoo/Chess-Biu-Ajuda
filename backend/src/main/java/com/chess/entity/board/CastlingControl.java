@@ -43,7 +43,7 @@ public class CastlingControl {
      * @param color a cor do jogador.
      * @return {@code true} se o jogador pode realizar o roque do lado do rei, {@code false} caso contrário.
       */
-    public boolean canCastleKingSide(Board board, Color color) {
+    public boolean canCastleKingSide(BaseBoard board, Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
         boolean rightsActive;
         int row, rookCol;
@@ -80,7 +80,7 @@ public class CastlingControl {
      * @param color a cor do jogador.
      * @return {@code true} se o jogador pode realizar o roque do lado da dama, {@code false} caso contrário.
       */
-    public boolean canCastleQueenSide(Board board, Color color) {
+    public boolean canCastleQueenSide(BaseBoard board, Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
         boolean rightsActive;
         int row, rookCol;

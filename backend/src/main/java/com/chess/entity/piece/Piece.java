@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.chess.entity.base.*;
-import com.chess.entity.board.Board;
+import com.chess.entity.board.BaseBoard;
 
 public abstract class Piece {
 
@@ -73,7 +73,7 @@ public abstract class Piece {
      * @return {@code true} se a peça em 'from' tem a casa 'to' em seu padrão de ataque,
      *         {@code false} caso contrário.
      */
-    public abstract boolean isAttacking(Board board, Position from, Position to);
+    public abstract boolean isAttacking(BaseBoard board, Position from, Position to);
 
     /**
      * Obtém todas as possíveis posições de movimento para esta peça a partir de uma posição dada.
@@ -86,7 +86,7 @@ public abstract class Piece {
      * @param from A posição de origem da peça.
      * @return Uma lista de posições para as quais a peça pode se mover.
       */
-    public abstract List<Position> getPossibleMoves(Board board, Position from);
+    public abstract List<Position> getPossibleMoves(BaseBoard board, Position from);
 
     @Override
     public int hashCode() {

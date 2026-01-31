@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.chess.entity.base.*;
-import com.chess.entity.board.Board;
+import com.chess.entity.board.BaseBoard;
 import com.chess.entity.board.BoardAnalyzer;
 import com.chess.utils.MoveUtils;
 
@@ -20,7 +20,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public boolean isAttacking(Board board, Position from, Position to) {
+    public boolean isAttacking(BaseBoard board, Position from, Position to) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
         Objects.requireNonNull(to, "A posição de destino não pode ser nula.");
@@ -36,7 +36,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<Position> getPossibleMoves(Board board, Position from) {
+    public List<Position> getPossibleMoves(BaseBoard board, Position from) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
 

@@ -10,9 +10,8 @@ import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Piece;
-import com.chess.utils.CloneUtils;
 
-public class BoardBuilder {
+public class BoardBuilder extends BaseBoard {
     
     // Matriz 8x8 que representa as casas do tabuleiro e as peças contidas nelas.
     private Piece[][] squares;
@@ -66,15 +65,15 @@ public class BoardBuilder {
         this.halfMoveClock = board.getHalfMoveClock();
     }
 
-    public Piece[][] getSquares() { return CloneUtils.cloneSquares(squares); }
-    public Piece getPieceAt(Position position) { return squares[position.getRow()][position.getCol()]; }
+    protected Piece[][] getInternalSquares() { return squares; }
+    protected Map<Color, List<Position>> getInternalPiecesPositionsByColor() { return piecesPositionsByColor; }
+
     public BoardState getBoardState() { return boardState; }
     public Color getCurrentPlayer() { return currentPlayer; }
     public Position getEnPassantTarget() { return enPassantTarget; }
     public CastlingControl getCastlingControl() { return castlingControl; }
     public Position getWhiteKingPosition() { return whiteKingPosition; }
     public Position getBlackKingPosition() { return blackKingPosition; }
-    public Map<Color, List<Position>> getPiecesPositionsByColor() { return CloneUtils.clonePiecesPositionsByColor(piecesPositionsByColor); }
     public int getFullMoveClock() { return fullMoveClock; }
     public int getHalfMoveClock() { return halfMoveClock; }
 
@@ -88,6 +87,12 @@ public class BoardBuilder {
     public void incrementFullMoveClock() { this.fullMoveClock++; }
     public void incrementHalfMoveClock() { this.halfMoveClock++; }
     public void resetHalfMoveClock() { this.halfMoveClock = 0; }
+
+    public Position getKingPosition(Color color) {
+        Objects.requireNonNull(color, "A cor não pode ser nula.");
+
+        return color.isWhite() ? whiteKingPosition : blackKingPosition;
+    }
 
     /**
      * Configura o tabuleiro com a disposição padrão das peças.
