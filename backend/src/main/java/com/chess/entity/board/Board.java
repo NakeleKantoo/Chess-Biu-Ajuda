@@ -3,10 +3,10 @@ package com.chess.entity.board;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.chess.entity.base.Color;
-import com.chess.entity.base.Direction;
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.Piece;
 import com.chess.utils.CloneUtils;
@@ -77,13 +77,16 @@ public class Board {
         Objects.requireNonNull(position, "A posição não pode ser nula");
 
         Piece piece = getPieceAt(position);
-        boolean hasPiece = piece != null;
+
+        if (piece == null) {
+            return false;
+        }
 
         if (color == null) {
-            return hasPiece;
+            return true;
         } 
         
-        return hasPiece && piece.getColor().equals(color);
+        return piece.getColor().equals(color);
     }
 
     /**
@@ -148,5 +151,23 @@ public class Board {
         sb.append("\n      a b c d e f g h");
         return sb.toString();
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.deepHashCode(squares), currentPlayer, enPassantTarget, castlingControl);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Board other = (Board) obj;
+        return  Arrays.deepEquals(squares, other.squares) &&
+                currentPlayer == other.currentPlayer &&
+                Objects.equals(enPassantTarget, other.enPassantTarget) &&
+                Objects.equals(castlingControl, other.castlingControl);
+    }
+
+    
 
 }

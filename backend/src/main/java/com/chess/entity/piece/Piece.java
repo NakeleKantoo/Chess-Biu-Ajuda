@@ -88,4 +88,17 @@ public abstract class Piece {
       */
     public abstract List<Position> getPossibleMoves(Board board, Position from);
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, getClass());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Piece other = (Piece) obj;
+        return this.color == other.color;
+    }
+
 }
