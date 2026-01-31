@@ -50,8 +50,32 @@ public class MoveValidator {
         return board;
     }
 
-    public boolean isMoveLegal(Move move) {
-        return legalMoves.contains(move);
+    public Move createMove(Position from, Position to, Piece promotionPiece) {
+        Objects.requireNonNull(from, "Posição de origem não pode ser nula.");
+        Objects.requireNonNull(to, "Posição de destino não pode ser nula.");
+
+        if (promotionPiece != null && !MoveRules.isPromotionPiece(promotionPiece)) {
+            throw new IllegalArgumentException("Peça de promoção inválida: " + promotionPiece.getSymbol());
+        }
+
+        Piece movedPiece = board.getPieceAt(from);
+        if (movedPiece == null) {
+            throw new IllegalArgumentException("Não há peça na posição de origem: " + from);
+        }
+
+        MoveBuilder moveBuilder = new MoveBuilder(from, to, movedPiece);
+
+        if (promotionPiece != null) {
+            moveBuilder.promotionPiece(promotionPiece);
+        }
+
+        Move possibleMove = moveBuilder.build();
+
+        if (!legalMoves.contains(possibleMove)) {
+            throw new IllegalArgumentException("Movimento ilegal de " + from + " para " + to);
+        }
+
+        return legalMoves.get(legalMoves.indexOf(possibleMove));
     }
 
     private void generateLegalMoves() {

@@ -70,4 +70,13 @@ public class MoveRules {
         int promotionRow = piece.getColor().isWhite() ? 0 : 7;
         return to.getRow() == promotionRow;
     }
+
+    public static boolean isPromotionPiece(Piece piece) {
+        if (piece == null) {
+            return false;
+        }
+
+        char type = Character.toUpperCase(piece.getSymbol());
+        return type == 'D' || type == 'T' || type == 'B' || type == 'C';
+    }
 }
