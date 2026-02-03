@@ -119,27 +119,16 @@ public class Position {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + row;
-        result = prime * result + col;
-        return result;
+        return Objects.hash(row, col);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Position other = (Position) obj;
-        if (row != other.row)
-            return false;
-        if (col != other.col)
-            return false;
-        return true;
+        return  Objects.equals(this.row, other.row) &&
+                Objects.equals(this.col, other.col);
     }
     
 }

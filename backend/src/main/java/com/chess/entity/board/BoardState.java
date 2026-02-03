@@ -7,12 +7,10 @@ public enum BoardState {
     
     CHECKMATE("Xeque-mate"),
     STALEMATE("Empate por afogamento"),
-    RESIGNATION("Desistência"),
 
     DRAW_BY_INSUFFICIENT_MATERIAL("Empate por material insuficiente"),
     DRAW_BY_FIFTY_MOVE_RULE("Empate pela regra dos cinquenta lances"),
-    DRAW_BY_THREEFOLD_REPETITION("Empate por tripla repetição"),
-    DRAW_BY_AGREEMENT("Empate por acordo");
+    DRAW_BY_THREEFOLD_REPETITION("Empate por tripla repetição");
 
     private final String description;
 
@@ -51,7 +49,7 @@ public enum BoardState {
         return  this == STALEMATE || 
                 this == DRAW_BY_INSUFFICIENT_MATERIAL || 
                 this == DRAW_BY_FIFTY_MOVE_RULE || 
-                this == DRAW_BY_THREEFOLD_REPETITION || 
-                this == DRAW_BY_AGREEMENT;
+                this == DRAW_BY_THREEFOLD_REPETITION;
     }
+
 }

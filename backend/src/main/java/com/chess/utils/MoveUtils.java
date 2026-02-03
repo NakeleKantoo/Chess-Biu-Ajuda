@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.chess.entity.base.*;
-import com.chess.entity.board.Board;
+import com.chess.entity.board.BaseBoard;
 
 public class MoveUtils {
     
@@ -18,7 +18,7 @@ public class MoveUtils {
      * @param directions As direções nas quais a peça pode se mover.
      * @return Uma lista de posições possíveis para a peça se mover.
       */
-    public static List<Position> getSlidingMoves(Board board, Color pieceColor, Position from, Direction[] directions) {
+    public static List<Position> getSlidingMoves(BaseBoard board, Color pieceColor, Position from, Direction[] directions) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(pieceColor, "A cor da peça não pode ser nula.");
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");

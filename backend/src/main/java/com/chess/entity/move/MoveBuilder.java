@@ -21,13 +21,6 @@ public class MoveBuilder {
     // --- Flags para Movimentos Especiais ---
     private boolean isCastling;
     private boolean isEnPassant;
-    private boolean needColDesambiguation;
-    private boolean needRowDesambiguation;
-
-    // --- Estado do Jogo ---
-    private boolean isCheck;
-    private boolean isCheckmate;
-    private boolean isStalemate;
 
     public MoveBuilder(Move other) {
         Objects.requireNonNull(other, "O Move fornecido não pode ser nulo.");
@@ -40,11 +33,6 @@ public class MoveBuilder {
         this.rookFrom = other.getRookFrom();
         this.isCastling = other.isCastling();
         this.isEnPassant = other.isEnPassant();
-        this.needColDesambiguation = other.getColDesambiguation();
-        this.needRowDesambiguation = other.getRowDesambiguation();
-        this.isCheck = other.isCheck();
-        this.isCheckmate = other.isCheckmate();
-        this.isStalemate = other.isStalemate();
     }
 
     public MoveBuilder(Position from, Position to, Piece movedPiece) {
@@ -111,57 +99,6 @@ public class MoveBuilder {
     }
 
     /**
-     * Define que o movimento necessita de desambiguação pela coluna.
-     * 
-     * @return o próprio construtor para encadeamento de chamadas.
-     */
-    public MoveBuilder needColDesambiguation() {
-        this.needColDesambiguation = true;
-        return this;
-    }
-
-    /**
-     * Define que o movimento necessita de desambiguação pela linha.
-     * 
-     * @return o próprio construtor para encadeamento de chamadas.
-      */
-    public MoveBuilder needRowDesambiguation() {
-        this.needRowDesambiguation = true;
-        return this;
-    }
-
-    /**
-     * Define que o movimento resulta em xeque.
-     * 
-     * @return o próprio construtor para encadeamento de chamadas.
-     */
-    public MoveBuilder check() {
-        this.isCheck = true;
-        return this;
-    }
-
-    /**
-     * Define que o movimento resulta em xeque-mate.
-     * 
-     * @return o próprio construtor para encadeamento de chamadas.
-      */
-    public MoveBuilder checkmate() {
-        this.isCheckmate = true;
-        this.isCheck = true; // Xeque-mate implica xeque
-        return this;
-    }
-
-    /**
-     * Define que o movimento resulta em empate.
-     * 
-     * @return o próprio construtor para encadeamento de chamadas.
-      */
-    public MoveBuilder stalemate() {
-        this.isStalemate = true;
-        return this;
-    }
-
-    /**
      * Constrói o objeto Move com as configurações definidas.
      * Valida a consistência interna antes de criar o objeto.
      * 
@@ -194,9 +131,6 @@ public class MoveBuilder {
                 throw new IllegalStateException("En passant deve capturar um peão.");
             }
         }
-        if (isCheckmate && isStalemate) {
-            throw new IllegalStateException("Um movimento não pode resultar em xeque-mate e empate ao mesmo tempo.");
-        }
 
         return new Move(this);
     }
@@ -209,10 +143,5 @@ public class MoveBuilder {
     public Position getRookFrom() { return rookFrom; }
     public boolean isCastling() { return isCastling; }
     public boolean isEnPassant() { return isEnPassant; }
-    public boolean getColDesambiguation() { return needColDesambiguation; }
-    public boolean getRowDesambiguation() { return needRowDesambiguation; }
-    public boolean isCheck() { return isCheck; }
-    public boolean isCheckmate() { return isCheckmate; }
-    public boolean isStalemate() { return isStalemate; }
 
 }

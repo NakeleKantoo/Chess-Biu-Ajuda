@@ -6,7 +6,6 @@ import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
-import com.chess.entity.board.BoardState;
 import com.chess.entity.board.CastlingControl;
 import com.chess.entity.move.Move;
 import com.chess.entity.piece.Pawn;
@@ -23,10 +22,14 @@ public class MoveExecutor {
      * @param move O movimento a ser executado.
      * @return O novo estado do tabuleiro após a execução do movimento.
       */
-    public Board executeMove(Board board, Move move) {
+    public BoardBuilder executeMove(Board board, Move move) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(move, "O movimento não pode ser nulo.");
-        
+
+        if (!board.getBoardState().isInProgress()) {
+            throw new IllegalStateException("Não é possível executar movimentos em um jogo que já foi concluído.");
+        }
+
         this.builder = new BoardBuilder(board);
 
         movePiece(move.getFrom(), move.getTo());
@@ -35,10 +38,6 @@ public class MoveExecutor {
         else if (move.isCastling()) castle(move);
         else if (move.isPromotion()) promote(move);
         
-        if (move.isCheckmate()) builder.setBoardState(BoardState.CHECKMATE);
-        else if (move.isCheck()) builder.setBoardState(BoardState.CHECK);
-        else builder.setBoardState(BoardState.IN_PROGRESS);
-
         if (builder.getCurrentPlayer().isBlack()) {
             builder.incrementFullMoveClock();
         }
@@ -52,7 +51,7 @@ public class MoveExecutor {
         updateCastlingControl(move);
         updateCurrentPlayer();
 
-        return builder.build();
+        return builder;
     }
 
     private void movePiece(Position from, Position to) {

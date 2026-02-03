@@ -5,39 +5,61 @@ import java.util.List;
 import java.util.Objects;
 
 import com.chess.entity.base.Position;
+import com.chess.entity.board.BaseBoard;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardAnalyzer;
+import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.move.Move;
 import com.chess.entity.move.MoveBuilder;
-import com.chess.entity.move.MoveContext;
 import com.chess.entity.piece.Piece;
 
 public class MoveValidator {
     
-    private final MoveExecutor moveExecutor;
     private final Board board;
     private final List<Move> legalMoves;
 
-    private final MoveContext moveContext;
+    public static boolean hasAnyLegalMove(BaseBoard board) {
+        List<Position> piecesPositions = board.getPiecesPositions(board.getCurrentPlayer());
+
+        for (Position from : piecesPositions) {
+            Piece piece = board.getPieceAt(from);
+            List<Position> possibleMoves = piece.getPossibleMoves(board, from);
+
+            for (Position to : possibleMoves) {
+                MoveBuilder moveBuilder = new MoveBuilder(from, to, piece);
+
+                applyRules(moveBuilder, board, from, to, piece);
+
+                if (MoveRules.isPromotion(to, piece)) {
+                    char c = board.getCurrentPlayer().isWhite() ? 'D' : 'd';
+                    Piece promotionPiece = Piece.create(c);
+
+                    // Adiciona a peça de promoção ao movimento
+                    moveBuilder.promotionPiece(promotionPiece);
+                }
+
+                Move move = moveBuilder.build();
+                
+                if (!movePutsOwnKingInCheck(board, move)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     public static MoveValidator of(Board board) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
 
-        MoveValidator validator = new MoveValidator(board, true);
-        new MoveAnnotator().annotateMoves(validator.moveContext, validator.legalMoves);
+        MoveValidator validator = new MoveValidator(board);
 
         return validator;
     }
 
-    protected MoveValidator(Board board) {
-        this(board, false);
-    }
-
-    private MoveValidator(Board board, boolean createContext) {
-        this.moveExecutor = new MoveExecutor();
+    private MoveValidator(Board board) {
         this.board = board;
         this.legalMoves = new ArrayList<>();
-        this.moveContext = createContext ? new MoveContext() : null;
 
         generateLegalMoves();
     }
@@ -50,8 +72,32 @@ public class MoveValidator {
         return board;
     }
 
-    public boolean isMoveLegal(Move move) {
-        return legalMoves.contains(move);
+    public Move createMove(Position from, Position to, Piece promotionPiece) {
+        Objects.requireNonNull(from, "Posição de origem não pode ser nula.");
+        Objects.requireNonNull(to, "Posição de destino não pode ser nula.");
+
+        if (promotionPiece != null && !MoveRules.isPromotionPiece(promotionPiece)) {
+            throw new IllegalArgumentException("Peça de promoção inválida: " + promotionPiece.getSymbol());
+        }
+
+        Piece movedPiece = board.getPieceAt(from);
+        if (movedPiece == null) {
+            throw new IllegalArgumentException("Não há peça na posição de origem: " + from);
+        }
+
+        MoveBuilder moveBuilder = new MoveBuilder(from, to, movedPiece);
+
+        if (promotionPiece != null) {
+            moveBuilder.promotionPiece(promotionPiece);
+        }
+
+        Move possibleMove = moveBuilder.build();
+
+        if (!legalMoves.contains(possibleMove)) {
+            throw new IllegalArgumentException("Movimento ilegal de " + from + " para " + to);
+        }
+
+        return legalMoves.get(legalMoves.indexOf(possibleMove));
     }
 
     private void generateLegalMoves() {
@@ -74,9 +120,7 @@ public class MoveValidator {
     private void validateMove(Position from, Position to, Piece piece) {
         MoveBuilder moveBuilder = new MoveBuilder(from, to, piece);
 
-        MoveRules.applyCaptureRule(board, to, moveBuilder);
-        MoveRules.applyCastleRule(board, from, to, piece, moveBuilder);
-        MoveRules.applyEnPassantRule(board, from, to, piece, moveBuilder);
+        applyRules(moveBuilder, board, from, to, piece);
 
         if (MoveRules.isPromotion(to, piece)) {
             addPromotionMoves(moveBuilder);
@@ -103,15 +147,31 @@ public class MoveValidator {
 
     private void addMove(MoveBuilder moveBuilder) {
         Move move = moveBuilder.build();
-        Board newBoard = moveExecutor.executeMove(board, move);
 
-        boolean movePutsOwnKingInCheck = BoardAnalyzer.isInCheck(newBoard, board.getCurrentPlayer());
-
-        if (!movePutsOwnKingInCheck) {
+        if (!movePutsOwnKingInCheck(board, move)) {
             legalMoves.add(move);
-
-            if (moveContext != null) moveContext.addMove(moveBuilder, newBoard);
         }
+    }
+
+    private static void applyRules(MoveBuilder moveBuilder, BaseBoard board, Position from, Position to, Piece piece) {
+        MoveRules.applyCaptureRule(board, to, moveBuilder);
+        MoveRules.applyCastleRule(board, from, to, piece, moveBuilder);
+        MoveRules.applyEnPassantRule(board, from, to, piece, moveBuilder);
+    }
+
+    private static boolean movePutsOwnKingInCheck(BaseBoard board, Move move) {
+        // Se for um Builder (mutável), precisamos de um snapshot imutável 
+        // para não corromper o estado original durante a simulação do movimento.
+        Board boardToSimulate;
+        if (board instanceof BoardBuilder) {
+            boardToSimulate = ((BoardBuilder) board).build();
+        } else {
+            boardToSimulate = (Board) board;
+        }
+
+        BoardBuilder newBoard = new MoveExecutor().executeMove(boardToSimulate, move);
+
+        return BoardAnalyzer.isInCheck(newBoard, board.getCurrentPlayer());
     }
 
 }

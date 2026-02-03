@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.chess.entity.base.*;
-import com.chess.entity.board.Board;
+import com.chess.entity.board.BaseBoard;
 
 public class Pawn extends Piece {
 
@@ -47,7 +47,7 @@ public class Pawn extends Piece {
         return false;
     }
 
-    private List<Position> getCaptureMoves(Board board, Position from) {
+    private List<Position> getCaptureMoves(BaseBoard board, Position from) {
         List<Position> captureMoves = new ArrayList<>();
 
         // Verifica cada direção de captura
@@ -66,7 +66,7 @@ public class Pawn extends Piece {
         return captureMoves;
     }
 
-    private List<Position> getForwardMoves(Board board, Position from) {
+    private List<Position> getForwardMoves(BaseBoard board, Position from) {
         List<Position> forwardMoves = new ArrayList<>();
 
         // Verifica a quantidade de passos possíveis (1 ou 2)
@@ -96,7 +96,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public boolean isAttacking(Board board, Position from, Position to) {
+    public boolean isAttacking(BaseBoard board, Position from, Position to) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
         Objects.requireNonNull(to, "A posição de destino não pode ser nula.");
@@ -109,7 +109,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<Position> getPossibleMoves(Board board, Position from) {
+    public List<Position> getPossibleMoves(BaseBoard board, Position from) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
 

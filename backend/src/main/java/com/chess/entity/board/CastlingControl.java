@@ -43,7 +43,7 @@ public class CastlingControl {
      * @param color a cor do jogador.
      * @return {@code true} se o jogador pode realizar o roque do lado do rei, {@code false} caso contrário.
       */
-    public boolean canCastleKingSide(Board board, Color color) {
+    public boolean canCastleKingSide(BaseBoard board, Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
         boolean rightsActive;
         int row, rookCol;
@@ -80,7 +80,7 @@ public class CastlingControl {
      * @param color a cor do jogador.
      * @return {@code true} se o jogador pode realizar o roque do lado da dama, {@code false} caso contrário.
       */
-    public boolean canCastleQueenSide(Board board, Color color) {
+    public boolean canCastleQueenSide(BaseBoard board, Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");
         boolean rightsActive;
         int row, rookCol;
@@ -164,21 +164,21 @@ public class CastlingControl {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(whiteKingCol, blackKingCol, whiteKingSideRookCol, whiteQueenSideRookCol, blackKingSideRookCol, blackQueenSideRookCol);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CastlingControl that = (CastlingControl) o;
-        return Objects.equals(whiteKingCol, that.whiteKingCol) &&
+        return  Objects.equals(whiteKingCol, that.whiteKingCol) &&
                 Objects.equals(blackKingCol, that.blackKingCol) &&
                 Objects.equals(whiteKingSideRookCol, that.whiteKingSideRookCol) &&
                 Objects.equals(whiteQueenSideRookCol, that.whiteQueenSideRookCol) &&
                 Objects.equals(blackKingSideRookCol, that.blackKingSideRookCol) &&
                 Objects.equals(blackQueenSideRookCol, that.blackQueenSideRookCol);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(whiteKingCol, blackKingCol, whiteKingSideRookCol, whiteQueenSideRookCol, blackKingSideRookCol, blackQueenSideRookCol);
     }
 
     @Override

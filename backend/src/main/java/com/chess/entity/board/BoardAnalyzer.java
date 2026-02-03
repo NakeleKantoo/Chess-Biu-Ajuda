@@ -18,9 +18,9 @@ public class BoardAnalyzer {
      * @param attackerColor A cor das peças que podem estar atacando.
      * @return {@code true} se pelo menos uma peça da cor atacante ameaça a posição alvo.
      */
-    public static boolean isUnderAttack(Board board, Position target, Color attackerColor) {
+    public static boolean isUnderAttack(BaseBoard board, Position target, Color attackerColor) {
         // Acessa diretamente o mapa para evitar o overhead de clonagem do getter público
-        List<Position> attackerPositions = board.piecesPositionsByColor.get(attackerColor);
+        List<Position> attackerPositions = board.getInternalPiecesPositionsByColor().get(attackerColor);
         
         if (attackerPositions == null || attackerPositions.isEmpty()) {
             return false;
@@ -47,7 +47,7 @@ public class BoardAnalyzer {
      * @param attackerColor a cor das peças que podem estar atacando.
      * @return {@code true} se pelo menos uma peça da cor atacante ameaça alguma posição no caminho.
       */
-    public static boolean isPathUnderAttack(Board board, Position from, Position to, Color attackerColor) {
+    public static boolean isPathUnderAttack(BaseBoard board, Position from, Position to, Color attackerColor) {
         Direction dir = Direction.get(from, to);
         if (dir == null) {
             return false;
@@ -76,7 +76,7 @@ public class BoardAnalyzer {
      * @param to a posição final.
      * @return {@code true} se o caminho estiver livre, {@code false} caso contrário.
       */
-    public static boolean isPathClear(Board board, Position from, Position to) {
+    public static boolean isPathClear(BaseBoard board, Position from, Position to) {
         Direction dir = Direction.get(from, to);
         if (dir == null) {
             return false;
@@ -102,7 +102,7 @@ public class BoardAnalyzer {
      * @param color A cor do rei a ser verificado.
      * @return {@code true} se o rei da cor especificada estiver em xeque, {@code false} caso contrário.
       */
-    public static boolean isInCheck(Board board, Color color) {
+    public static boolean isInCheck(BaseBoard board, Color color) {
         return isUnderAttack(board, board.getKingPosition(color), color.opposite());
     }
 }
