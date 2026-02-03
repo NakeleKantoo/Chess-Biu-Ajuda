@@ -60,8 +60,9 @@ public class GameService {
         MoveValidator validator = MoveValidator.of(game.getCurrentBoard());
         Move move = validator.createMove(from, to, promotionPiece);
         BoardBuilder nextBoardBuilder = moveExecutor.executeMove(game.getCurrentBoard(), move);
-
+        
         // Validar estado do BoardBuilder e instanciar Board
+        nextBoardBuilder.setBoardState(BoardStateEvaluator.evaluateState(nextBoardBuilder, game));
         Board nextBoard = nextBoardBuilder.build();
 
         game.commitMove(move, nextBoard);
