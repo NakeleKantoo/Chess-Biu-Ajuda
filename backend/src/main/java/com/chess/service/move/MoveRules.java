@@ -2,7 +2,7 @@ package com.chess.service.move;
 
 import com.chess.entity.base.Direction;
 import com.chess.entity.base.Position;
-import com.chess.entity.board.Board;
+import com.chess.entity.board.BaseBoard;
 import com.chess.entity.board.CastlingControl;
 import com.chess.entity.move.MoveBuilder;
 import com.chess.entity.piece.King;
@@ -13,14 +13,14 @@ public class MoveRules {
 
     private MoveRules() {}
 
-    public static void applyCaptureRule(Board board, Position to, MoveBuilder moveBuilder) {
+    public static void applyCaptureRule(BaseBoard board, Position to, MoveBuilder moveBuilder) {
         Piece capturedPiece = board.getPieceAt(to);
         if (capturedPiece != null) {
             moveBuilder.capturedPiece(capturedPiece);
         }
     }
 
-    public static void applyCastleRule(Board board, Position from, Position to, Piece piece, MoveBuilder moveBuilder) {
+    public static void applyCastleRule(BaseBoard board, Position from, Position to, Piece piece, MoveBuilder moveBuilder) {
         boolean isCastling = piece instanceof King && !from.isNear(to); 
         if (!isCastling) {
             return;
@@ -48,7 +48,7 @@ public class MoveRules {
         moveBuilder.castling(rookFrom);
     }
 
-    public static void applyEnPassantRule(Board board, Position from, Position to, Piece piece, MoveBuilder moveBuilder) {
+    public static void applyEnPassantRule(BaseBoard board, Position from, Position to, Piece piece, MoveBuilder moveBuilder) {
         boolean isPawn = piece instanceof Pawn;
         if (!isPawn) {
             return;

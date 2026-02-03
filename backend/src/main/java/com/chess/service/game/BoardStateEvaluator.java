@@ -6,9 +6,7 @@ import java.util.List;
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.BaseBoard;
-import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardAnalyzer;
-import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.board.BoardState;
 import com.chess.entity.game.Game;
 import com.chess.entity.piece.Bishop;
@@ -83,7 +81,7 @@ public class BoardStateEvaluator {
                     hasKnight = true;
                 } else if (p instanceof Bishop) {
                     int color = (pos.getRow() + pos.getCol()) % 2;
-                    
+
                     if (firstBishopColor == null) {
                         firstBishopColor = color;
                     } else if (firstBishopColor != color) {
@@ -121,17 +119,7 @@ public class BoardStateEvaluator {
     }
     
     private static boolean hasAnyLegalMove(BaseBoard board) {
-        Board boardToCheck;
-        
-        if (board instanceof Board) {
-            boardToCheck = (Board) board;
-        } else if (board instanceof BoardBuilder) {
-            boardToCheck = ((BoardBuilder) board).build();
-        } else {
-            throw new IllegalArgumentException("Tipo de tabuleiro não suportado");
-        }
-        
-        return !MoveValidator.of(boardToCheck).getLegalMoves().isEmpty();
+        return MoveValidator.hasAnyLegalMove(board);
     }
 
 
