@@ -1,6 +1,7 @@
 package com.chess.entity.board;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -92,4 +93,20 @@ public abstract class BaseBoard {
         return new ArrayList<>(positions);
     }
     
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.deepHashCode(getInternalSquares()), getCurrentPlayer(), getEnPassantTarget(), getCastlingControl());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        BaseBoard other = (BaseBoard) obj;
+        return  Arrays.deepEquals(getInternalSquares(), other.getInternalSquares()) &&
+                getCurrentPlayer() == other.getCurrentPlayer() &&
+                Objects.equals(getEnPassantTarget(), other.getEnPassantTarget()) &&
+                Objects.equals(getCastlingControl(), other.getCastlingControl());
+    }
+
 }

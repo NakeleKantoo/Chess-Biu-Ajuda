@@ -2,7 +2,6 @@ package com.chess.entity.board;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Arrays;
 import java.util.List;
 
 import com.chess.entity.base.Color;
@@ -84,22 +83,6 @@ public class Board extends BaseBoard {
         }
         sb.append("\n      a b c d e f g h");
         return sb.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(Arrays.deepHashCode(squares), currentPlayer, enPassantTarget, castlingControl);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Board other = (Board) obj;
-        return  Arrays.deepEquals(squares, other.squares) &&
-                currentPlayer == other.currentPlayer &&
-                Objects.equals(enPassantTarget, other.enPassantTarget) &&
-                Objects.equals(castlingControl, other.castlingControl);
     }
 
 }
