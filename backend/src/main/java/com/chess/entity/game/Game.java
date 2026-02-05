@@ -7,10 +7,8 @@ import java.util.Objects;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.board.Board;
-import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.board.BoardState;
 import com.chess.entity.clock.ChessClock;
-import com.chess.entity.clock.ChessClockBuilder;
 import com.chess.entity.move.Move;
 
 public class Game {
@@ -26,27 +24,12 @@ public class Game {
     private final ChessClock chessClock;
 
     // Construtor privado para forçar uso dos métodos de fábrica
-    private Game(Board initialBoard) {
+    protected Game(Board initialBoard, ChessClock chessClock) {
         this.boardHistory = new ArrayList<>();
         this.moveHistory = new ArrayList<>();
+
         this.boardHistory.add(initialBoard);
-        this.chessClock = ChessClockBuilder.RAPID_10M(); // Exemplo: 5 minutos iniciais para cada jogador
-    }
-
-    /**
-     * Inicia um novo jogo com as regras e posições padrão.
-     */
-    public static Game startNewStandardGame() {
-        Board initialBoard = new BoardBuilder().buildStandard();
-        return new Game(initialBoard);
-    }
-
-    /**
-     * Inicia um jogo a partir de um tabuleiro personalizado (ex: para cenários de teste).
-     */
-    public static Game startFromBoard(Board board) {
-        Objects.requireNonNull(board, "O tabuleiro inicial não pode ser nulo.");
-        return new Game(board);
+        this.chessClock = chessClock;
     }
 
     public Board getCurrentBoard() { return boardHistory.getLast(); }

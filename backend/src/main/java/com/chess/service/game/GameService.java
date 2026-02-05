@@ -9,6 +9,7 @@ import com.chess.entity.base.Position;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.game.Game;
+import com.chess.entity.game.GameBuilder;
 import com.chess.entity.move.Move;
 import com.chess.entity.piece.Piece;
 import com.chess.service.move.MoveExecutor;
@@ -18,18 +19,15 @@ public class GameService {
     
     private Game game;
 
-    private MoveExecutor moveExecutor;
+    private MoveExecutor moveExecutor = new MoveExecutor();
 
-    private Timer timer;
+    private Timer timer = new Timer();
 
     private TimerTask startTask;
     private TimerTask endTask;
 
-    public GameService() {
-        this.game = Game.startNewStandardGame();
-        this.moveExecutor = new MoveExecutor();
-        this.timer = new Timer();
-
+    private GameService() {
+        this.game = GameBuilder.standardRapidGame();
         scheduleAutoStart();
     }
 
@@ -97,22 +95,6 @@ public class GameService {
       */
     public void undoLastMove() {
         this.game.undoLastMove();
-    }
-
-    /**
-     * Reinicia o jogo para o estado inicial padrão.
-      */
-    public void resetGame() {
-        if (this.timer != null) {
-            this.timer.cancel(); 
-        }
-
-        this.game = Game.startNewStandardGame();
-        this.timer = new Timer();
-        this.startTask = null;
-        this.endTask = null;
-
-        scheduleAutoStart();
     }
 
     private void configTimerToEnd() {
