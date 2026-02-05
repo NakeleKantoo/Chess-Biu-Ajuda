@@ -90,13 +90,6 @@ public class GameService {
         configTimerToEnd();
     }
 
-    /**
-     * Desfaz o último movimento realizado no jogo atual.
-      */
-    public void undoLastMove() {
-        this.game.undoLastMove();
-    }
-
     private void configTimerToEnd() {
         if (endTask != null) endTask.cancel();
 

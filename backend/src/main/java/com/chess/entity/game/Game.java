@@ -79,19 +79,4 @@ public class Game {
             this.chessClock.makeMove();
         }
     }
-
-    /**
-     * Desfaz o último movimento, revertendo o jogo para o estado anterior.
-     * Retorna o movimento que foi desfeito.
-     */
-    public Move undoLastMove() {
-        if (moveHistory.isEmpty()) {
-            return null;
-        }
-
-        Move lastMove = moveHistory.remove(moveHistory.size() - 1);
-        boardHistory.remove(boardHistory.size() - 1);
-        chessClock.undoMove();
-        return lastMove;
-    }
 }
