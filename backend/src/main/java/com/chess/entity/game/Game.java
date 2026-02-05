@@ -5,9 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import com.chess.entity.base.Color;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.board.BoardState;
+import com.chess.entity.clock.ChessClock;
+import com.chess.entity.clock.ChessClockBuilder;
 import com.chess.entity.move.Move;
 
 public class Game {
@@ -19,11 +22,15 @@ public class Game {
     // Histórico de movimentos que levaram aos estados.
     private final List<Move> moveHistory;
 
+    // Relógio de xadrez associado ao jogo.
+    private final ChessClock chessClock;
+
     // Construtor privado para forçar uso dos métodos de fábrica
     private Game(Board initialBoard) {
         this.boardHistory = new ArrayList<>();
         this.moveHistory = new ArrayList<>();
         this.boardHistory.add(initialBoard);
+        this.chessClock = ChessClockBuilder.RAPID_10M(); // Exemplo: 5 minutos iniciais para cada jogador
     }
 
     /**
@@ -46,6 +53,10 @@ public class Game {
     public BoardState getCurrentState() { return getCurrentBoard().getBoardState(); }
     public List<Move> getMoveHistory() { return Collections.unmodifiableList(moveHistory); }
     public List<Board> getBoardHistory() { return Collections.unmodifiableList(boardHistory); }
+    public long getTimeRemaining(Color color) { return chessClock.getTimeRemaining(color); }
+
+    public void startClock() { chessClock.start(); }
+    public void stopClock() { chessClock.stop(); }
 
     /**
      * Registra um movimento e o novo estado resultante.
@@ -62,6 +73,9 @@ public class Game {
 
         this.moveHistory.add(move);
         this.boardHistory.add(nextBoard);
+
+        this.chessClock.start(); // Idempotente: só inicia se não estiver rodando
+        this.chessClock.makeMove();
     }
 
     /**
@@ -75,7 +89,7 @@ public class Game {
 
         Move lastMove = moveHistory.remove(moveHistory.size() - 1);
         boardHistory.remove(boardHistory.size() - 1);
-        
+        chessClock.undoMove();
         return lastMove;
     }
 }
