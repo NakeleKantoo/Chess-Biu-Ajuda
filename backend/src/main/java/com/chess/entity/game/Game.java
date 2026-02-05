@@ -100,6 +100,26 @@ public class Game {
         endGame(GameState.DRAW, GameEndReason.AGREED_DRAW);
     }
 
+    public void timeoutDraw() {
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível declarar empate por timeout.");
+        }
+
+        endGame(GameState.DRAW, GameEndReason.TIMEOUT);
+    }
+
+    public void timeoutLoss(Color losingPlayer) {
+        Objects.requireNonNull(losingPlayer, "O jogador que perdeu por timeout não pode ser nulo.");
+
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível declarar vitória por timeout.");
+        }
+
+        GameState gameState = losingPlayer.isWhite() ? GameState.BLACK_WON : GameState.WHITE_WON;
+
+        endGame(gameState, GameEndReason.TIMEOUT);
+    }
+
     public void abort() {
         if (gameState != GameState.ACTIVE) {
             throw new IllegalStateException("O jogo já acabou. Não é possível abortar.");

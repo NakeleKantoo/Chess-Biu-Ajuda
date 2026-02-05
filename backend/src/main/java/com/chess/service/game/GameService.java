@@ -78,7 +78,7 @@ public class GameService {
      * @param to Posição de destino do movimento.
      * @param promotionPiece Peça para promoção, se aplicável.
       */
-    public void makeMove(Position from, Position to, Piece promotionPiece) {
+    public synchronized void makeMove(Position from, Position to, Piece promotionPiece) {
         Objects.requireNonNull(from, "Posição de origem não pode ser nula.");
         Objects.requireNonNull(to, "Posição de destino não pode ser nula.");
 
@@ -164,14 +164,28 @@ public class GameService {
             @Override
             public void run() {
                 game.stopClock();
+                timeout();
                 // TODO: Notificar fim de jogo (Timeout)
-                System.out.println("TEMPO ACABOU PARA: " + getCurrentPlayer());
             }
         };
 
         // Agendar a tarefa para encerrar o relógio após o tempo restante do jogador atual
         long timeRemaining = game.getTimeRemaining(getCurrentPlayer());
         timer.schedule(endTask, Math.max(timeRemaining, 1));
+    }
+
+    private synchronized void timeout() {
+        Color playerWhoRanOutOfTime = getCurrentPlayer();
+        Color opponent = playerWhoRanOutOfTime.opposite();
+
+        // Verifico se o VENCEDOR (por tempo) tem material suficiente para vencer
+        boolean opponentHasMatingMaterial = BoardStateEvaluator.hasMatingMaterial(getCurrentBoard(), opponent);
+
+        if (opponentHasMatingMaterial) {
+            game.timeoutLoss(playerWhoRanOutOfTime);
+        } else {
+            game.timeoutDraw();
+        }
     }
 
 }
