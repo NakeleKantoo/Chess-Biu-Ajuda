@@ -23,6 +23,10 @@ public class Game {
     // Relógio de xadrez associado ao jogo.
     private final ChessClock chessClock;
 
+    // Estado do jogo (ativo, vitória, empate, etc.) pode ser inferido do estado atual do tabuleiro e do relógio.
+    private GameState gameState;
+    private GameEndReason gameEndReason;
+
     // Construtor privado para forçar uso dos métodos de fábrica
     protected Game(Board initialBoard, ChessClock chessClock) {
         this.boardHistory = new ArrayList<>();
@@ -30,6 +34,9 @@ public class Game {
 
         this.boardHistory.add(initialBoard);
         this.chessClock = chessClock;
+
+        this.gameState = GameState.fromBoardState(initialBoard.getBoardState(), initialBoard.getCurrentPlayer());
+        this.gameEndReason = GameEndReason.fromBoardState(initialBoard.getBoardState());
     }
 
     public Board getCurrentBoard() { return boardHistory.getLast(); }
@@ -37,6 +44,8 @@ public class Game {
     public List<Move> getMoveHistory() { return Collections.unmodifiableList(moveHistory); }
     public List<Board> getBoardHistory() { return Collections.unmodifiableList(boardHistory); }
     public long getTimeRemaining(Color color) { return chessClock.getTimeRemaining(color); }
+    public GameState getGameState() { return gameState; }
+    public GameEndReason getGameEndReason() { return gameEndReason; }
 
     public void startClock() { chessClock.start(); }
     public void stopClock() { chessClock.stop(); }
@@ -57,22 +66,72 @@ public class Game {
         this.moveHistory.add(move);
         this.boardHistory.add(nextBoard);
 
+        this.gameState = GameState.fromBoardState(nextBoard.getBoardState(), nextBoard.getCurrentPlayer());
+        this.gameEndReason = GameEndReason.fromBoardState(nextBoard.getBoardState());
+
         this.chessClock.start(); // Idempotente: só inicia se não estiver rodando
-        this.chessClock.makeMove();
+
+        if (this.gameState != GameState.ACTIVE) {
+            // Se acabou (Mate/Empate), para o relógio imediatamente!
+            this.chessClock.stop();
+        } else {
+            // Se continua, troca o turno e aplica incremento
+            this.chessClock.makeMove();
+        }
     }
 
-    /**
-     * Desfaz o último movimento, revertendo o jogo para o estado anterior.
-     * Retorna o movimento que foi desfeito.
-     */
-    public Move undoLastMove() {
-        if (moveHistory.isEmpty()) {
-            return null;
+    public void resign(Color resigningPlayer) {
+        Objects.requireNonNull(resigningPlayer, "O jogador que desiste não pode ser nulo.");
+
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível desistir.");
         }
 
-        Move lastMove = moveHistory.remove(moveHistory.size() - 1);
-        boardHistory.remove(boardHistory.size() - 1);
-        chessClock.undoMove();
-        return lastMove;
+        GameState gameState = resigningPlayer.isWhite() ? GameState.BLACK_WON : GameState.WHITE_WON;
+
+        endGame(gameState, GameEndReason.RESIGNATION);
     }
+
+    public void drawByAgreement() {
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível aceitar empate.");
+        }
+
+        endGame(GameState.DRAW, GameEndReason.AGREED_DRAW);
+    }
+
+    public void timeoutDraw() {
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível declarar empate por timeout.");
+        }
+
+        endGame(GameState.DRAW, GameEndReason.TIMEOUT);
+    }
+
+    public void timeoutLoss(Color losingPlayer) {
+        Objects.requireNonNull(losingPlayer, "O jogador que perdeu por timeout não pode ser nulo.");
+
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível declarar vitória por timeout.");
+        }
+
+        GameState gameState = losingPlayer.isWhite() ? GameState.BLACK_WON : GameState.WHITE_WON;
+
+        endGame(gameState, GameEndReason.TIMEOUT);
+    }
+
+    public void abort() {
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível abortar.");
+        }
+
+        endGame(GameState.ABORTED, GameEndReason.ABORTION);
+    }
+
+    private void endGame(GameState endState, GameEndReason reason) {
+        this.chessClock.stop();
+        this.gameState = endState;
+        this.gameEndReason = reason;
+    }
+
 }

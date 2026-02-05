@@ -2,6 +2,7 @@ package com.chess.service.game;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
@@ -10,6 +11,7 @@ import com.chess.entity.board.BoardAnalyzer;
 import com.chess.entity.board.BoardState;
 import com.chess.entity.game.Game;
 import com.chess.entity.piece.Bishop;
+import com.chess.entity.piece.King;
 import com.chess.entity.piece.Knight;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;
@@ -122,5 +124,89 @@ public class BoardStateEvaluator {
         return MoveValidator.hasAnyLegalMove(board);
     }
 
+    /**
+     * Verifica se o jogador possui material suficiente para dar mate.
+     * Considera como verdadeiro se for possível dar mate com ajuda do adversário.
+     * 
+     * @param board O tabuleiro a ser avaliado.
+     * @param player O jogador a ser avaliado.
+     * @return {@code true} se o jogador possuir material para mate, {@code false} caso contrário.
+      */
+    public static boolean hasMatingMaterial(BaseBoard board, Color player) {
+        Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
+        Objects.requireNonNull(player, "O jogador não pode ser nulo.");
+
+        List<Position> positions = board.getPiecesPositions(player);
+        int playerPieces = positions.size();
+
+        // Somente rei -> mate impossível
+        if (playerPieces <= 1) {
+            return false;
+        }
+
+        boolean hasKnight = false;
+        Integer firstBishopColor = null;
+
+        for (Position pos : positions) {
+            Piece p = board.getPieceAt(pos);
+
+            if (p instanceof King) {
+                continue;
+            }
+
+            // Possui peão, torre ou dama -> mate possível
+            if (p instanceof Queen || p instanceof Rook || p instanceof Pawn) {
+                return true;
+            }
+
+            // Salva se tem cavalo
+            if (p instanceof Knight) {
+                hasKnight = true;
+            } 
+
+            // Se não é nenhuma outra peça, só pode ser bispo
+            int colorSquare = (pos.getRow() + pos.getCol()) % 2;
+            if (firstBishopColor == null) {
+                firstBishopColor = colorSquare;
+            } else if (firstBishopColor != colorSquare) {
+                return true; // Bispos em cores diferentes -> mate possível
+            }
+        }
+
+        List<Position> opponentPositions = board.getPiecesPositions(player.opposite());
+        
+        // Caso de K+N
+        if (hasKnight) {
+            // Se tenho mais de 2 peças (ex: K+N+N ou K+N+B), ganha sempre.
+            // Se o oponente tiver mais de 1 peça, pode ajudar a dar mate.
+            if (playerPieces > 2 || opponentPositions.size() > 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // Caso de K+BBB... (bispos de mesmas cores)
+        // Se oponente tiver bispo de cor diferente ou qualquer outra peça -> mate possível
+        for (Position pos : opponentPositions) {
+            Piece p = board.getPieceAt(pos);
+
+            if (p instanceof King) {
+                continue;
+            }
+
+            if (p instanceof Queen || p instanceof Rook || p instanceof Pawn || p instanceof Knight) {
+                return true;
+            }
+
+            int colorSquare = (pos.getRow() + pos.getCol()) % 2;
+
+            if (firstBishopColor != null && colorSquare != firstBishopColor) {
+                return true; // Bispos em cores diferentes -> mate possível
+            }
+        }
+
+        return false;
+    }
 
 }

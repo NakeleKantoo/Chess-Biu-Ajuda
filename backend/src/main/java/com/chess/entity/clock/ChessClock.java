@@ -1,8 +1,6 @@
 package com.chess.entity.clock;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,17 +20,10 @@ public class ChessClock {
     // Indica se o relógio está em execução.
     private boolean isRunning;
 
-    // Histórico de tempos para possível desfazer movimentos.
-    private Map<Color, List<Long>> historyTimeRemaining;
-
     protected ChessClock(long whiteTimeRemaining, long blackTimeRemaining, long incrementMillis, Color currentTurn) {
         this.timeRemaining = new EnumMap<>(Color.class);
         this.timeRemaining.put(Color.WHITE, whiteTimeRemaining);
         this.timeRemaining.put(Color.BLACK, blackTimeRemaining);
-
-        this.historyTimeRemaining = new EnumMap<>(Color.class);
-        this.historyTimeRemaining.put(Color.WHITE, new ArrayList<>());
-        this.historyTimeRemaining.put(Color.BLACK, new ArrayList<>());
 
         this.incrementMillis = incrementMillis;
         this.currentTurn = currentTurn;
@@ -78,33 +69,26 @@ public class ChessClock {
     public void stop() {
         if (!isRunning) return;
 
-        updateTime();
+        updateTime(0);
         this.isRunning = false;
     }
 
     public long makeMove() {
         if (!isRunning) throw new IllegalStateException("O relógio deve estar em execução para fazer um movimento.");
 
-        long timeElapsed = updateTime(this.incrementMillis, true);
+        long timeElapsed = updateTime(this.incrementMillis);
         changeTurn();
 
         return timeElapsed;
     }
 
-    private void updateTime() {
-        updateTime(0, false);
-    }
-
-    private long updateTime(long incrementMillis, boolean saveToHistory) {
+    private long updateTime(long incrementMillis) {
         long timeElapsed = System.currentTimeMillis() - lastMoveTimestamp;
         long currentTime = timeRemaining.get(currentTurn);
 
         long updatedTime = currentTime - timeElapsed;
 
-        if (saveToHistory) {
-            historyTimeRemaining.get(currentTurn).add(currentTime);
-        }
-
+        // Proteção contra negativo
         if (updatedTime < 0) {
             updatedTime = 0;
         } else {
@@ -118,21 +102,6 @@ public class ChessClock {
 
     private void changeTurn() {
         currentTurn =  currentTurn.opposite();
-        lastMoveTimestamp = System.currentTimeMillis();
-    }
-
-    public void undoMove() {
-        Color previousTurn = currentTurn.opposite();
-
-        List<Long> previousTimes = historyTimeRemaining.get(previousTurn);
-        if (previousTimes.isEmpty()) {
-            throw new IllegalStateException("Não há histórico de tempo para desfazer o movimento.");
-        }
-
-        long restoredTime = previousTimes.remove(previousTimes.size() - 1);
-        timeRemaining.put(previousTurn, restoredTime);
-
-        currentTurn = previousTurn;
         lastMoveTimestamp = System.currentTimeMillis();
     }
 
