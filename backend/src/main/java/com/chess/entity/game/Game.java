@@ -79,4 +79,39 @@ public class Game {
             this.chessClock.makeMove();
         }
     }
+
+    public void resign(Color resigningPlayer) {
+        Objects.requireNonNull(resigningPlayer, "O jogador que desiste não pode ser nulo.");
+
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível desistir.");
+        }
+
+        GameState gameState = resigningPlayer.isWhite() ? GameState.BLACK_WON : GameState.WHITE_WON;
+
+        endGame(gameState, GameEndReason.RESIGNATION);
+    }
+
+    public void drawByAgreement() {
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível aceitar empate.");
+        }
+
+        endGame(GameState.DRAW, GameEndReason.AGREED_DRAW);
+    }
+
+    public void abort() {
+        if (gameState != GameState.ACTIVE) {
+            throw new IllegalStateException("O jogo já acabou. Não é possível abortar.");
+        }
+
+        endGame(GameState.ABORTED, GameEndReason.ABORTION);
+    }
+
+    private void endGame(GameState endState, GameEndReason reason) {
+        this.chessClock.stop();
+        this.gameState = endState;
+        this.gameEndReason = reason;
+    }
+
 }

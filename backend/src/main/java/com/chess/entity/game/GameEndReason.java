@@ -12,7 +12,9 @@ public enum GameEndReason {
     AGREED_DRAW("Empate por acordo"),
     THREEFOLD_REPETITION("Empate por repetição tripla"),
     FIFTY_MOVE_RULE("Empate pela regra dos cinquenta lances"),
-    INSUFFICIENT_MATERIAL("Material insuficiente");
+    INSUFFICIENT_MATERIAL("Material insuficiente"),
+
+    ABORTION("Jogo abortado");
 
     private final String description;
 
