@@ -131,7 +131,7 @@ public class MoveValidator {
     }
 
     private void addPromotionMoves(MoveBuilder builder) {
-        char[] promotionPieces = {'D', 'T', 'B', 'C'};
+        char[] promotionPieces = {'Q', 'R', 'B', 'N'};
         for (char c : promotionPieces) {
             // Verifica a peça da cor para criar
             c = board.getCurrentPlayer().isWhite() ? c : Character.toLowerCase(c);

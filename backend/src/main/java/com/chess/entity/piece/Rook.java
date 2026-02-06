@@ -16,7 +16,7 @@ public class Rook extends Piece {
 
     @Override
     public char getSymbol() {
-        return this.color.isWhite() ? 'T' : 't';
+        return this.color.isWhite() ? 'R' : 'r';
     }
 
     @Override

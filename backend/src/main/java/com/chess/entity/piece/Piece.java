@@ -20,11 +20,11 @@ public abstract class Piece {
      * Símbolos maiúsculos representam peças brancas, enquanto minúsculos representam peças pretas.
      * <ul>
      * <li>'P'/'p' - Peão</li>
-     * <li>'T'/'t' - Torre</li>
-     * <li>'C'/'c' - Cavalo</li>
+     * <li>'R'/'r' - Torre</li>
+     * <li>'N'/'n' - Cavalo</li>
      * <li>'B'/'b' - Bispo</li>
-     * <li>'D'/'d' - Dama</li>
-     * <li>'R'/'r' - Rei</li>
+     * <li>'Q'/'q' - Dama</li>
+     * <li>'K'/'k' - Rei</li>
      * </ul>
      * 
      * @param symbol O símbolo representando a peça.
@@ -38,15 +38,15 @@ public abstract class Piece {
         switch (Character.toUpperCase(symbol)) {
             case 'P':
                 return new Pawn(color);
-            case 'T':
+            case 'R':
                 return new Rook(color);
-            case 'C':
+            case 'N':
                 return new Knight(color);
             case 'B':
                 return new Bishop(color);
-            case 'D':
+            case 'Q':
                 return new Queen(color);
-            case 'R':
+            case 'K':
                 return new King(color);
             default:
                 throw new IllegalArgumentException("Símbolo de peça inválido: " + symbol);

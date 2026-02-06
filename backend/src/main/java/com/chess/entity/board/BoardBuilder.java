@@ -41,7 +41,7 @@ public class BoardBuilder extends BaseBoard {
     // Contador de meio-movimentos (para a regra dos 50 movimentos).
     private int halfMoveClock;
 
-    public static final char[] standardLinePieces = {'T', 'C', 'B', 'D', 'R', 'B', 'C', 'T'};
+    public static final char[] standardLinePieces = {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'};
 
     public BoardBuilder() {
         this.squares = new Piece[8][8];
@@ -274,8 +274,7 @@ public class BoardBuilder extends BaseBoard {
         squares[row][col] = piece;
         piecesPositionsByColor.get(piece.getColor()).add(position);
 
-        char pieceType = Character.toUpperCase(piece.getSymbol());
-        if (pieceType == 'R') {
+        if (piece instanceof King) {
             if (piece.getColor().isWhite()) {
                 whiteKingPosition = position;
             } else {

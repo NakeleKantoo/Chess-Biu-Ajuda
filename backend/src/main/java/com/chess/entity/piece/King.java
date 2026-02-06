@@ -56,7 +56,7 @@ public class King extends Piece {
 
     @Override
     public char getSymbol() {
-        return this.color.isWhite() ? 'R' : 'r';
+        return this.color.isWhite() ? 'K' : 'k';
     }
 
     @Override

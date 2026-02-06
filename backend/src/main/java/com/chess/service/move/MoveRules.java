@@ -5,9 +5,13 @@ import com.chess.entity.base.Position;
 import com.chess.entity.board.BaseBoard;
 import com.chess.entity.board.CastlingControl;
 import com.chess.entity.move.MoveBuilder;
+import com.chess.entity.piece.Bishop;
 import com.chess.entity.piece.King;
+import com.chess.entity.piece.Knight;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;
+import com.chess.entity.piece.Queen;
+import com.chess.entity.piece.Rook;
 
 public class MoveRules {
 
@@ -76,7 +80,10 @@ public class MoveRules {
             return false;
         }
 
-        char type = Character.toUpperCase(piece.getSymbol());
-        return type == 'D' || type == 'T' || type == 'B' || type == 'C';
+        return  piece instanceof Queen ||
+                piece instanceof Rook ||
+                piece instanceof Bishop ||
+                piece instanceof Knight;
     }
+
 }
