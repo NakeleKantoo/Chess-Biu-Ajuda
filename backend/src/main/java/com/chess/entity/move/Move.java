@@ -43,6 +43,17 @@ public class Move {
     public boolean isCapture() { return capturedPiece != null; }
     public boolean isPromotion() { return promotionPiece != null; }
 
+    public String toUci() {
+        StringBuilder uci = new StringBuilder();
+        uci.append(from.toString());
+        uci.append(to.toString());
+        if (isPromotion()) {
+            char promoChar = Character.toLowerCase(promotionPiece.getSymbol());
+            uci.append(promoChar);
+        }
+        return uci.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

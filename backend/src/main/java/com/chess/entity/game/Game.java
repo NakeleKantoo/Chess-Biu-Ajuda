@@ -44,6 +44,8 @@ public class Game {
     public List<Move> getMoveHistory() { return Collections.unmodifiableList(moveHistory); }
     public List<Board> getBoardHistory() { return Collections.unmodifiableList(boardHistory); }
     public long getTimeRemaining(Color color) { return chessClock.getTimeRemaining(color); }
+    public long getLastMoveTimestamp() { return chessClock.getLastMoveTimestamp(); }
+    public boolean isClockRunning() { return chessClock.isRunning(); }
     public GameState getGameState() { return gameState; }
     public GameEndReason getGameEndReason() { return gameEndReason; }
 
