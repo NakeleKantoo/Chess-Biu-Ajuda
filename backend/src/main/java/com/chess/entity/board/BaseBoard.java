@@ -10,6 +10,7 @@ import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.piece.Piece;
 import com.chess.utils.CloneUtils;
+import com.chess.utils.FenUtils;
 
 public abstract class BaseBoard {
     // Método protegido para acesso direto ao array (sem clone) para uso interno eficiente
@@ -92,7 +93,11 @@ public abstract class BaseBoard {
         List<Position> positions = getPiecesPositionsByColor().get(color);
         return new ArrayList<>(positions);
     }
-    
+
+    public String toFen() {
+        return FenUtils.boardToFen(this);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(Arrays.deepHashCode(getInternalSquares()), getCurrentPlayer(), getEnPassantTarget(), getCastlingControl());

@@ -1,4 +1,4 @@
-package com.chess.service.game;
+package com.chess.utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,9 +7,9 @@ import java.util.Objects;
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
 import com.chess.entity.board.BaseBoard;
+import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardAnalyzer;
 import com.chess.entity.board.BoardState;
-import com.chess.entity.game.Game;
 import com.chess.entity.piece.Bishop;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Knight;
@@ -19,16 +19,16 @@ import com.chess.entity.piece.Queen;
 import com.chess.entity.piece.Rook;
 import com.chess.service.move.MoveValidator;
 
-public class BoardStateEvaluator {
+public class BoardStateUtils {
 
     /**
      * Avalia e determina o estado do tabuleiro (Xeque, Mate, Empate, Em Andamento).
      * 
      * @param board O tabuleiro (ou builder) a ser analisado.
-     * @param game O jogo atual (para verificação de histórico).
+     * @param boardHistory Histórico dos tabuleiros anteriores para verificação de repetições.
      * @return O BoardState calculado.
      */
-    public static BoardState evaluateState(BaseBoard board, Game game) {
+    public static BoardState evaluateState(BaseBoard board, List<Board> boardHistory) {
         // 1. Verificar regras automáticas de empate (50 lances, material)
         if (isInsufficientMaterial(board)) {
             return BoardState.DRAW_BY_INSUFFICIENT_MATERIAL;
@@ -38,11 +38,15 @@ public class BoardStateEvaluator {
             return BoardState.DRAW_BY_FIFTY_MOVE_RULE;
         }
 
-        if (isThreefoldRepetition(game, board)) {
+        if (isThreefoldRepetition(board, boardHistory)) {
             return BoardState.DRAW_BY_THREEFOLD_REPETITION;
         }
 
         // 2. Verificar Xeque e Movimentos Legais
+        return getCheckState(board);
+    }
+
+    public static BoardState getCheckState(BaseBoard board) {
         boolean isCheck = BoardAnalyzer.isInCheck(board, board.getCurrentPlayer());
         boolean hasLegalMoves = hasAnyLegalMove(board);
 
@@ -111,9 +115,9 @@ public class BoardStateEvaluator {
         return true;
     }
 
-    private static boolean isThreefoldRepetition(Game game, BaseBoard currentBoardStructure) {
+    private static boolean isThreefoldRepetition(BaseBoard currentBoardStructure, List<Board> boardHistory) {
         // Como currentBoardStructure pode ser um Builder recém-modificado, precisamos ver se ele iguala aos anteriores.
-        long repetitionCount = game.getBoardHistory().stream()
+        long repetitionCount = boardHistory.stream()
                 .filter(historyBoard -> historyBoard.equals(currentBoardStructure))
                 .count();
 

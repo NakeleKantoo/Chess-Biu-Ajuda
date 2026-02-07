@@ -20,7 +20,7 @@ public class Knight extends Piece {
 
     @Override
     public char getSymbol() {
-        return this.color.isWhite() ? 'C' : 'c';
+        return this.color.isWhite() ? 'N' : 'n';
     }
 
     @Override

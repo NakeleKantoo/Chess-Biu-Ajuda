@@ -38,7 +38,9 @@ public class ChessClock {
         this(initialTimeMillis, initialTimeMillis, incrementMillis, currentTurn);
     }
 
+    public long getLastMoveTimestamp() { return lastMoveTimestamp; }
     public Color getCurrentTurn() { return currentTurn; }
+    public boolean isRunning() { return isRunning; }
 
     public long getTimeRemaining(Color color) {
         Objects.requireNonNull(color, "A cor não pode ser nula.");

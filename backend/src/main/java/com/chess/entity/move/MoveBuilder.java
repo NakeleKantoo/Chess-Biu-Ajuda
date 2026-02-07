@@ -6,6 +6,7 @@ import com.chess.entity.base.Position;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Pawn;
 import com.chess.entity.piece.Piece;
+import com.chess.utils.NotationUtils;
 
 public class MoveBuilder {
 
@@ -22,17 +23,22 @@ public class MoveBuilder {
     private boolean isCastling;
     private boolean isEnPassant;
 
-    public MoveBuilder(Move other) {
-        Objects.requireNonNull(other, "O Move fornecido não pode ser nulo.");
+    private String san; // Notação algébrica
+    private String uci; // Notação algébrica
 
-        this.from = other.getFrom();
-        this.to = other.getTo();
-        this.movedPiece = other.getMovedPiece();
-        this.capturedPiece = other.getCapturedPiece();
-        this.promotionPiece = other.getPromotionPiece();
-        this.rookFrom = other.getRookFrom();
-        this.isCastling = other.isCastling();
-        this.isEnPassant = other.isEnPassant();
+    public MoveBuilder(Move move) {
+        Objects.requireNonNull(move, "O movimento não pode ser nulo.");
+
+        this.from = move.getFrom();
+        this.to = move.getTo();
+        this.movedPiece = move.getMovedPiece();
+        this.capturedPiece = move.getCapturedPiece();
+        this.promotionPiece = move.getPromotionPiece();
+        this.rookFrom = move.getRookFrom();
+        this.isCastling = move.isCastling();
+        this.isEnPassant = move.isEnPassant();
+        this.san = move.getSan();
+        this.uci = move.getUci();
     }
 
     public MoveBuilder(Position from, Position to, Piece movedPiece) {
@@ -98,6 +104,13 @@ public class MoveBuilder {
         return this;
     }
 
+    public MoveBuilder san(String san) {
+        Objects.requireNonNull(san, "Notação algébrica (SAN) não pode ser nula.");
+
+        this.san = san;
+        return this;
+    }
+
     /**
      * Constrói o objeto Move com as configurações definidas.
      * Valida a consistência interna antes de criar o objeto.
@@ -132,6 +145,8 @@ public class MoveBuilder {
             }
         }
 
+        this.uci = NotationUtils.toUci(this.from, this.to, this.promotionPiece);
+
         return new Move(this);
     }
 
@@ -143,5 +158,7 @@ public class MoveBuilder {
     public Position getRookFrom() { return rookFrom; }
     public boolean isCastling() { return isCastling; }
     public boolean isEnPassant() { return isEnPassant; }
+    public String getSan() { return san; }
+    public String getUci() { return uci; }
 
 }

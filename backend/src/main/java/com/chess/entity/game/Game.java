@@ -9,6 +9,7 @@ import com.chess.entity.base.Color;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardState;
 import com.chess.entity.clock.ChessClock;
+import com.chess.entity.game.GameConfig.GameType;
 import com.chess.entity.move.Move;
 
 public class Game {
@@ -27,8 +28,10 @@ public class Game {
     private GameState gameState;
     private GameEndReason gameEndReason;
 
+    private final GameType gameType; // Útil para validar roque no Chess960, por exemplo.
+
     // Construtor privado para forçar uso dos métodos de fábrica
-    protected Game(Board initialBoard, ChessClock chessClock) {
+    protected Game(Board initialBoard, ChessClock chessClock, GameType gameType) {
         this.boardHistory = new ArrayList<>();
         this.moveHistory = new ArrayList<>();
 
@@ -37,6 +40,8 @@ public class Game {
 
         this.gameState = GameState.fromBoardState(initialBoard.getBoardState(), initialBoard.getCurrentPlayer());
         this.gameEndReason = GameEndReason.fromBoardState(initialBoard.getBoardState());
+
+        this.gameType = gameType;
     }
 
     public Board getCurrentBoard() { return boardHistory.getLast(); }
@@ -44,8 +49,11 @@ public class Game {
     public List<Move> getMoveHistory() { return Collections.unmodifiableList(moveHistory); }
     public List<Board> getBoardHistory() { return Collections.unmodifiableList(boardHistory); }
     public long getTimeRemaining(Color color) { return chessClock.getTimeRemaining(color); }
+    public long getLastMoveTimestamp() { return chessClock.getLastMoveTimestamp(); }
+    public boolean isClockRunning() { return chessClock.isRunning(); }
     public GameState getGameState() { return gameState; }
     public GameEndReason getGameEndReason() { return gameEndReason; }
+    public GameType getGameType() { return gameType; }
 
     public void startClock() { chessClock.start(); }
     public void stopClock() { chessClock.stop(); }

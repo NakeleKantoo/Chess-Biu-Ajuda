@@ -16,7 +16,7 @@ public class Queen extends Piece {
 
     @Override
     public char getSymbol() {
-        return this.color.isWhite() ? 'D' : 'd';
+        return this.color.isWhite() ? 'Q' : 'q';
     }
 
     @Override

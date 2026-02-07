@@ -1,5 +1,6 @@
 package com.chess.service.game;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,12 +11,16 @@ import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.game.Game;
 import com.chess.entity.game.GameBuilder;
+import com.chess.entity.game.GameConfig;
 import com.chess.entity.game.GameEndReason;
 import com.chess.entity.game.GameState;
 import com.chess.entity.move.Move;
+import com.chess.entity.move.MoveBuilder;
 import com.chess.entity.piece.Piece;
 import com.chess.service.move.MoveExecutor;
 import com.chess.service.move.MoveValidator;
+import com.chess.utils.BoardStateUtils;
+import com.chess.utils.NotationUtils;
 
 public class GameService {
     
@@ -30,8 +35,8 @@ public class GameService {
 
     private Color drawOffer;
 
-    public GameService() {
-        this.game = GameBuilder.standardRapidGame();
+    public GameService(GameConfig config) {
+        this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
         scheduleAutoStart();
     }
 
@@ -93,11 +98,16 @@ public class GameService {
 
         MoveValidator validator = MoveValidator.of(game.getCurrentBoard());
         Move move = validator.createMove(from, to, promotionPiece);
+
         BoardBuilder nextBoardBuilder = moveExecutor.executeMove(game.getCurrentBoard(), move);
+        List<Board> boardHistory = game.getBoardHistory();
         
         // Validar estado do BoardBuilder e instanciar Board
-        nextBoardBuilder.setBoardState(BoardStateEvaluator.evaluateState(nextBoardBuilder, game));
+        nextBoardBuilder.setBoardState(BoardStateUtils.evaluateState(nextBoardBuilder, boardHistory));
         Board nextBoard = nextBoardBuilder.build();
+
+        String san = NotationUtils.toSan(move, game.getCurrentBoard(), nextBoard.getBoardState(), validator.getLegalMoves());
+        move = new MoveBuilder(move).san(san).build();
 
         game.commitMove(move, nextBoard);
 
@@ -179,7 +189,7 @@ public class GameService {
         Color opponent = playerWhoRanOutOfTime.opposite();
 
         // Verifico se o VENCEDOR (por tempo) tem material suficiente para vencer
-        boolean opponentHasMatingMaterial = BoardStateEvaluator.hasMatingMaterial(getCurrentBoard(), opponent);
+        boolean opponentHasMatingMaterial = BoardStateUtils.hasMatingMaterial(getCurrentBoard(), opponent);
 
         if (opponentHasMatingMaterial) {
             game.timeoutLoss(playerWhoRanOutOfTime);
