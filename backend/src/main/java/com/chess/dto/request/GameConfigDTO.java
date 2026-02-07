@@ -1,6 +1,7 @@
 package com.chess.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -15,7 +16,7 @@ public record GameConfigDTO(
     @Pattern(regexp = "BULLET|BLITZ|RAPID|CLASSICAL|CUSTOM", message = "Controle de tempo inválido")
     String timeControl,
 
-    @NotBlank(message = "A preferência de cor é obrigatória")
+    @NotNull(message = "A preferência de cor é obrigatória")
     PlayerColorPreference playerColorPreference,
 
     @Positive(message = "O tempo para as brancas deve ser positivo")

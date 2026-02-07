@@ -14,6 +14,6 @@ public record MoveDTO(
     String to,
 
     @Pattern(regexp = "^[QRNBqrnb]$", message = "Promoção inválida (Q, R, N, B)")
-    Character promotion
+    String promotion
 
 ) {}
