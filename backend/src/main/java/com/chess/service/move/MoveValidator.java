@@ -101,6 +101,10 @@ public class MoveValidator {
     }
 
     private void generateLegalMoves() {
+        if (board.getBoardState().isGameOver()) {
+            return; // Se o jogo já acabou, não há movimentos legais
+        }
+
         List<Position> piecesPositions = board.getPiecesPositions(board.getCurrentPlayer());
 
         for (Position pos : piecesPositions) {

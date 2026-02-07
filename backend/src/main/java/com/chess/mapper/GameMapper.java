@@ -51,8 +51,8 @@ public class GameMapper {
         return config;
     }
 
-    public static GameResponseDTO toDTO(Game game) {
-        UUID id = UUID.randomUUID(); // TODO: Substituir por ID real do jogo quando implementado
+    public static GameResponseDTO toDTO(Game game, UUID gameId) {
+        UUID id = gameId;
         BoardDTO boardDTO = getBoardDTO(game.getCurrentBoard());
         GameState state = game.getGameState();
         GameEndReason endReason = game.getGameEndReason();
