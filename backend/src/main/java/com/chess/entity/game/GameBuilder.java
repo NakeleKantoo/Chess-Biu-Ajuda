@@ -2,22 +2,22 @@ package com.chess.entity.game;
 
 import java.util.Objects;
 
+import com.chess.entity.base.Color;
 import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.clock.ChessClock;
 import com.chess.entity.clock.ChessClockBuilder;
+import com.chess.entity.game.GameConfig.GameType;
+import com.chess.entity.game.GameConfig.TimeControl;
 
 public class GameBuilder {
 
     // Configurações padrão
     private Board initialBoard;
     private ChessClock chessClock;
+    private GameType gameType;
 
-    public GameBuilder() {
-        // Valores default (Xadrez Padrão, 10 min)
-        this.initialBoard = new BoardBuilder().buildStandard();
-        this.chessClock = ChessClockBuilder.RAPID();
-    }
+    public GameBuilder() {}
 
     // Define um tabuleiro específico
     public GameBuilder withBoard(Board board) {
@@ -33,31 +33,41 @@ public class GameBuilder {
         return this;
     }
 
-    public static Game standardClassicalGame() {
-        return new GameBuilder()
-            .withBoard(new BoardBuilder().buildStandard())
-            .withClock(ChessClockBuilder.CLASSICAL())
-            .build();
+    public GameBuilder withGameType(GameType gameType) {
+        Objects.requireNonNull(gameType, "O tipo de jogo não pode ser nulo.");
+        this.gameType = gameType;
+        return this;
     }
 
-    public static Game standardRapidGame() {
-        return new GameBuilder()
-            .withBoard(new BoardBuilder().buildStandard())
-            .withClock(ChessClockBuilder.RAPID())
-            .build();
+    public static Game from(GameConfig config) {
+        Objects.requireNonNull(config, "A configuração do jogo não pode ser nula.");
+
+        GameBuilder builder = new GameBuilder();
+
+        // Configura o tabuleiro com base no tipo de jogo
+        builder.withBoard(BoardBuilder.buildByGameType(config.getGameType()));
+        builder.withGameType(config.getGameType());
+
+        // Configura o relógio com base no tipo de jogo
+        if (config.getTimeControl() != TimeControl.CUSTOM) {
+            builder.withClock(ChessClockBuilder.buildByTimeControl(config.getTimeControl(), config.getStartingColor()));
+        } else {
+            builder.withClock(new ChessClockBuilder()
+                .withWhiteTime(config.getWhiteTimeRemaining())
+                .withBlackTime(config.getBlackTimeRemaining())
+                .withIncrement(config.getIncrementMillis())
+                .withStartingColor(config.getStartingColor())
+                .build());
+        }
+
+        return builder.build();
     }
 
-    public static Game standardBlitzGame() {
+    public static Game create(GameType gameType, TimeControl timeControl, Color startingColor) {
         return new GameBuilder()
-            .withBoard(new BoardBuilder().buildStandard())
-            .withClock(ChessClockBuilder.BLITZ())
-            .build();
-    }
-
-    public static Game standardBulletGame() {
-        return new GameBuilder()
-            .withBoard(new BoardBuilder().buildStandard())
-            .withClock(ChessClockBuilder.BULLET())
+            .withBoard(BoardBuilder.buildByGameType(gameType))
+            .withClock(ChessClockBuilder.buildByTimeControl(timeControl, startingColor))
+            .withGameType(gameType)
             .build();
     }
 
@@ -66,8 +76,9 @@ public class GameBuilder {
     public Game build() {
         Objects.requireNonNull(initialBoard, "O tabuleiro inicial não pode ser nulo.");
         Objects.requireNonNull(chessClock, "O relógio de xadrez não pode ser nulo.");
+        Objects.requireNonNull(gameType, "O tipo de jogo não pode ser nulo.");
         // Aqui chamamos um construtor pacote-privado ou público do Game
-        return new Game(initialBoard, chessClock);
+        return new Game(initialBoard, chessClock, gameType);
     }
     
 }

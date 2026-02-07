@@ -11,6 +11,7 @@ import com.chess.entity.board.Board;
 import com.chess.entity.board.BoardBuilder;
 import com.chess.entity.game.Game;
 import com.chess.entity.game.GameBuilder;
+import com.chess.entity.game.GameConfig;
 import com.chess.entity.game.GameEndReason;
 import com.chess.entity.game.GameState;
 import com.chess.entity.move.Move;
@@ -34,8 +35,8 @@ public class GameService {
 
     private Color drawOffer;
 
-    public GameService() {
-        this.game = GameBuilder.standardRapidGame();
+    public GameService(GameConfig config) {
+        this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
         scheduleAutoStart();
     }
 

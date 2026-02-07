@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
+import com.chess.entity.game.GameConfig.GameType;
 import com.chess.entity.piece.King;
 import com.chess.entity.piece.Piece;
 
@@ -94,54 +95,72 @@ public class BoardBuilder extends BaseBoard {
         return color.isWhite() ? whiteKingPosition : blackKingPosition;
     }
 
+    public static Board buildByGameType(GameType gameType) {
+        Objects.requireNonNull(gameType, "O tipo de jogo não pode ser nulo.");
+
+        return switch (gameType) {
+            case STANDARD -> buildStandard();
+            case CHESS960 -> buildFisherRandom();
+            // Outros tipos de jogo podem ser adicionados aqui
+        };
+    }
+
     /**
      * Configura o tabuleiro com a disposição padrão das peças.
      * 
      * @return um objeto {@code Board} representando o tabuleiro configurado.
       */
-    public Board buildStandard() {
+    public static Board buildStandard() {
+        BoardBuilder builder = new BoardBuilder();
+
         char[] linePieces = standardLinePieces;
-        squares = new Piece[8][8];
-        piecesPositionsByColor.get(Color.WHITE).clear();
-        piecesPositionsByColor.get(Color.BLACK).clear();
+        builder.squares = new Piece[8][8];
+        builder.piecesPositionsByColor.get(Color.WHITE).clear();
+        builder.piecesPositionsByColor.get(Color.BLACK).clear();
 
-        setRowPieces(Color.WHITE, 7, linePieces);
-        setRowPawns(Color.WHITE, 6);
-        setRowPawns(Color.BLACK, 1);
-        setRowPieces(Color.BLACK, 0, linePieces);
+        builder.setRowPieces(Color.WHITE, 7, linePieces);
+        builder.setRowPawns(Color.WHITE, 6);
+        builder.setRowPawns(Color.BLACK, 1);
+        builder.setRowPieces(Color.BLACK, 0, linePieces);
 
-        this.boardState = BoardState.IN_PROGRESS;
-        this.currentPlayer = Color.WHITE;
-        this.enPassantTarget = null;
-        this.castlingControl = CastlingControl.INIT;
-        this.fullMoveClock = 1;
-        this.halfMoveClock = 0;
+        builder.boardState = BoardState.IN_PROGRESS;
+        builder.currentPlayer = Color.WHITE;
+        builder.enPassantTarget = null;
+        builder.castlingControl = CastlingControl.INIT;
+        builder.fullMoveClock = 1;
+        builder.halfMoveClock = 0;
 
-        return new Board(this);
+        return new Board(builder);
     }
 
-    public Board buildTest() {
+    public static Board buildFisherRandom() {
+        throw new UnsupportedOperationException("Xadrez 960 não suportado."); // TODO: Implementar o tabuleiro para Chess960 no futuro
+    }
+
+    public static Board buildTest() {
+        BoardBuilder builder = new BoardBuilder();
+
         char[] linePieces = standardLinePieces;
-        squares = new Piece[8][8];
-        piecesPositionsByColor.get(Color.WHITE).clear();
-        piecesPositionsByColor.get(Color.BLACK).clear();
+        builder.squares = new Piece[8][8];
+        builder.piecesPositionsByColor.get(Color.WHITE).clear();
+        builder.piecesPositionsByColor.get(Color.BLACK).clear();
 
-        setRowPieces(Color.WHITE, 7, linePieces);
-        setRowPawns(Color.WHITE, 6);
-        setRowPawns(Color.BLACK, 1);
-        setRowPieces(Color.BLACK, 0, linePieces);
+        builder.setRowPieces(Color.WHITE, 7, linePieces);
+        builder.setRowPawns(Color.WHITE, 6);
+        builder.setRowPawns(Color.BLACK, 1);
+        builder.setRowPieces(Color.BLACK, 0, linePieces);
 
-        this.boardState = BoardState.IN_PROGRESS;
-        this.currentPlayer = Color.BLACK;
-        this.enPassantTarget = null;
-        this.castlingControl = CastlingControl.INIT;
-        this.fullMoveClock = 1;
-        this.halfMoveClock = 0;
+        builder.boardState = BoardState.IN_PROGRESS;
+        builder.currentPlayer = Color.BLACK;
+        builder.enPassantTarget = null;
+        builder.castlingControl = CastlingControl.INIT;
+        builder.fullMoveClock = 1;
+        builder.halfMoveClock = 0;
         
-        removePiece(Position.at("e2"));
-        placePiece(Piece.create('P'), Position.at("e5"));
+        builder.removePiece(Position.at("e2"));
+        builder.placePiece(Piece.create('P'), Position.at("e5"));
 
-        return new Board(this);
+        return new Board(builder);
     }
 
     /**
