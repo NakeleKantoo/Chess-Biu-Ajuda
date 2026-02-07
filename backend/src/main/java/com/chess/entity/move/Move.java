@@ -20,6 +20,9 @@ public class Move {
     private final boolean isCastling;
     private final boolean isEnPassant;
 
+    private final String san; // Notação algébrica
+    private final String uci; // Notação algébrica
+
     public Move(MoveBuilder builder) {
         this.from = builder.getFrom();
         this.to = builder.getTo();
@@ -29,6 +32,8 @@ public class Move {
         this.rookFrom = builder.getRookFrom();
         this.isCastling = builder.isCastling();
         this.isEnPassant = builder.isEnPassant();
+        this.san = builder.getSan();
+        this.uci = builder.getUci();
     }
 
     // --- Getters ---
@@ -42,17 +47,8 @@ public class Move {
     public boolean isEnPassant() { return isEnPassant; }
     public boolean isCapture() { return capturedPiece != null; }
     public boolean isPromotion() { return promotionPiece != null; }
-
-    public String toUci() {
-        StringBuilder uci = new StringBuilder();
-        uci.append(from.toString());
-        uci.append(to.toString());
-        if (isPromotion()) {
-            char promoChar = Character.toLowerCase(promotionPiece.getSymbol());
-            uci.append(promoChar);
-        }
-        return uci.toString();
-    }
+    public String getSan() { return san; }
+    public String getUci() { return uci; }
 
     @Override
     public boolean equals(Object o) {

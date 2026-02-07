@@ -52,4 +52,12 @@ public enum BoardState {
                 this == DRAW_BY_THREEFOLD_REPETITION;
     }
 
+    public boolean isCheck() {
+        return this == CHECK;
+    }
+
+    public boolean isCheckmate() {
+        return this == CHECKMATE;
+    }
+
 }

@@ -14,10 +14,12 @@ import com.chess.entity.game.GameBuilder;
 import com.chess.entity.game.GameEndReason;
 import com.chess.entity.game.GameState;
 import com.chess.entity.move.Move;
+import com.chess.entity.move.MoveBuilder;
 import com.chess.entity.piece.Piece;
 import com.chess.service.move.MoveExecutor;
 import com.chess.service.move.MoveValidator;
 import com.chess.utils.BoardStateUtils;
+import com.chess.utils.NotationUtils;
 
 public class GameService {
     
@@ -102,6 +104,9 @@ public class GameService {
         // Validar estado do BoardBuilder e instanciar Board
         nextBoardBuilder.setBoardState(BoardStateUtils.evaluateState(nextBoardBuilder, boardHistory));
         Board nextBoard = nextBoardBuilder.build();
+
+        String san = NotationUtils.toSan(move, game.getCurrentBoard(), nextBoard.getBoardState(), validator.getLegalMoves());
+        move = new MoveBuilder(move).san(san).build();
 
         game.commitMove(move, nextBoard);
 
