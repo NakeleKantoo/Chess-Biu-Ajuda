@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.chess.entity.user.Role;
 import com.chess.entity.user.User;
 
 import lombok.AllArgsConstructor;
@@ -27,6 +28,8 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() { return user.getUsername(); }
+
+    public Role getRole() { return user.getRole(); }
 
     @Override
     public boolean isAccountNonExpired() { return true; }
