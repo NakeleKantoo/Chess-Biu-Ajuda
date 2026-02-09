@@ -54,6 +54,7 @@ public class SecurityConfig {
 
                         // APIs de Jogo
                         .requestMatchers(HttpMethod.POST, "/api/games").hasAnyRole("ADMIN", "USER") // Criar jogo
+                        .requestMatchers(HttpMethod.POST, "/api/games/join").hasAnyRole("ADMIN", "USER") // Entrar em jogo
                         .requestMatchers(HttpMethod.GET, "/api/games/{gameId}").hasAnyRole("ADMIN", "USER") // Ver detalhes do jogo
                         .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/move").hasAnyRole("ADMIN", "USER") // Fazer movimento
                         .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/{action}").hasAnyRole("ADMIN", "USER") // Ações especiais (desistir, pedir empate, etc)
