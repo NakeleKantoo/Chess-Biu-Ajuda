@@ -5,12 +5,10 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.chess.domain.model.user.User;
+import com.chess.infrastructure.persistence.entity.UserEntity;
 
-public interface UserRepository extends JpaRepository<User, UUID> {
-    // Necessário para o Login
-    Optional<User> findByUsername(String username);
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
-    // Necessário para o Cadastro
+    Optional<UserEntity> findByUsername(String username);
     Boolean existsByUsername(String username);
 }
