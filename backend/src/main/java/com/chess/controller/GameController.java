@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chess.dto.request.GameConfigDTO;
+import com.chess.dto.request.JoinGameRequestDTO;
 import com.chess.dto.request.MoveDTO;
 import com.chess.dto.response.GameResponseDTO;
-import com.chess.entity.base.Color;
+import com.chess.dto.response.PendingGameDTO;
 import com.chess.entity.base.Position;
 import com.chess.entity.game.GameConfig;
 import com.chess.entity.piece.Piece;
 import com.chess.mapper.GameMapper;
+import com.chess.security.service.UserDetailsImpl;
 import com.chess.service.game.GameManager;
 import com.chess.service.game.GameService;
 
@@ -33,15 +36,27 @@ public class GameController {
     GameManager gameManager;
 
     @PostMapping
-    public ResponseEntity<GameResponseDTO> createGame(@RequestBody @Valid GameConfigDTO configDTO) {
+    public ResponseEntity<PendingGameDTO> createGame(
+        @RequestBody @Valid GameConfigDTO configDTO,
+        @AuthenticationPrincipal UserDetailsImpl user
+    ) {
+
         GameConfig config = GameMapper.fromGameConfigDTO(configDTO);
-        UUID gameId = gameManager.createGame(config);
+        PendingGameDTO pendingGameDTO = gameManager.createGame(config, user.getId());
 
-        URI location = URI.create(String.format("/api/games/%s", gameId)); 
+        return ResponseEntity.ok(pendingGameDTO);
+    }
 
-        return ResponseEntity
-                .created(location)
-                .body(GameMapper.toDTO(gameManager.getGameService(gameId).getGame(), gameId));
+    @PostMapping("/join")
+    public ResponseEntity<UUID> joinGame(
+        @RequestBody JoinGameRequestDTO joinGameDTO,
+        @AuthenticationPrincipal UserDetailsImpl user
+    ) {
+
+        UUID gameId = gameManager.joinGame(joinGameDTO.gameCode(), user.getId());
+        URI location = URI.create(String.format("/api/games/%s", gameId));
+
+        return ResponseEntity.created(location).body(gameId);
     }
 
     @GetMapping("/{gameId}")
@@ -50,28 +65,40 @@ public class GameController {
     }
 
     @PostMapping("/{gameId}/move")
-    public ResponseEntity<GameResponseDTO> makeMove(@PathVariable UUID gameId, @RequestBody @Valid MoveDTO moveDTO) {
+    public ResponseEntity<GameResponseDTO> makeMove(
+        @PathVariable UUID gameId,
+        @RequestBody @Valid MoveDTO moveDTO,
+        @AuthenticationPrincipal UserDetailsImpl user
+    ) {
         GameService gameService = gameManager.getGameService(gameId);
         Position from = Position.at(moveDTO.from());
         Position to = Position.at(moveDTO.to());
         Piece promotionPiece = moveDTO.promotion() != null ? Piece.create(moveDTO.promotion().charAt(0)) : null;
-        gameService.makeMove(from, to, promotionPiece);
+
+        gameService.makeMove(from, to, promotionPiece, user.getId());
+
         return ResponseEntity.ok(GameMapper.toDTO(gameService.getGame(), gameId));
     }
 
     @PostMapping("/{gameId}/{action}")
-    public ResponseEntity<GameResponseDTO> performAction(@PathVariable UUID gameId, @PathVariable String action) {
+    public ResponseEntity<GameResponseDTO> performAction(
+        @PathVariable UUID gameId,
+        @PathVariable String action,
+        @AuthenticationPrincipal UserDetailsImpl user
+    ) {
+
         GameService gameService = gameManager.getGameService(gameId);
-        Color currentPlayer = gameService.getCurrentPlayer(); // TODO: trocar pelo usuário autenticado quando implementado
+        UUID playerId = user.getId();
+        
         switch (action.toLowerCase()) {
             case "offer-draw":
-                gameService.offerDraw(currentPlayer);
+                gameService.offerDraw(playerId);
                 break;
             case "resign":
-                gameService.resign(currentPlayer);
+                gameService.resign(playerId);
                 break;
             case "accept-draw":
-                gameService.acceptDraw(currentPlayer);
+                gameService.acceptDraw(playerId);
                 break;
             default:
                 return ResponseEntity.badRequest().build();
