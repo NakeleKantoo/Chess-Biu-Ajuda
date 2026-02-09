@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import com.chess.entity.base.Color;
 import com.chess.entity.base.Position;
@@ -33,10 +34,15 @@ public class GameService {
     private TimerTask startTask;
     private TimerTask endTask;
 
-    private Color drawOffer;
+    private final UUID whitePlayerId;
+    private final UUID blackPlayerId;
 
-    public GameService(GameConfig config) {
+    private UUID drawOfferPlayerId;
+
+    public GameService(GameConfig config, UUID whitePlayerId, UUID blackPlayerId) {
         this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
+        this.whitePlayerId = whitePlayerId;
+        this.blackPlayerId = blackPlayerId;
         scheduleAutoStart();
     }
 
@@ -112,43 +118,45 @@ public class GameService {
         game.commitMove(move, nextBoard);
 
         if (isActive()) {
-            this.drawOffer = null; 
+            this.drawOfferPlayerId = null; 
             configTimerToEnd();
         } else {
             stopTimer();
         }
     }
 
-    public void resign(Color resigningPlayer) {
-        Objects.requireNonNull(resigningPlayer, "A cor do jogador que desiste não pode ser nula.");
+    public void resign(UUID resigningPlayer) {
+        Objects.requireNonNull(resigningPlayer, "O ID do jogador que desiste não pode ser nulo.");
 
         if (!isActive()) {
             throw new IllegalStateException("O jogo não está ativo. Não é possível desistir.");
         }
 
+        Color resigningColor = getPlayerColor(resigningPlayer);
+
         stopTimer();
-        game.resign(resigningPlayer);
+        game.resign(resigningColor);
     }
 
-    public void offerDraw(Color player) {
+    public void offerDraw(UUID offeringDrawPlayerId) {
         if (!isActive()) {
             throw new IllegalStateException("O jogo não está ativo. Não é possível oferecer empate.");
         }
 
-        if (drawOffer == player.opposite()) {
-            acceptDraw(player);
+        if (drawOfferPlayerId == getOpponentId(offeringDrawPlayerId)) {
+            acceptDraw(offeringDrawPlayerId);
         } else {
-            this.drawOffer = player;
+            this.drawOfferPlayerId = offeringDrawPlayerId;
         }
     }
 
-    public void acceptDraw(Color player) {
+    public void acceptDraw(UUID acceptingDrawPlayerId) {
         if (!isActive()) {
             throw new IllegalStateException("O jogo não está ativo. Não é possível aceitar empate.");
         }
 
-        if (drawOffer != player.opposite()) {
-            throw new IllegalStateException("Não há oferta de empate para o jogador " + player);
+        if (drawOfferPlayerId != getOpponentId(acceptingDrawPlayerId)) {
+            return;
         }
 
         stopTimer();
@@ -195,6 +203,26 @@ public class GameService {
             game.timeoutLoss(playerWhoRanOutOfTime);
         } else {
             game.timeoutDraw();
+        }
+    }
+
+    private Color getPlayerColor(UUID playerId) {
+        if (playerId.equals(whitePlayerId)) {
+            return Color.WHITE;
+        } else if (playerId.equals(blackPlayerId)) {
+            return Color.BLACK;
+        } else {
+            throw new IllegalArgumentException("O jogador com ID " + playerId + " não está participando deste jogo.");
+        }
+    }
+
+    private UUID getOpponentId(UUID playerId) {
+        if (playerId.equals(whitePlayerId)) {
+            return blackPlayerId;
+        } else if (playerId.equals(blackPlayerId)) {
+            return whitePlayerId;
+        } else {
+            throw new IllegalArgumentException("O jogador com ID " + playerId + " não está participando deste jogo.");
         }
     }
 
