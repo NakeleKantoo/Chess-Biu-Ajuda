@@ -2,6 +2,7 @@ package com.chess.security.service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,6 +31,8 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() { return user.getUsername(); }
 
     public Role getRole() { return user.getRole(); }
+
+    public UUID getId() { return user.getId(); }
 
     @Override
     public boolean isAccountNonExpired() { return true; }

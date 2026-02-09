@@ -41,19 +41,22 @@ public class SecurityConfig {
                 
                 // 2. Define as regras de quem pode acessar qual URL
                 .authorizeHttpRequests(auth -> auth
-                        // --- Públicos (Qualquer um acessa) ---
+                        // APIs públicas (sem autenticação)
                         .requestMatchers("/h2-console/**").permitAll() // Banco de dados em memória
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Documentação da API
 
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll() // Cadastro de usuários (ninguém logado ainda)
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Login (ninguém logado ainda)
+                        // APIs de Usuário
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll() // Cadastro de usuários
+                        .requestMatchers(HttpMethod.GET, "/users").hasAnyRole("ADMIN") // Listar usuários
 
-                        // --- Privados (Precisa de Token JWT) ---
-                        // Note que usamos hasAnyRole. O Spring espera que o usuário tenha "ROLE_ADMIN" ou "ROLE_USER".
-                        .requestMatchers(HttpMethod.POST, "/api/games").hasAnyRole("ADMIN", "USER") 
-                        .requestMatchers(HttpMethod.GET, "/api/games/{gameId}").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/move").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/{action}").hasAnyRole("ADMIN", "USER")
+                        // APIs de Autenticação
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Login de usuários
+
+                        // APIs de Jogo
+                        .requestMatchers(HttpMethod.POST, "/api/games").hasAnyRole("ADMIN", "USER") // Criar jogo
+                        .requestMatchers(HttpMethod.GET, "/api/games/{gameId}").hasAnyRole("ADMIN", "USER") // Ver detalhes do jogo
+                        .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/move").hasAnyRole("ADMIN", "USER") // Fazer movimento
+                        .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/{action}").hasAnyRole("ADMIN", "USER") // Ações especiais (desistir, pedir empate, etc)
 
                         // Qualquer outra rota não listada acima EXIGE autenticação por padrão
                         .anyRequest().authenticated()
