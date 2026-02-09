@@ -77,8 +77,8 @@ public class GameService {
      * @param from Posição de origem do movimento.
      * @param to Posição de destino do movimento.
       */
-    public void makeMove(Position from, Position to) {
-        makeMove(from, to, null);
+    public void makeMove(Position from, Position to, UUID playerId) {
+        makeMove(from, to, null, playerId);
     }
 
     /**
@@ -89,12 +89,16 @@ public class GameService {
      * @param to Posição de destino do movimento.
      * @param promotionPiece Peça para promoção, se aplicável.
       */
-    public synchronized void makeMove(Position from, Position to, Piece promotionPiece) {
+    public synchronized void makeMove(Position from, Position to, Piece promotionPiece, UUID playerId) {
         Objects.requireNonNull(from, "Posição de origem não pode ser nula.");
         Objects.requireNonNull(to, "Posição de destino não pode ser nula.");
 
         if (!isActive()) {
             throw new IllegalStateException("O jogo não está ativo. Não é possível fazer movimentos.");
+        }
+
+        if (!playerId.equals(getCurrentPlayerId())) {
+            throw new IllegalStateException("Não é a vez do jogador com ID: " + playerId);
         }
 
         if (startTask != null) {
@@ -224,6 +228,11 @@ public class GameService {
         } else {
             throw new IllegalArgumentException("O jogador com ID " + playerId + " não está participando deste jogo.");
         }
+    }
+
+    private UUID getCurrentPlayerId() {
+        Color currentPlayerColor = getCurrentPlayer();
+        return currentPlayerColor == Color.WHITE ? whitePlayerId : blackPlayerId;
     }
 
 }
