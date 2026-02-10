@@ -53,7 +53,7 @@ public class GamePersistenceService {
 
     public GameEntity getGameById(UUID id) {
         return gameRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado para o ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado para o ID: " + id));
     }
 
     public boolean existsById(UUID id) {

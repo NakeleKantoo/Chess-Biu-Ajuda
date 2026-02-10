@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.chess.api.dto.response.game.PendingGameDTO;
@@ -14,6 +16,8 @@ import com.chess.infrastructure.persistence.entity.GameEntity;
 
 @Service
 public class GameManagerService {
+
+    private static final Logger log = LoggerFactory.getLogger(GameManagerService.class);
 
     private final GameTimerManager timerManager;
     private final GamePersistenceService gamePersistenceService;
@@ -34,6 +38,9 @@ public class GameManagerService {
         
         pendingGames.put(gameCode, new PendingGame(gameId, creatorId, config));
 
+        log.info("Jogo pendente criado: {} (código: {}, criador: {})",
+                gameId, gameCode, creatorId);
+
         return new PendingGameDTO(gameId, gameCode);
     }
 
@@ -43,6 +50,9 @@ public class GameManagerService {
             throw new IllegalArgumentException("Jogo não encontrado para o código: " + gameCode);
         }
 
+        log.info("Usuário {} está se juntando ao jogo com código {}",
+                joiningPlayerId, gameCode);
+
         UUID whitePlayerId = pendingGame.config().getStartingColor() == Color.WHITE ? pendingGame.creatorId() : joiningPlayerId;
         UUID blackPlayerId = whitePlayerId == joiningPlayerId ? pendingGame.creatorId() : joiningPlayerId;
 
@@ -50,26 +60,41 @@ public class GameManagerService {
             throw new IllegalArgumentException("O criador do jogo não pode se juntar como oponente.");
         }
 
-        GameSession gameService = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, this, pendingGame.gameId(), timerManager);
-        activeGames.put(pendingGame.gameId(), gameService);
+        GameSession gameSession = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, this, pendingGame.gameId(), timerManager);
+        activeGames.put(pendingGame.gameId(), gameSession);
+
+        log.info("Jogo {} iniciado com sucesso (white: {}, black: {})", 
+                pendingGame.gameId(), whitePlayerId, blackPlayerId);
 
         return pendingGame.gameId();
     }
 
     public GameSession getGameSession(UUID gameId) {
-        GameSession service = activeGames.get(gameId);
-        if (service == null) throw new IllegalArgumentException("Jogo não encontrado para o ID: " + gameId);
-        return service;
+        GameSession gameSession = activeGames.get(gameId);
+        if (gameSession == null) {
+            log.warn("Jogo {} não encontrado nas sessões ativas", gameId);
+            throw new IllegalArgumentException("Jogo não encontrado para o ID: " + gameId);
+        }
+        return gameSession;
     }
 
     public void saveGame(GameSession gameSession) {
-        gamePersistenceService.saveCompletedGame(
-            gameSession.getGame(),
-            gameSession.getWhitePlayerId(),
-            gameSession.getBlackPlayerId(),
-            gameSession.getSessionId()
-        );
-        activeGames.remove(gameSession.getSessionId());
+        UUID sessionId = gameSession.getSessionId();
+        
+        try {
+            gamePersistenceService.saveCompletedGame(
+                gameSession.getGame(),
+                gameSession.getWhitePlayerId(),
+                gameSession.getBlackPlayerId(),
+                sessionId
+            );
+            
+            activeGames.remove(sessionId);
+            log.info("Jogo {} salvo e removido das sessões ativas", sessionId);
+            
+        } catch (Exception e) {
+            log.error("Erro ao salvar jogo {}. Mantendo na memória para retry.", sessionId, e);
+        }
     }
 
     private String generateGameCode() {

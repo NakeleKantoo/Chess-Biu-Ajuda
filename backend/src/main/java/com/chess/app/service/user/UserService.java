@@ -2,6 +2,8 @@ package com.chess.app.service.user;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -25,6 +29,8 @@ public class UserService {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Já existe um usuário com esse nome.");
         }
+
+        log.info("Criando novo usuário: {}", username);
         
         User user = new User();
         user.setUsername(username);
@@ -33,6 +39,8 @@ public class UserService {
 
         UserEntity entityFunc = userMapper.toEntity(user);
         UserEntity savedEntity = userRepository.save(entityFunc);
+
+        log.info("Usuário {} criado com sucesso", username);
 
         return userMapper.toDomain(savedEntity);
     }
