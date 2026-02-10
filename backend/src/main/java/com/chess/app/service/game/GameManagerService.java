@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.chess.api.dto.response.game.PendingGameDTO;
@@ -12,23 +11,23 @@ import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.game.PendingGame;
 import com.chess.infrastructure.persistence.entity.GameEntity;
-import com.chess.infrastructure.persistence.mapper.GamePersistenceMapper;
-import com.chess.infrastructure.repository.GameRepository;
-import com.chess.infrastructure.repository.UserRepository;
 
 @Service
 public class GameManagerService {
 
-    @Autowired private GamePersistenceMapper gameMapper;
-    @Autowired private GameRepository gameRepository;
-    @Autowired private UserRepository userRepository;
+    private final GameTimerManager timerManager;
+    private final GamePersistenceService gamePersistenceService;
     
-    // Onde tudo fica guardado
-    private final Map<UUID, GameSession> activeGames = new ConcurrentHashMap<>();
+    private final Map<UUID, GameSession> activeGames;
+    private final Map<String, PendingGame> pendingGames;
 
-    private final Map<String, PendingGame> pendingGames = new ConcurrentHashMap<>();
+    public GameManagerService(GameTimerManager timerManager, GamePersistenceService gamePersistenceService) {
+        this.timerManager = timerManager;
+        this.gamePersistenceService = gamePersistenceService;
+        this.activeGames = new ConcurrentHashMap<>();
+        this.pendingGames = new ConcurrentHashMap<>();
+    }
 
-    // Cria uma nova partida e devolve o ID (a chave do apartamento)
     public PendingGameDTO createGame(GameConfig config, UUID creatorId) {
         UUID gameId = UUID.randomUUID();
         String gameCode = generateGameCode();
@@ -51,21 +50,25 @@ public class GameManagerService {
             throw new IllegalArgumentException("O criador do jogo não pode se juntar como oponente.");
         }
 
-        GameSession gameService = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, this, pendingGame.gameId());
+        GameSession gameService = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, this, pendingGame.gameId(), timerManager);
         activeGames.put(pendingGame.gameId(), gameService);
 
         return pendingGame.gameId();
     }
 
-    // Busca a partida para jogar
-    public GameSession getGameService(UUID gameId) {
+    public GameSession getGameSession(UUID gameId) {
         GameSession service = activeGames.get(gameId);
         if (service == null) throw new IllegalArgumentException("Jogo não encontrado para o ID: " + gameId);
         return service;
     }
 
     public void saveGame(GameSession gameSession) {
-        gameSession.save(gameRepository, gameMapper, userRepository);
+        gamePersistenceService.saveCompletedGame(
+            gameSession.getGame(),
+            gameSession.getWhitePlayerId(),
+            gameSession.getBlackPlayerId(),
+            gameSession.getSessionId()
+        );
         activeGames.remove(gameSession.getSessionId());
     }
 
@@ -89,8 +92,7 @@ public class GameManagerService {
     }
 
     public GameEntity getSavedGameEntity(UUID gameId) {
-        return gameRepository.findById(gameId)
-            .orElseThrow(() -> new IllegalArgumentException("Jogo salvo não encontrado para o ID: " + gameId));
+        return gamePersistenceService.getGameById(gameId);
     }
 
 }
