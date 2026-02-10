@@ -22,9 +22,17 @@ import com.chess.domain.model.move.MoveBuilder;
 import com.chess.domain.model.piece.Piece;
 import com.chess.domain.utils.BoardStateUtils;
 import com.chess.domain.utils.NotationUtils;
+import com.chess.infrastructure.persistence.entity.GameEntity;
+import com.chess.infrastructure.persistence.entity.UserEntity;
+import com.chess.infrastructure.persistence.mapper.GameMapper;
+import com.chess.infrastructure.repository.GameRepository;
+import com.chess.infrastructure.repository.UserRepository;
 
-public class GameService {
+public class GameSession {
+
+    private UUID sessionId;
     
+    private GameManagerService gameManager;
     private Game game;
 
     private MoveExecutor moveExecutor = new MoveExecutor();
@@ -39,10 +47,14 @@ public class GameService {
 
     private UUID drawOfferPlayerId;
 
-    public GameService(GameConfig config, UUID whitePlayerId, UUID blackPlayerId) {
+    private boolean saved = false;
+
+    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, GameManagerService manager, UUID sessionId) {
         this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
         this.whitePlayerId = whitePlayerId;
         this.blackPlayerId = blackPlayerId;
+        this.gameManager = manager;
+        this.sessionId = sessionId;
         scheduleAutoStart();
     }
 
@@ -52,6 +64,7 @@ public class GameService {
     public long getTimeRemaining(Color color) { return game.getTimeRemaining(color);  }
     public GameState getGameState() { return game.getGameState(); }
     public GameEndReason getGameEndReason() { return game.getGameEndReason(); }
+    public UUID getSessionId() { return sessionId; }
 
     private void scheduleAutoStart() {
         this.startTask = new TimerTask() {
@@ -126,6 +139,7 @@ public class GameService {
             configTimerToEnd();
         } else {
             stopTimer();
+            gameManager.saveGame(this);
         }
     }
 
@@ -233,6 +247,20 @@ public class GameService {
     private UUID getCurrentPlayerId() {
         Color currentPlayerColor = getCurrentPlayer();
         return currentPlayerColor == Color.WHITE ? whitePlayerId : blackPlayerId;
+    }
+
+    public void save(GameRepository repo, GameMapper mapper, UserRepository userRepo) {
+        if (this.saved) {
+            throw new IllegalStateException("Este jogo já foi salvo. Não é possível salvar novamente.");
+        }
+        UserEntity white = userRepo.findById(whitePlayerId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário branco não encontrado para o ID: " + whitePlayerId));
+        UserEntity black = userRepo.findById(blackPlayerId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário preto não encontrado para o ID: " + blackPlayerId));
+
+        GameEntity entity = mapper.toEntity(this.game, white, black, this.sessionId);
+        repo.save(entity);
+        this.saved = true;
     }
 
 }

@@ -18,15 +18,18 @@ import com.chess.api.dto.request.game.JoinGameRequest;
 import com.chess.api.dto.request.game.MoveDTO;
 import com.chess.api.dto.response.game.GameDTO;
 import com.chess.api.dto.response.game.PendingGameDTO;
+import com.chess.api.dto.response.game.SavedGameDTO;
 import com.chess.api.mapper.GameMapper;
+import com.chess.api.mapper.SavedGameMapper;
 import com.chess.app.service.game.GameManagerService;
-import com.chess.app.service.game.GameService;
+import com.chess.app.service.game.GameSession;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.piece.Piece;
 import com.chess.infrastructure.security.service.UserDetailsImpl;
 
 import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/games")
@@ -70,7 +73,7 @@ public class GameController {
         @RequestBody @Valid MoveDTO moveDTO,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
-        GameService gameService = gameManager.getGameService(gameId);
+        GameSession gameService = gameManager.getGameService(gameId);
         Position from = Position.at(moveDTO.from());
         Position to = Position.at(moveDTO.to());
         Piece promotionPiece = moveDTO.promotion() != null ? Piece.create(moveDTO.promotion().charAt(0)) : null;
@@ -87,7 +90,7 @@ public class GameController {
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
 
-        GameService gameService = gameManager.getGameService(gameId);
+        GameSession gameService = gameManager.getGameService(gameId);
         UUID playerId = user.getId();
         
         switch (action.toLowerCase()) {
@@ -105,5 +108,11 @@ public class GameController {
         }
         return ResponseEntity.ok(GameMapper.toDTO(gameService.getGame(), gameId));
     }
+
+    @GetMapping("/saved/{gameId}")
+    public ResponseEntity<SavedGameDTO> getGameEntityById(@PathVariable UUID gameId) {
+        return ResponseEntity.ok(SavedGameMapper.toDTO(gameManager.getSavedGameEntity(gameId)));
+    }
+    
 
 }
