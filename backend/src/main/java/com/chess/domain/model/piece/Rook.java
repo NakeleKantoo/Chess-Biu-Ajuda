@@ -1,0 +1,48 @@
+package com.chess.domain.model.piece;
+
+import java.util.List;
+import java.util.Objects;
+
+import com.chess.domain.model.base.*;
+import com.chess.domain.model.board.BaseBoard;
+import com.chess.domain.model.board.BoardAnalyzer;
+import com.chess.domain.utils.MoveUtils;
+
+public class Rook extends Piece {
+
+    protected Rook(Color color) {
+        super(color);
+    }
+
+    @Override
+    public char getSymbol() {
+        return this.color.isWhite() ? 'R' : 'r';
+    }
+
+    @Override
+    public boolean isAttacking(BaseBoard board, Position from, Position to) {
+        Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
+        Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
+        Objects.requireNonNull(to, "A posição de destino não pode ser nula.");
+
+        Direction dir = Direction.get(from, to);
+
+        if (dir == null) return false;
+
+        // Verifica se o caminho está livre de peças e se está na direção ortogonal
+        boolean isAttacking = dir.isOrthogonal() && BoardAnalyzer.isPathClear(board, from, to);
+
+        return isAttacking;
+    }
+
+    @Override
+    public List<Position> getPossibleMoves(BaseBoard board, Position from) {
+        Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
+        Objects.requireNonNull(from, "A posição de origem não pode ser nula.");
+
+        Direction[] directions = Direction.getOrthogonalDirections();
+
+        return MoveUtils.getSlidingMoves(board, this.color, from, directions);
+    }
+
+}
