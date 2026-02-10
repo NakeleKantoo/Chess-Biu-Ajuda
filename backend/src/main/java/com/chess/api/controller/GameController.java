@@ -64,7 +64,7 @@ public class GameController {
 
     @GetMapping("/{gameId}")
     public ResponseEntity<GameDTO> getGameById(@PathVariable UUID gameId) {
-        return ResponseEntity.ok(GameApiMapper.toDTO(gameManager.getGameService(gameId).getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(gameManager.getGameSession(gameId).getGame(), gameId));
     }
 
     @PostMapping("/{gameId}/move")
@@ -73,14 +73,14 @@ public class GameController {
         @RequestBody @Valid MoveDTO moveDTO,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
-        GameSession gameService = gameManager.getGameService(gameId);
+        GameSession gameSession = gameManager.getGameSession(gameId);
         Position from = Position.at(moveDTO.from());
         Position to = Position.at(moveDTO.to());
         Piece promotionPiece = moveDTO.promotion() != null ? Piece.create(moveDTO.promotion().charAt(0)) : null;
 
-        gameService.makeMove(from, to, promotionPiece, user.getId());
+        gameSession.makeMove(from, to, promotionPiece, user.getId());
 
-        return ResponseEntity.ok(GameApiMapper.toDTO(gameService.getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(gameSession.getGame(), gameId));
     }
 
     @PostMapping("/{gameId}/{action}")
@@ -89,24 +89,23 @@ public class GameController {
         @PathVariable String action,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
-
-        GameSession gameService = gameManager.getGameService(gameId);
+        GameSession gameSession = gameManager.getGameSession(gameId);
         UUID playerId = user.getId();
         
         switch (action.toLowerCase()) {
             case "offer-draw":
-                gameService.offerDraw(playerId);
+                gameSession.offerDraw(playerId);
                 break;
             case "resign":
-                gameService.resign(playerId);
+                gameSession.resign(playerId);
                 break;
             case "accept-draw":
-                gameService.acceptDraw(playerId);
+                gameSession.acceptDraw(playerId);
                 break;
             default:
                 return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(GameApiMapper.toDTO(gameService.getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(gameSession.getGame(), gameId));
     }
 
     @GetMapping("/saved/{gameId}")
