@@ -8,7 +8,7 @@ import com.chess.infrastructure.persistence.entity.GameEntity;
 import com.chess.infrastructure.persistence.entity.MoveEntity;
 
 @Component
-public class MoveMapper {
+public class MovePersistenceMapper {
     
     public MoveEntity toEntity(GameEntity gameEntity, Move move, Board board, int moveNumber) {
         if (move == null) return null;

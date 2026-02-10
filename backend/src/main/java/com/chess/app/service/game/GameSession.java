@@ -24,7 +24,7 @@ import com.chess.domain.utils.BoardStateUtils;
 import com.chess.domain.utils.NotationUtils;
 import com.chess.infrastructure.persistence.entity.GameEntity;
 import com.chess.infrastructure.persistence.entity.UserEntity;
-import com.chess.infrastructure.persistence.mapper.GameMapper;
+import com.chess.infrastructure.persistence.mapper.GamePersistenceMapper;
 import com.chess.infrastructure.repository.GameRepository;
 import com.chess.infrastructure.repository.UserRepository;
 
@@ -249,7 +249,7 @@ public class GameSession {
         return currentPlayerColor == Color.WHITE ? whitePlayerId : blackPlayerId;
     }
 
-    public void save(GameRepository repo, GameMapper mapper, UserRepository userRepo) {
+    public void save(GameRepository repo, GamePersistenceMapper mapper, UserRepository userRepo) {
         if (this.saved) {
             throw new IllegalStateException("Este jogo já foi salvo. Não é possível salvar novamente.");
         }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.chess.domain.model.user.Role;
 import com.chess.domain.model.user.User;
 import com.chess.infrastructure.persistence.entity.UserEntity;
-import com.chess.infrastructure.persistence.mapper.UserMapper;
+import com.chess.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.chess.infrastructure.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
+    private final UserPersistenceMapper userMapper;
 
     public User createUser(String username, String password) {
         if (userRepository.existsByUsername(username)) {

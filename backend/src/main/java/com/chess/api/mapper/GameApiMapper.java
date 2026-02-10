@@ -22,7 +22,7 @@ import com.chess.domain.model.game.GameConfig.GameType;
 import com.chess.domain.model.game.GameConfig.TimeControl;
 import com.chess.domain.model.move.Move;
 
-public class GameMapper {
+public class GameApiMapper {
     
     public static GameConfig fromGameConfigDTO(GameConfigDTO configDTO) {
         GameType gameType = GameType.fromString(configDTO.gameType());
@@ -84,7 +84,7 @@ public class GameMapper {
 
     private static List<MoveDTO> getMoveHistory(List<Move> moveHistory) {
         return moveHistory.stream()
-            .map(GameMapper::getMoveDTO)
+            .map(GameApiMapper::getMoveDTO)
             .toList();
     }
 

@@ -10,7 +10,7 @@ import com.chess.infrastructure.persistence.entity.MoveEntity;
 import com.chess.domain.model.game.GameEndReason;
 import com.chess.domain.model.game.GameState;
 
-public class SavedGameMapper {
+public class SavedGameApiMapper {
     
     public static SavedGameDTO toDTO(GameEntity entity) {
         List<MoveDTO> moves = mapMoves(entity.getMoves());
@@ -38,7 +38,7 @@ public class SavedGameMapper {
 
     private static List<MoveDTO> mapMoves(List<MoveEntity> moveEntities) {
         return moveEntities.stream()
-            .map(SavedGameMapper::mapMove)
+            .map(SavedGameApiMapper::mapMove)
             .toList();
     }
 

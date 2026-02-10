@@ -19,8 +19,8 @@ import com.chess.api.dto.request.game.MoveDTO;
 import com.chess.api.dto.response.game.GameDTO;
 import com.chess.api.dto.response.game.PendingGameDTO;
 import com.chess.api.dto.response.game.SavedGameDTO;
-import com.chess.api.mapper.GameMapper;
-import com.chess.api.mapper.SavedGameMapper;
+import com.chess.api.mapper.GameApiMapper;
+import com.chess.api.mapper.SavedGameApiMapper;
 import com.chess.app.service.game.GameManagerService;
 import com.chess.app.service.game.GameSession;
 import com.chess.domain.model.base.Position;
@@ -44,7 +44,7 @@ public class GameController {
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
 
-        GameConfig config = GameMapper.fromGameConfigDTO(configDTO);
+        GameConfig config = GameApiMapper.fromGameConfigDTO(configDTO);
         PendingGameDTO pendingGameDTO = gameManager.createGame(config, user.getId());
 
         return ResponseEntity.ok(pendingGameDTO);
@@ -64,7 +64,7 @@ public class GameController {
 
     @GetMapping("/{gameId}")
     public ResponseEntity<GameDTO> getGameById(@PathVariable UUID gameId) {
-        return ResponseEntity.ok(GameMapper.toDTO(gameManager.getGameService(gameId).getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(gameManager.getGameService(gameId).getGame(), gameId));
     }
 
     @PostMapping("/{gameId}/move")
@@ -80,7 +80,7 @@ public class GameController {
 
         gameService.makeMove(from, to, promotionPiece, user.getId());
 
-        return ResponseEntity.ok(GameMapper.toDTO(gameService.getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(gameService.getGame(), gameId));
     }
 
     @PostMapping("/{gameId}/{action}")
@@ -106,12 +106,12 @@ public class GameController {
             default:
                 return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(GameMapper.toDTO(gameService.getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(gameService.getGame(), gameId));
     }
 
     @GetMapping("/saved/{gameId}")
     public ResponseEntity<SavedGameDTO> getGameEntityById(@PathVariable UUID gameId) {
-        return ResponseEntity.ok(SavedGameMapper.toDTO(gameManager.getSavedGameEntity(gameId)));
+        return ResponseEntity.ok(SavedGameApiMapper.toDTO(gameManager.getSavedGameEntity(gameId)));
     }
     
 

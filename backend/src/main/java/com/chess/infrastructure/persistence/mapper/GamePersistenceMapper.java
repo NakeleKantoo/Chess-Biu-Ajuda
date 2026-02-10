@@ -16,10 +16,10 @@ import com.chess.infrastructure.persistence.entity.MoveEntity;
 import com.chess.infrastructure.persistence.entity.UserEntity;
 
 @Component
-public class GameMapper {
+public class GamePersistenceMapper {
 
     @Autowired
-    MoveMapper moveMapper;
+    MovePersistenceMapper moveMapper;
     
     public GameEntity toEntity(Game game, UserEntity whitePlayer, UserEntity blackPlayer, UUID sessionId) {
         if (game == null) return null;

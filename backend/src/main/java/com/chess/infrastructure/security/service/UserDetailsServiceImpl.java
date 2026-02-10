@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.chess.infrastructure.persistence.entity.UserEntity;
-import com.chess.infrastructure.persistence.mapper.UserMapper;
+import com.chess.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.chess.infrastructure.repository.UserRepository;
 
 @Service
@@ -17,7 +17,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     UserRepository userRepository;
 
     @Autowired
-    UserMapper userMapper;
+    UserPersistenceMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

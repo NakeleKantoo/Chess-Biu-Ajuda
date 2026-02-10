@@ -12,14 +12,14 @@ import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.game.PendingGame;
 import com.chess.infrastructure.persistence.entity.GameEntity;
-import com.chess.infrastructure.persistence.mapper.GameMapper;
+import com.chess.infrastructure.persistence.mapper.GamePersistenceMapper;
 import com.chess.infrastructure.repository.GameRepository;
 import com.chess.infrastructure.repository.UserRepository;
 
 @Service
 public class GameManagerService {
 
-    @Autowired private GameMapper gameMapper;
+    @Autowired private GamePersistenceMapper gameMapper;
     @Autowired private GameRepository gameRepository;
     @Autowired private UserRepository userRepository;
     
