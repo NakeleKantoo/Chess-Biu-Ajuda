@@ -14,6 +14,7 @@ import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.move.InvalidMoveException;
 import com.chess.domain.exception.user.DuplicateUsernameException;
+import com.chess.domain.exception.user.UserNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -79,7 +80,7 @@ public class GlobalApiExceptionHandler {
             HttpStatus.BAD_REQUEST,
             "Validation Failed",
             ex, request,
-            Map.of("details", fieldErrors));
+            Map.of("fieldErrors", fieldErrors));
     }
 
     // ---------- Tratamento de Exceções de Domínio ----------
@@ -116,6 +117,17 @@ public class GlobalApiExceptionHandler {
             "Game Session Not Found",
             ex, request,
             Map.of("gameId", ex.getGameId()));
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
+        UserNotFoundException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.NOT_FOUND,
+            "User Not Found",
+            ex, request,
+            Map.of("userId", ex.getUserId()));
     }
 
     // CONFLICT - 409

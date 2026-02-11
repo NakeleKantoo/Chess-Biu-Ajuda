@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.chess.app.service.user.UserService;
 import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.model.game.Game;
@@ -15,7 +16,6 @@ import com.chess.infrastructure.persistence.entity.GameEntity;
 import com.chess.infrastructure.persistence.entity.UserEntity;
 import com.chess.infrastructure.persistence.mapper.GamePersistenceMapper;
 import com.chess.infrastructure.repository.GameRepository;
-import com.chess.infrastructure.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -26,7 +26,7 @@ public class GamePersistenceService {
     private static final Logger log = LoggerFactory.getLogger(GamePersistenceService.class);
 
     private final GameRepository gameRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final GamePersistenceMapper gamePersistenceMapper;
 
     @Transactional
@@ -40,10 +40,8 @@ public class GamePersistenceService {
 
         log.info("Salvando jogo {} (white: {}, black: {})", id, whitePlayerId, blackPlayerId);
 
-        UserEntity white = userRepository.findById(whitePlayerId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário branco não encontrado para o ID: " + whitePlayerId));
-        UserEntity black = userRepository.findById(blackPlayerId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário preto não encontrado para o ID: " + blackPlayerId));
+        UserEntity white = userService.getUserEntityById(whitePlayerId);
+        UserEntity black = userService.getUserEntityById(blackPlayerId);
 
         GameEntity entity = gamePersistenceMapper.toEntity(game, white, black, id);
         GameEntity savedEntity = gameRepository.save(entity);
