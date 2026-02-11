@@ -4,6 +4,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.chess.domain.exception.move.InvalidPositionNotationException;
+
 public class Position {
     // Coordenadas da posição
     private final int row;
@@ -54,14 +56,14 @@ public class Position {
     public static Position at(String string) {
         Objects.requireNonNull(string, "Notação de posição não pode ser nula.");
         if (string.trim().isEmpty()) {
-            throw new IllegalArgumentException("Notação de posição não pode ser nula ou vazia.");
+            throw new InvalidPositionNotationException(string);
         }
 
         // Valida a notação da posição
         Pattern pattern = Pattern.compile("^[a-h][1-8]$");
         Matcher matcher = pattern.matcher(string);
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Formato de notação de posição inválido: \"" + string + "\"");
+            throw new InvalidPositionNotationException(string);
         }
 
         // Converte a notação para coordenadas de linha e coluna

@@ -214,6 +214,17 @@ public class GlobalApiExceptionHandler {
             ex, request,
             Map.of("piece", ex.getPiece()));
     }
+    @ExceptionHandler(InvalidPositionNotationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPositionNotation(
+        InvalidPositionNotationException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid Position Notation",
+            ex, request,
+            Map.of("notation", ex.getNotation()));
+    }
 
     // FORBIDDEN - 403
     @ExceptionHandler(PlayerNotInGameException.class)
