@@ -3,6 +3,7 @@ package com.chess.app.service.game;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.chess.domain.exception.player.NotPlayerTurnException;
 import com.chess.domain.exception.player.PlayerNotInGameException;
 import com.chess.domain.model.base.Color;
 
@@ -17,7 +18,7 @@ public class PlayerSessionValidator {
         Objects.requireNonNull(currentPlayerId, "O ID do jogador atual não pode ser nulo.");
 
         if (!playerId.equals(currentPlayerId)) {
-            throw new IllegalStateException("Não é a vez do jogador com ID: " + playerId);
+            throw new NotPlayerTurnException(playerId);
         }
     }
 

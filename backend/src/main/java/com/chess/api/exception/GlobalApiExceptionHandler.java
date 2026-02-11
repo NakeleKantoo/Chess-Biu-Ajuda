@@ -14,6 +14,7 @@ import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.move.InvalidMoveException;
+import com.chess.domain.exception.player.NotPlayerTurnException;
 import com.chess.domain.exception.player.PlayerNotInGameException;
 import com.chess.domain.exception.user.DuplicateUsernameException;
 import com.chess.domain.exception.user.UserNotFoundException;
@@ -186,6 +187,17 @@ public class GlobalApiExceptionHandler {
             "Invalid Game State",
             ex, request,
             Map.of("gameId", ex.getGameId(), "currentState", ex.getCurrentState()));
+    }
+    @ExceptionHandler(NotPlayerTurnException.class)
+    public ResponseEntity<ErrorResponse> handleNotPlayerTurn(
+        NotPlayerTurnException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Not Player Turn",
+            ex, request,
+            Map.of("playerId", ex.getPlayerId()));
     }
 
     // FORBIDDEN - 403
