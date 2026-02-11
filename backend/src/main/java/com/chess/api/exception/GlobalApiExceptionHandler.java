@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.chess.api.dto.response.ErrorResponse;
+import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
@@ -109,6 +110,18 @@ public class GlobalApiExceptionHandler {
         return buildResponse(
             HttpStatus.NOT_FOUND,
             "Game Session Not Found",
+            ex, request,
+            Map.of("gameId", ex.getGameId()));
+    }
+
+    @ExceptionHandler(DuplicateGameException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateGame(
+        DuplicateGameException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.CONFLICT,
+            "Duplicate Game",
             ex, request,
             Map.of("gameId", ex.getGameId()));
     }

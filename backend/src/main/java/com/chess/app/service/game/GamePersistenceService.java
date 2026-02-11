@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.model.game.Game;
 import com.chess.domain.model.game.GameState;
@@ -34,7 +35,7 @@ public class GamePersistenceService {
             throw new IllegalStateException("O jogo ainda está ativo e não pode ser salvo como concluído.");
         }
         if (gameRepository.existsById(id)) {
-            throw new IllegalStateException("Um jogo com este UUID já foi salvo.");
+            throw new DuplicateGameException(id);
         }
 
         log.info("Salvando jogo {} (white: {}, black: {})", id, whitePlayerId, blackPlayerId);
