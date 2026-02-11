@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.chess.app.service.user.UserService;
 import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
+import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.model.game.Game;
 import com.chess.domain.model.game.GameState;
 import com.chess.infrastructure.persistence.entity.GameEntity;
@@ -32,7 +33,7 @@ public class GamePersistenceService {
     @Transactional
     public GameEntity saveCompletedGame(Game game, UUID whitePlayerId, UUID blackPlayerId, UUID id) {
         if (game.getGameState() == GameState.ACTIVE) {
-            throw new IllegalStateException("O jogo ainda está ativo e não pode ser salvo como concluído.");
+            throw new InvalidGameStateException("O jogo ainda está ativo e não pode ser salvo como concluído.", id, game.getGameState());
         }
         if (gameRepository.existsById(id)) {
             throw new DuplicateGameException(id);

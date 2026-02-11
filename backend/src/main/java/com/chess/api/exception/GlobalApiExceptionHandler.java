@@ -11,6 +11,7 @@ import com.chess.api.dto.response.ErrorResponse;
 import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
+import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.move.InvalidMoveException;
 import com.chess.domain.exception.player.PlayerNotInGameException;
@@ -174,6 +175,17 @@ public class GlobalApiExceptionHandler {
             type,
             ex, request,
             details);
+    }
+    @ExceptionHandler(InvalidGameStateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidGameState(
+        InvalidGameStateException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid Game State",
+            ex, request,
+            Map.of("gameId", ex.getGameId(), "currentState", ex.getCurrentState()));
     }
 
     // FORBIDDEN - 403
