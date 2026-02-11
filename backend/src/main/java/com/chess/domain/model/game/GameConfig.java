@@ -58,30 +58,11 @@ public class GameConfig {
         RAPID,
         CLASSICAL,
         CUSTOM;
-
-        public static TimeControl fromString(String value) {
-            return switch (value.toUpperCase()) {
-                case "BULLET" -> BULLET;
-                case "BLITZ" -> BLITZ;
-                case "RAPID" -> RAPID;
-                case "CLASSICAL" -> CLASSICAL;
-                case "CUSTOM" -> CUSTOM;
-                default -> throw new IllegalArgumentException("Controle de tempo inválido: " + value);
-            };
-        }
     }
     
     public enum GameType {
         STANDARD,
         CHESS960;
-
-        public static GameType fromString(String value) {
-            return switch (value.toUpperCase()) {
-                case "STANDARD" -> STANDARD;
-                case "CHESS960" -> CHESS960;
-                default -> throw new IllegalArgumentException("Tipo de jogo inválido: " + value);
-            };
-        }
     }
 
     public TimeControl getTimeControl() { return timeControl; }
