@@ -13,6 +13,7 @@ import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.move.InvalidMoveException;
+import com.chess.domain.exception.player.PlayerNotInGameException;
 import com.chess.domain.exception.user.DuplicateUsernameException;
 import com.chess.domain.exception.user.UserNotFoundException;
 
@@ -173,6 +174,19 @@ public class GlobalApiExceptionHandler {
             type,
             ex, request,
             details);
+    }
+
+    // FORBIDDEN - 403
+    @ExceptionHandler(PlayerNotInGameException.class)
+    public ResponseEntity<ErrorResponse> handlePlayerNotInGame(
+        PlayerNotInGameException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.FORBIDDEN,
+            "Player Not In Game",
+            ex, request,
+            Map.of("playerId", ex.getPlayerId()));
     }
 
     // ---------- Métodos Auxiliares ----------
