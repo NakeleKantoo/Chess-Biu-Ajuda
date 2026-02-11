@@ -18,6 +18,7 @@ import com.chess.domain.exception.move.InvalidPositionNotationException;
 import com.chess.domain.exception.move.InvalidPromotionPieceException;
 import com.chess.domain.exception.player.NotPlayerTurnException;
 import com.chess.domain.exception.player.PlayerNotInGameException;
+import com.chess.domain.exception.player.SelfJoinGameException;
 import com.chess.domain.exception.user.DuplicateUsernameException;
 import com.chess.domain.exception.user.UserNotFoundException;
 
@@ -198,6 +199,17 @@ public class GlobalApiExceptionHandler {
         return buildResponse(
             HttpStatus.BAD_REQUEST,
             "Not Player Turn",
+            ex, request,
+            Map.of("playerId", ex.getPlayerId()));
+    }
+    @ExceptionHandler(SelfJoinGameException.class)
+    public ResponseEntity<ErrorResponse> handleSelfJoinGame(
+        SelfJoinGameException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Self Join Game",
             ex, request,
             Map.of("playerId", ex.getPlayerId()));
     }

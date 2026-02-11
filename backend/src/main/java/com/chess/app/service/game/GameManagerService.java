@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.chess.api.dto.response.game.PendingGameDTO;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
+import com.chess.domain.exception.player.SelfJoinGameException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.game.PendingGame;
@@ -59,7 +60,7 @@ public class GameManagerService {
         UUID blackPlayerId = whitePlayerId == joiningPlayerId ? pendingGame.creatorId() : joiningPlayerId;
 
         if (whitePlayerId.equals(blackPlayerId)) {
-            throw new IllegalArgumentException("O criador do jogo não pode se juntar como oponente.");
+            throw new SelfJoinGameException(joiningPlayerId);
         }
 
         GameSession gameSession = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, this, pendingGame.gameId(), timerManager);
