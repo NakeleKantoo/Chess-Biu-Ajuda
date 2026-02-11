@@ -12,6 +12,7 @@ import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
+import com.chess.domain.exception.move.InvalidMoveException;
 import com.chess.domain.exception.user.DuplicateUsernameException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalApiExceptionHandler {
 
+    // ---------- Tratamento de Exceções Genéricas ----------
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
         Exception ex,
@@ -36,6 +38,7 @@ public class GlobalApiExceptionHandler {
         );
     }
 
+    // ---------- Tratamento de Exceções do Java ----------
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalState(
         IllegalStateException ex,
@@ -47,7 +50,6 @@ public class GlobalApiExceptionHandler {
             ex,
             request);
     }
-    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(
         IllegalArgumentException ex, 
@@ -59,6 +61,7 @@ public class GlobalApiExceptionHandler {
             ex, request);
     }
 
+    // ---------- Tratamento de Exceções do Spring ----------
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(
         MethodArgumentNotValidException ex, 
@@ -79,6 +82,8 @@ public class GlobalApiExceptionHandler {
             Map.of("details", fieldErrors));
     }
 
+    // ---------- Tratamento de Exceções de Domínio ----------
+    // NOT FOUND - 404
     @ExceptionHandler(GameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGameNotFound(
         GameNotFoundException ex,
@@ -90,7 +95,6 @@ public class GlobalApiExceptionHandler {
             ex, request,
             Map.of("gameId", ex.getGameId()));
     }
-
     @ExceptionHandler(PendingGameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePendingGameNotFound(
         PendingGameNotFoundException ex,
@@ -102,7 +106,6 @@ public class GlobalApiExceptionHandler {
             ex, request,
             Map.of("gameCode", ex.getGameCode()));
     }
-
     @ExceptionHandler(GameSessionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGameSessionNotFound(
         GameSessionNotFoundException ex,
@@ -115,6 +118,7 @@ public class GlobalApiExceptionHandler {
             Map.of("gameId", ex.getGameId()));
     }
 
+    // CONFLICT - 409
     @ExceptionHandler(DuplicateGameException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateGame(
         DuplicateGameException ex,
@@ -126,7 +130,6 @@ public class GlobalApiExceptionHandler {
             ex, request,
             Map.of("gameId", ex.getGameId()));
     }
-
     @ExceptionHandler(DuplicateUsernameException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateUsername(
         DuplicateUsernameException ex,
@@ -139,6 +142,28 @@ public class GlobalApiExceptionHandler {
             Map.of("username", ex.getUsername()));
     }
 
+    // BAD REQUEST - 400 (Regras de Negócio)
+    @ExceptionHandler(InvalidMoveException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidMove(
+        InvalidMoveException ex,
+        HttpServletRequest request
+    ) {
+        String type = ex.getTo() == null 
+            ? "Invalid Move - No Piece at Origin" 
+            : "Invalid Move";
+    
+        Map<String, Object> details = ex.getTo() == null
+            ? Map.of("from", ex.getFrom().toString())
+            : Map.of("from", ex.getFrom().toString(), "to", ex.getTo().toString());
+        
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            type,
+            ex, request,
+            details);
+    }
+
+    // ---------- Métodos Auxiliares ----------
     private ResponseEntity<ErrorResponse> buildResponse(
         HttpStatus status,
         String type,

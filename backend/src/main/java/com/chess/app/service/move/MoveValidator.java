@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.chess.domain.exception.move.InvalidMoveException;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.board.BaseBoard;
 import com.chess.domain.model.board.Board;
@@ -82,7 +83,7 @@ public class MoveValidator {
 
         Piece movedPiece = board.getPieceAt(from);
         if (movedPiece == null) {
-            throw new IllegalArgumentException("Não há peça na posição de origem: " + from);
+            throw new InvalidMoveException(from);
         }
 
         MoveBuilder moveBuilder = new MoveBuilder(from, to, movedPiece);
@@ -94,7 +95,7 @@ public class MoveValidator {
         Move possibleMove = moveBuilder.build();
 
         if (!legalMoves.contains(possibleMove)) {
-            throw new IllegalArgumentException("Movimento ilegal de " + from + " para " + to);
+            throw new InvalidMoveException(from, to);
         }
 
         return legalMoves.get(legalMoves.indexOf(possibleMove));
