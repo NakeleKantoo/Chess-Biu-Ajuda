@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.chess.api.dto.response.game.PendingGameDTO;
+import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.game.PendingGame;
@@ -47,7 +48,7 @@ public class GameManagerService {
     public UUID joinGame(String gameCode, UUID joiningPlayerId) {
         PendingGame pendingGame = pendingGames.remove(gameCode);
         if (pendingGame == null) {
-            throw new IllegalArgumentException("Jogo não encontrado para o código: " + gameCode);
+            throw new PendingGameNotFoundException(gameCode);
         }
 
         log.info("Usuário {} está se juntando ao jogo com código {}",

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.chess.api.dto.response.ErrorResponse;
 import com.chess.domain.exception.game.GameNotFoundException;
+import com.chess.domain.exception.game.PendingGameNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -85,6 +86,18 @@ public class GlobalApiExceptionHandler {
             "Game Not Found",
             ex, request,
             Map.of("gameId", ex.getGameId()));
+    }
+
+    @ExceptionHandler(PendingGameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePendingGameNotFound(
+        PendingGameNotFoundException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.NOT_FOUND,
+            "Pending Game Not Found",
+            ex, request,
+            Map.of("gameCode", ex.getGameCode()));
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(
