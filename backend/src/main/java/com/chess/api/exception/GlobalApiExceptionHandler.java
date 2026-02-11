@@ -12,6 +12,7 @@ import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
+import com.chess.domain.exception.user.DuplicateUsernameException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -124,6 +125,18 @@ public class GlobalApiExceptionHandler {
             "Duplicate Game",
             ex, request,
             Map.of("gameId", ex.getGameId()));
+    }
+
+    @ExceptionHandler(DuplicateUsernameException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateUsername(
+        DuplicateUsernameException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.CONFLICT,
+            "Duplicate Username",
+            ex, request,
+            Map.of("username", ex.getUsername()));
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(
