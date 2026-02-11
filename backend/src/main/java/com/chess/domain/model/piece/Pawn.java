@@ -96,6 +96,11 @@ public class Pawn extends Piece {
     }
 
     @Override
+    public String getName() {
+        return "Peão";
+    }
+
+    @Override
     public boolean isAttacking(BaseBoard board, Position from, Position to) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(from, "A posição de origem não pode ser nula.");

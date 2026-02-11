@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.chess.domain.exception.move.InvalidMoveException;
+import com.chess.domain.exception.move.InvalidPromotionPieceException;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.board.BaseBoard;
 import com.chess.domain.model.board.Board;
@@ -78,7 +79,7 @@ public class MoveValidator {
         Objects.requireNonNull(to, "Posição de destino não pode ser nula.");
 
         if (promotionPiece != null && !MoveRules.isPromotionPiece(promotionPiece)) {
-            throw new IllegalArgumentException("Peça de promoção inválida: " + promotionPiece.getSymbol());
+            throw new InvalidPromotionPieceException(promotionPiece);
         }
 
         Piece movedPiece = board.getPieceAt(from);
