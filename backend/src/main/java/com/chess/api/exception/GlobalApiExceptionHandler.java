@@ -19,50 +19,97 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalApiExceptionHandler {
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(
+        Exception ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Internal Server Error",
+            new RuntimeException("Ocorreu um erro inesperado. Tente novamente mais tarde."),
+            request
+        );
+    }
+
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Object> handleIllegalState(IllegalStateException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-            "error", "Invalid Action",
-            "message", ex.getMessage(), // "Não é a vez das brancas", etc.
-            "timestamp", LocalDateTime.now()
-        ));
+    public ResponseEntity<ErrorResponse> handleIllegalState(
+        IllegalStateException ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid Action",
+            ex,
+            request);
     }
     
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-            "error", "Bad Request",
-            "message", ex.getMessage(),
-            "timestamp", LocalDateTime.now()
-        ));
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+        IllegalArgumentException ex, 
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid Argument",
+            ex, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
-            .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-            "error", "Validation Failed",
-            "message", "One or more fields are invalid",
-            "details", errors,
-            "timestamp", LocalDateTime.now()
-        ));
+    public ResponseEntity<ErrorResponse> handleValidationErrors(
+        MethodArgumentNotValidException ex, 
+        HttpServletRequest request
+    ) {
+        Map<String, String> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
+            .collect(Collectors.toMap(
+                FieldError::getField,
+                error -> error.getDefaultMessage() != null 
+                    ? error.getDefaultMessage() 
+                    : "Valor inválido"
+            ));
+        
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Validation Failed",
+            ex, request,
+            Map.of("details", fieldErrors));
     }
 
     @ExceptionHandler(GameNotFoundException.class)
-    public ResponseEntity<Object> handleGameNotFound(
+    public ResponseEntity<ErrorResponse> handleGameNotFound(
         GameNotFoundException ex,
         HttpServletRequest request
     ) {
-        ErrorResponse error = new ErrorResponse(
+        return buildResponse(
+            HttpStatus.NOT_FOUND,
             "Game Not Found",
+            ex, request,
+            Map.of("gameId", ex.getGameId()));
+    }
+
+    private ResponseEntity<ErrorResponse> buildResponse(
+        HttpStatus status,
+        String type,
+        Exception ex,
+        HttpServletRequest request,
+        Map<String, Object> details
+    ) {
+        ErrorResponse error = new ErrorResponse(
+            type,
             ex.getMessage(),
             LocalDateTime.now(),
             request.getRequestURI(),
-            Map.of("gameId", ex.getGameId())
-        );
+            details);
+        return ResponseEntity.status(status).body(error);
+    }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    private ResponseEntity<ErrorResponse> buildResponse(
+        HttpStatus status,
+        String type,
+        Exception ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(status, type, ex, request, null);
     }
 
 }
