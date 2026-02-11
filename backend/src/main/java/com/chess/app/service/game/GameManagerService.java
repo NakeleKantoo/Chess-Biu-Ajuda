@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.chess.api.dto.response.game.PendingGameDTO;
+import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
@@ -74,7 +75,7 @@ public class GameManagerService {
         GameSession gameSession = activeGames.get(gameId);
         if (gameSession == null) {
             log.warn("Jogo {} não encontrado nas sessões ativas", gameId);
-            throw new IllegalArgumentException("Jogo não encontrado para o ID: " + gameId);
+            throw new GameSessionNotFoundException(gameId);
         }
         return gameSession;
     }
