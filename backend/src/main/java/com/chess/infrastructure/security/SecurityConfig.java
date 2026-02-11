@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/games/{gameId}").hasAnyRole("ADMIN", "USER") // Ver detalhes do jogo
                         .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/move").hasAnyRole("ADMIN", "USER") // Fazer movimento
                         .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/{action}").hasAnyRole("ADMIN", "USER") // Ações especiais (desistir, pedir empate, etc)
+                        .requestMatchers(HttpMethod.GET, "/api/games/saved/{gameId}").permitAll() // Ver jogo salvo (pode ser público, sem autenticação)
 
                         // Qualquer outra rota não listada acima EXIGE autenticação por padrão
                         .anyRequest().authenticated()
