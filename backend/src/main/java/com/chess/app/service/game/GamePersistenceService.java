@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.model.game.Game;
 import com.chess.domain.model.game.GameState;
 import com.chess.infrastructure.persistence.entity.GameEntity;
@@ -53,7 +54,7 @@ public class GamePersistenceService {
 
     public GameEntity getGameById(UUID id) {
         return gameRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado para o ID: " + id));
+                .orElseThrow(() -> new GameNotFoundException(id));
     }
 
     public boolean existsById(UUID id) {

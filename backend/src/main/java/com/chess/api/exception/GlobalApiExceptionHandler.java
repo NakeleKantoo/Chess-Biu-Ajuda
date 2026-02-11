@@ -7,6 +7,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.chess.api.dto.response.ErrorResponse;
+import com.chess.domain.exception.game.GameNotFoundException;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +47,22 @@ public class GlobalApiExceptionHandler {
             "details", errors,
             "timestamp", LocalDateTime.now()
         ));
+    }
+
+    @ExceptionHandler(GameNotFoundException.class)
+    public ResponseEntity<Object> handleGameNotFound(
+        GameNotFoundException ex,
+        HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+            "Game Not Found",
+            ex.getMessage(),
+            LocalDateTime.now(),
+            request.getRequestURI(),
+            Map.of("gameId", ex.getGameId())
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
 }
