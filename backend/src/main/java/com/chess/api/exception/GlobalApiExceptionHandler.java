@@ -2,6 +2,7 @@ package com.chess.api.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,7 @@ import com.chess.domain.exception.user.DuplicateUsernameException;
 import com.chess.domain.exception.user.UserNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -69,6 +71,27 @@ public class GlobalApiExceptionHandler {
     }
 
     // ---------- Tratamento de Exceções do Spring ----------
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJson(
+        HttpMessageNotReadableException ex,
+        HttpServletRequest request
+    ) {
+        String message = "Corpo da requisição contém valores inválidos";
+        
+        // Tenta extrair detalhes se for erro de formato
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException ife) {
+            String fieldName = ife.getPath().get(0).getPropertyName();
+            message = String.format("Valor inválido para o campo '%s'", fieldName);
+        }
+        
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid Request Body",
+            new RuntimeException(message),
+            request
+        );
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(
         MethodArgumentNotValidException ex, 
