@@ -25,8 +25,8 @@ import com.chess.domain.model.move.Move;
 public class GameApiMapper {
     
     public static GameConfig fromGameConfigDTO(GameConfigDTO configDTO) {
-        GameType gameType = GameType.fromString(configDTO.gameType());
-        TimeControl timeControl = TimeControl.fromString(configDTO.timeControl());
+        GameType gameType = configDTO.gameType();
+        TimeControl timeControl = configDTO.timeControl();
         Color startingColor = Color.fromPlayerColorPreference(configDTO.playerColorPreference());
 
         GameConfig config;

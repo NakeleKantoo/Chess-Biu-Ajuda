@@ -1,12 +1,15 @@
 package com.chess.app.service.user;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.chess.domain.exception.user.DuplicateUsernameException;
+import com.chess.domain.exception.user.UserNotFoundException;
 import com.chess.domain.model.user.Role;
 import com.chess.domain.model.user.User;
 import com.chess.infrastructure.persistence.entity.UserEntity;
@@ -27,7 +30,7 @@ public class UserService {
 
     public User createUser(String username, String password) {
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Já existe um usuário com esse nome.");
+            throw new DuplicateUsernameException(username);
         }
 
         log.info("Criando novo usuário: {}", username);
@@ -49,6 +52,11 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(userMapper::toDomain)
                 .toList();
+    }
+
+    public UserEntity getUserEntityById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
 }

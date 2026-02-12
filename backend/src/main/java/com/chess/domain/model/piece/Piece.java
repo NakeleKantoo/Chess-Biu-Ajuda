@@ -58,6 +58,7 @@ public abstract class Piece {
     }
 
     public abstract char getSymbol();
+    public abstract String getName();
 
     /**
      * Verifica se esta peça, a partir de uma posição 'from', ataca uma casa 'to'.

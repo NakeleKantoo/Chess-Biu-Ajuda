@@ -26,10 +26,6 @@ public class MoveExecutor {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(move, "O movimento não pode ser nulo.");
 
-        if (!board.getBoardState().isInProgress()) {
-            throw new IllegalStateException("Não é possível executar movimentos em um jogo que já foi concluído.");
-        }
-
         this.builder = new BoardBuilder(board);
 
         movePiece(move.getFrom(), move.getTo());

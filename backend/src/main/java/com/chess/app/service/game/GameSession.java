@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.chess.app.service.move.MoveExecutor;
 import com.chess.app.service.move.MoveValidator;
+import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.board.Board;
@@ -65,7 +66,7 @@ public class GameSession {
 
     private void validateActiveGame() {
         if (!isActive()) {
-            throw new IllegalStateException("O jogo não está ativo. Ação não permitida.");
+            throw new InvalidGameStateException("O jogo não está ativo. Ação não permitida.", sessionId, game.getGameState());
         }
     }
 

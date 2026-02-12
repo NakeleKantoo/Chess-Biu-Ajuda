@@ -1,20 +1,19 @@
 package com.chess.api.dto.request.game;
 
-import jakarta.validation.constraints.NotBlank;
+import com.chess.domain.model.game.GameConfig.GameType;
+import com.chess.domain.model.game.GameConfig.TimeControl;
+
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record GameConfigDTO(
 
-    @NotBlank(message = "O tipo de jogo é obrigatório")
-    @Pattern(regexp = "STANDARD|CHESS960", message = "Tipo de jogo inválido (STANDARD, CHESS960)")
-    String gameType,
+    @NotNull(message = "O tipo de jogo é obrigatório")
+    GameType gameType,
 
-    @NotBlank(message = "O controle de tempo é obrigatório")
-    @Pattern(regexp = "BULLET|BLITZ|RAPID|CLASSICAL|CUSTOM", message = "Controle de tempo inválido")
-    String timeControl,
+    @NotNull(message = "O controle de tempo é obrigatório")
+    TimeControl timeControl,
 
     @NotNull(message = "A preferência de cor é obrigatória")
     PlayerColorPreference playerColorPreference,
