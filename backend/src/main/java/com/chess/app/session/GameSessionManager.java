@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import com.chess.domain.event.GameFinishedEvent;
+import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.player.SelfJoinGameException;
 import com.chess.domain.model.game.GameConfig;
@@ -60,7 +61,13 @@ public class GameSessionManager {
     }
 
     public GameSession getGameSession(UUID sessionId) {
-        return activeGames.get(sessionId);
+        GameSession gameSession = activeGames.get(sessionId);
+
+        if (gameSession == null) {
+            throw new GameSessionNotFoundException(sessionId);
+        }
+
+        return gameSession;
     }
 
     private String generateGameCode() {
