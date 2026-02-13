@@ -2,12 +2,13 @@ package com.chess.app.service.game;
 
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chess.app.service.user.UserService;
+import com.chess.app.session.GameSession;
+import com.chess.domain.event.GameFinishedEvent;
 import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.InvalidGameStateException;
@@ -24,8 +25,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GamePersistenceService {
 
-    private static final Logger log = LoggerFactory.getLogger(GamePersistenceService.class);
-
     private final GameRepository gameRepository;
     private final UserService userService;
     private final GamePersistenceMapper gamePersistenceMapper;
@@ -39,15 +38,11 @@ public class GamePersistenceService {
             throw new DuplicateGameException(id);
         }
 
-        log.info("Salvando jogo {} (white: {}, black: {})", id, whitePlayerId, blackPlayerId);
-
         UserEntity white = userService.getUserEntityById(whitePlayerId);
         UserEntity black = userService.getUserEntityById(blackPlayerId);
 
         GameEntity entity = gamePersistenceMapper.toEntity(game, white, black, id);
         GameEntity savedEntity = gameRepository.save(entity);
-
-        log.info("Jogo {} salvo com sucesso", id);
 
         return savedEntity;
     }
@@ -59,6 +54,17 @@ public class GamePersistenceService {
 
     public boolean existsById(UUID id) {
         return gameRepository.existsById(id);
+    }
+
+    @EventListener
+    public void handleGameFinished(GameFinishedEvent event) {
+        GameSession session = event.getGameSession();
+        this.saveCompletedGame(
+            session.getGame(),
+            session.getWhitePlayerId(),
+            session.getBlackPlayerId(),
+            session.getSessionId()
+        );
     }
 
 }
