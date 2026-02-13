@@ -2,8 +2,8 @@ package com.chess.app.session;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-import com.chess.app.service.game.GameManagerService;
 import com.chess.app.service.move.MoveExecutor;
 import com.chess.app.service.move.MoveValidator;
 import com.chess.domain.exception.game.InvalidGameStateException;
@@ -27,24 +27,23 @@ public class GameSession {
     private static final long DEFAULT_AUTO_START_DELAY = 10000; // 10 segundos
 
     private UUID sessionId;
-    
-    private GameManagerService gameManager;
     private Game game;
 
     private final GameTimerManager timerManager;
+    private final Consumer<GameSession> onGameFinished;
 
     private final UUID whitePlayerId;
     private final UUID blackPlayerId;
 
     private UUID drawOfferPlayerId;
 
-    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, GameManagerService manager, UUID sessionId, GameTimerManager timerManager) {
+    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, UUID sessionId, GameTimerManager timerManager, Consumer<GameSession> onGameFinished) {
         this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
         this.whitePlayerId = whitePlayerId;
         this.blackPlayerId = blackPlayerId;
-        this.gameManager = manager;
         this.sessionId = sessionId;
         this.timerManager = timerManager;
+        this.onGameFinished = onGameFinished;
         this.scheduleAutoStart();
     }
 
@@ -78,13 +77,15 @@ public class GameSession {
      * @param to Posição de destino do movimento.
      * @param promotionPiece Peça para promoção, se aplicável.
       */
-    public synchronized void makeMove(Position from, Position to, Piece promotionPiece, UUID playerId) {
+    public synchronized Game makeMove(Position from, Position to, Piece promotionPiece, UUID playerId) {
         validateMoveRequest(from, to, playerId);
 
         MoveResult moveResult = createMove(from, to, promotionPiece);
         game.commitMove(moveResult.move(), moveResult.nextBoard());
 
         handlePostMove();
+
+        return game;
     }
 
     private void validateMoveRequest(Position from, Position to, UUID playerId) {
@@ -129,7 +130,7 @@ public class GameSession {
         }
     }
 
-    public void resign(UUID resigningPlayer) {
+    public Game resign(UUID resigningPlayer) {
         Objects.requireNonNull(resigningPlayer, "O ID do jogador que desiste não pode ser nulo.");
         validateActiveGame();
 
@@ -137,9 +138,11 @@ public class GameSession {
         game.resign(resigningColor);
 
         finishGame();
+
+        return game;
     }
 
-    public void offerDraw(UUID offeringDrawPlayerId) {
+    public Game offerDraw(UUID offeringDrawPlayerId) {
         validateActiveGame();
 
         if (drawOfferMatchesOpponent(offeringDrawPlayerId)) {
@@ -147,17 +150,21 @@ public class GameSession {
         } else {
             this.drawOfferPlayerId = offeringDrawPlayerId;
         }
+
+        return game;
     }
 
-    public void acceptDraw(UUID acceptingDrawPlayerId) {
+    public Game acceptDraw(UUID acceptingDrawPlayerId) {
         validateActiveGame();
 
         if (!drawOfferMatchesOpponent(acceptingDrawPlayerId)) {
-            return;
+            return game;
         }
 
         game.drawByAgreement();
         finishGame();
+
+        return game;
     }
 
     private boolean drawOfferMatchesOpponent(UUID offeringPlayerId) {
@@ -198,7 +205,7 @@ public class GameSession {
 
     private void finishGame() {
         timerManager.cancelAllTimers(sessionId);
-        gameManager.saveGame(this);
+        onGameFinished.accept(this);
     }
 
 }
