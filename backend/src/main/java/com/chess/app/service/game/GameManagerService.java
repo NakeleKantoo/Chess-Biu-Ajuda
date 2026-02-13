@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.chess.app.session.GameSession;
-import com.chess.app.session.GameSessionManager;
+import com.chess.app.session.game.GameSession;
+import com.chess.app.session.game.GameSessionManager;
 import com.chess.domain.exception.game.InvalidGameAction;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.Game;

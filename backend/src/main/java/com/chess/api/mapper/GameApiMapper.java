@@ -7,10 +7,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.chess.api.dto.request.game.GameConfigDTO;
-import com.chess.api.dto.response.game.BoardDTO;
-import com.chess.api.dto.response.game.ClockDTO;
 import com.chess.api.dto.response.game.GameDTO;
-import com.chess.api.dto.response.game.MoveDTO;
+import com.chess.api.dto.response.game.base.BoardDTO;
+import com.chess.api.dto.response.game.base.ClockDTO;
+import com.chess.api.dto.response.game.base.MoveDTO;
 import com.chess.app.service.move.MoveValidator;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.board.Board;

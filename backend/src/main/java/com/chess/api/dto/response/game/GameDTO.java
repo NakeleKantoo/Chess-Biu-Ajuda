@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.chess.api.dto.response.game.base.BoardDTO;
+import com.chess.api.dto.response.game.base.ClockDTO;
+import com.chess.api.dto.response.game.base.MoveDTO;
 import com.chess.domain.model.game.GameEndReason;
 import com.chess.domain.model.game.GameState;
 

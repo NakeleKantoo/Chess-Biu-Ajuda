@@ -23,7 +23,7 @@ import com.chess.api.mapper.GameApiMapper;
 import com.chess.api.mapper.SavedGameApiMapper;
 import com.chess.app.service.game.GameManagerService;
 import com.chess.app.service.game.GamePersistenceService;
-import com.chess.app.session.GameSessionManager;
+import com.chess.app.session.game.GameSessionManager;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.Game;
 import com.chess.domain.model.game.GameConfig;

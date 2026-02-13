@@ -1,4 +1,4 @@
-package com.chess.app.session;
+package com.chess.app.session.game;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -6,6 +6,8 @@ import java.util.function.Consumer;
 
 import com.chess.app.service.move.MoveExecutor;
 import com.chess.app.service.move.MoveValidator;
+import com.chess.app.session.player.PlayerSessionValidator;
+import com.chess.app.session.player.PlayersIDs;
 import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.base.Position;

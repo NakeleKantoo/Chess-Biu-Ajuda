@@ -2,8 +2,8 @@ package com.chess.api.mapper;
 
 import java.util.List;
 
-import com.chess.api.dto.response.game.MoveDTO;
 import com.chess.api.dto.response.game.SavedGameDTO;
+import com.chess.api.dto.response.game.base.MoveDTO;
 import com.chess.domain.model.game.GameConfig.GameType;
 import com.chess.infrastructure.persistence.entity.GameEntity;
 import com.chess.infrastructure.persistence.entity.MoveEntity;

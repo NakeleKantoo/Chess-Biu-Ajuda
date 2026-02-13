@@ -1,4 +1,4 @@
-package com.chess.app.session;
+package com.chess.app.session.player;
 
 import java.util.Objects;
 import java.util.UUID;

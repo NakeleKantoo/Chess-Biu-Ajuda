@@ -2,7 +2,7 @@ package com.chess.domain.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.chess.app.session.GameSession;
+import com.chess.app.session.game.GameSession;
 
 import lombok.Getter;
 
