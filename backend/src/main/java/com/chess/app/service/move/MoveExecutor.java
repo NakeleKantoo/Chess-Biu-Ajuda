@@ -13,7 +13,9 @@ import com.chess.domain.model.piece.Piece;
 
 public class MoveExecutor {
 
-    BoardBuilder builder;
+    private MoveExecutor() {
+        throw new UnsupportedOperationException("Classe utilitária não pode ser instanciada");
+    }
 
     /**
      * Executa um movimento no tabuleiro fornecido e retorna o novo estado do tabuleiro após o movimento.
@@ -22,17 +24,17 @@ public class MoveExecutor {
      * @param move O movimento a ser executado.
      * @return O novo estado do tabuleiro após a execução do movimento.
       */
-    public BoardBuilder executeMove(Board board, Move move) {
+    public static BoardBuilder executeMove(Board board, Move move) {
         Objects.requireNonNull(board, "O tabuleiro não pode ser nulo.");
         Objects.requireNonNull(move, "O movimento não pode ser nulo.");
 
-        this.builder = new BoardBuilder(board);
+        BoardBuilder builder = new BoardBuilder(board);
 
-        movePiece(move.getFrom(), move.getTo());
+        movePiece(builder, move.getFrom(), move.getTo());
 
-        if (move.isEnPassant()) enPassant(move);
-        else if (move.isCastling()) castle(move);
-        else if (move.isPromotion()) promote(move);
+        if (move.isEnPassant()) enPassant(builder, move);
+        else if (move.isCastling()) castle(builder, move);
+        else if (move.isPromotion()) promote(builder, move);
         
         if (builder.getCurrentPlayer().isBlack()) {
             builder.incrementFullMoveClock();
@@ -43,25 +45,25 @@ public class MoveExecutor {
             builder.resetHalfMoveClock();
         }
 
-        updateEnPassantTarget(move);
-        updateCastlingControl(move);
-        updateCurrentPlayer();
+        updateEnPassantTarget(builder, move);
+        updateCastlingControl(builder, move);
+        updateCurrentPlayer(builder);
 
         return builder;
     }
 
-    private void movePiece(Position from, Position to) {
+    private static void movePiece(BoardBuilder builder, Position from, Position to) {
         Piece piece = builder.getPieceAt(from);
         builder.removePiece(from);
         builder.placePiece(piece, to);
     }
 
-    private void enPassant(Move move) {
+    private static void enPassant(BoardBuilder builder, Move move) {
         Position capturedPawnPos = Position.at(move.getFrom().getRow(), move.getTo().getCol());
         builder.removePiece(capturedPawnPos);
     }
 
-    private void castle(Move move) {
+    private static void castle(BoardBuilder builder, Move move) {
         Position rookFrom = move.getRookFrom();
         Position rookTo;
         boolean isLongCastling = move.getTo().getCol() < move.getFrom().getCol();
@@ -72,20 +74,20 @@ public class MoveExecutor {
             rookTo = Position.at(move.getTo().getRow(), 5);
         }
 
-        movePiece(rookFrom, rookTo);
+        movePiece(builder, rookFrom, rookTo);
     }
 
-    private void promote(Move move) {
+    private static void promote(BoardBuilder builder, Move move) {
         builder.removePiece(move.getTo());
         builder.placePiece(move.getPromotionPiece(), move.getTo());
     }
 
-    private void updateCurrentPlayer() {
+    private static void updateCurrentPlayer(BoardBuilder builder) {
         Color nextPlayer = builder.getCurrentPlayer().opposite();
         builder.setCurrentPlayer(nextPlayer);
     }
 
-    private void updateEnPassantTarget(Move move) {
+    private static void updateEnPassantTarget(BoardBuilder builder, Move move) {
         Piece movedPiece = move.getMovedPiece();
         if (!move.getFrom().isNear(move.getTo()) && movedPiece instanceof Pawn) {
             int direction = movedPiece.getColor().isWhite() ? -1 : 1;
@@ -96,7 +98,7 @@ public class MoveExecutor {
         }
     }
 
-    private void updateCastlingControl(Move move) {
+    private static void updateCastlingControl(BoardBuilder builder, Move move) {
         CastlingControl builderCastling = builder.getCastlingControl();
         builder.setCastlingControl(builderCastling.update(move));
     }

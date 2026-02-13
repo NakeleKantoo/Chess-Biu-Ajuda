@@ -31,7 +31,6 @@ public class GameSession {
     private GameManagerService gameManager;
     private Game game;
 
-    private MoveExecutor moveExecutor = new MoveExecutor();
     private final GameTimerManager timerManager;
 
     private final UUID whitePlayerId;
@@ -102,7 +101,7 @@ public class GameSession {
 
     private Board executeMoveAndBuildBoard(Move move) {
         Board currentBoard = game.getCurrentBoard();
-        BoardBuilder nextBoardBuilder = moveExecutor.executeMove(currentBoard, move);
+        BoardBuilder nextBoardBuilder = MoveExecutor.executeMove(currentBoard, move);
         nextBoardBuilder.setBoardState(
             BoardStateUtils.evaluateState(nextBoardBuilder, game.getBoardHistory())
         );
