@@ -5,5 +5,6 @@ import java.util.UUID;
 public record PendingGame(
     UUID gameId,
     UUID creatorId,
-    GameConfig config
+    GameConfig config,
+    String gameCode
 ) {}

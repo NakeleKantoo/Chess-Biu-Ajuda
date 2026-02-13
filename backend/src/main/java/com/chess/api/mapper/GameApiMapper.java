@@ -7,10 +7,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.chess.api.dto.request.game.GameConfigDTO;
-import com.chess.api.dto.response.game.BoardDTO;
-import com.chess.api.dto.response.game.ClockDTO;
 import com.chess.api.dto.response.game.GameDTO;
-import com.chess.api.dto.response.game.MoveDTO;
+import com.chess.api.dto.response.game.base.BoardDTO;
+import com.chess.api.dto.response.game.base.ClockDTO;
+import com.chess.api.dto.response.game.base.MoveDTO;
 import com.chess.app.service.move.MoveValidator;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.board.Board;
@@ -27,7 +27,8 @@ public class GameApiMapper {
     public static GameConfig fromGameConfigDTO(GameConfigDTO configDTO) {
         GameType gameType = configDTO.gameType();
         TimeControl timeControl = configDTO.timeControl();
-        Color startingColor = Color.fromPlayerColorPreference(configDTO.playerColorPreference());
+        Color startingColor = configDTO.startingColor() == null ? Color.WHITE : configDTO.startingColor();
+        Color creatorColor = Color.fromPlayerColorPreference(configDTO.playerColorPreference());
 
         GameConfig config;
 
@@ -41,11 +42,12 @@ public class GameApiMapper {
                 configDTO.whiteTimeRemaining(),
                 configDTO.blackTimeRemaining(),
                 configDTO.incrementMillis(),
-                startingColor
+                startingColor,
+                creatorColor
             );
         } else {
             // Para controles de tempo pré-definidos, os tempos serão definidos pelo ChessClockBuilder, então passamos null aqui.
-            config = GameConfig.of(timeControl, gameType, startingColor);
+            config = GameConfig.of(timeControl, gameType, startingColor, creatorColor);
         }
 
         return config;

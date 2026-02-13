@@ -12,6 +12,7 @@ import com.chess.api.dto.response.ErrorResponse;
 import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
+import com.chess.domain.exception.game.InvalidGameAction;
 import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.move.InvalidMoveException;
@@ -236,7 +237,18 @@ public class GlobalApiExceptionHandler {
             ex, request,
             Map.of("playerId", ex.getPlayerId()));
     }
-
+    @ExceptionHandler(InvalidGameAction.class)
+    public ResponseEntity<ErrorResponse> handleInvalidGameAction(
+        InvalidGameAction ex,
+        HttpServletRequest request
+    ) {
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid Game Action",
+            ex, request,
+            Map.of("action", ex.getAction()));
+    }
+    
     // BAD REQUEST - 400 (Validação de Entrada)
     @ExceptionHandler(InvalidPromotionPieceException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPromotionPiece(

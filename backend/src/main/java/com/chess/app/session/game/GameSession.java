@@ -1,10 +1,13 @@
-package com.chess.app.service.game;
+package com.chess.app.session.game;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import com.chess.app.service.move.MoveExecutor;
 import com.chess.app.service.move.MoveValidator;
+import com.chess.app.session.player.PlayerSessionValidator;
+import com.chess.app.session.player.PlayersIDs;
 import com.chess.domain.exception.game.InvalidGameStateException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.base.Position;
@@ -26,25 +29,21 @@ public class GameSession {
     private static final long DEFAULT_AUTO_START_DELAY = 10000; // 10 segundos
 
     private UUID sessionId;
-    
-    private GameManagerService gameManager;
     private Game game;
 
-    private MoveExecutor moveExecutor = new MoveExecutor();
     private final GameTimerManager timerManager;
+    private final Consumer<GameSession> onGameFinished;
 
-    private final UUID whitePlayerId;
-    private final UUID blackPlayerId;
+    private final PlayersIDs playersIDs;
 
     private UUID drawOfferPlayerId;
 
-    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, GameManagerService manager, UUID sessionId, GameTimerManager timerManager) {
+    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, UUID sessionId, GameTimerManager timerManager, Consumer<GameSession> onGameFinished) {
         this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
-        this.whitePlayerId = whitePlayerId;
-        this.blackPlayerId = blackPlayerId;
-        this.gameManager = manager;
+        this.playersIDs = new PlayersIDs(whitePlayerId, blackPlayerId);
         this.sessionId = sessionId;
         this.timerManager = timerManager;
+        this.onGameFinished = onGameFinished;
         this.scheduleAutoStart();
     }
 
@@ -55,8 +54,8 @@ public class GameSession {
     public GameState getGameState() { return game.getGameState(); }
     public GameEndReason getGameEndReason() { return game.getGameEndReason(); }
     public UUID getSessionId() { return sessionId; }
-    public UUID getWhitePlayerId() { return whitePlayerId; }
-    public UUID getBlackPlayerId() { return blackPlayerId; }
+    public UUID getWhitePlayerId() { return playersIDs.white(); }
+    public UUID getBlackPlayerId() { return playersIDs.black(); }
 
     private record MoveResult(Move move, Board nextBoard) {}
 
@@ -78,13 +77,15 @@ public class GameSession {
      * @param to Posição de destino do movimento.
      * @param promotionPiece Peça para promoção, se aplicável.
       */
-    public synchronized void makeMove(Position from, Position to, Piece promotionPiece, UUID playerId) {
+    public synchronized Game makeMove(Position from, Position to, Piece promotionPiece, UUID playerId) {
         validateMoveRequest(from, to, playerId);
 
         MoveResult moveResult = createMove(from, to, promotionPiece);
         game.commitMove(moveResult.move(), moveResult.nextBoard());
 
         handlePostMove();
+
+        return game;
     }
 
     private void validateMoveRequest(Position from, Position to, UUID playerId) {
@@ -93,15 +94,15 @@ public class GameSession {
         Objects.requireNonNull(playerId, "ID do jogador não pode ser nulo.");
         validateActiveGame();
 
-        UUID currentPlayerId = PlayerSessionValidator.getCurrentPlayerId(getCurrentPlayerColor(), whitePlayerId, blackPlayerId);
-        PlayerSessionValidator.validatePlayerTurn(playerId, currentPlayerId);
+        UUID currentPlayerId = PlayerSessionValidator.getCurrentPlayerId(getCurrentPlayerColor(), playersIDs);
+        PlayerSessionValidator.validatePlayerTurn(playerId, currentPlayerId, playersIDs);
 
         timerManager.cancelAutoStart(sessionId);
     }
 
     private Board executeMoveAndBuildBoard(Move move) {
         Board currentBoard = game.getCurrentBoard();
-        BoardBuilder nextBoardBuilder = moveExecutor.executeMove(currentBoard, move);
+        BoardBuilder nextBoardBuilder = MoveExecutor.executeMove(currentBoard, move);
         nextBoardBuilder.setBoardState(
             BoardStateUtils.evaluateState(nextBoardBuilder, game.getBoardHistory())
         );
@@ -129,17 +130,19 @@ public class GameSession {
         }
     }
 
-    public void resign(UUID resigningPlayer) {
+    public Game resign(UUID resigningPlayer) {
         Objects.requireNonNull(resigningPlayer, "O ID do jogador que desiste não pode ser nulo.");
         validateActiveGame();
 
-        Color resigningColor = PlayerSessionValidator.getPlayerColor(resigningPlayer, whitePlayerId, blackPlayerId);
+        Color resigningColor = PlayerSessionValidator.getPlayerColor(resigningPlayer, playersIDs);
         game.resign(resigningColor);
 
         finishGame();
+
+        return game;
     }
 
-    public void offerDraw(UUID offeringDrawPlayerId) {
+    public Game offerDraw(UUID offeringDrawPlayerId) {
         validateActiveGame();
 
         if (drawOfferMatchesOpponent(offeringDrawPlayerId)) {
@@ -147,21 +150,25 @@ public class GameSession {
         } else {
             this.drawOfferPlayerId = offeringDrawPlayerId;
         }
+
+        return game;
     }
 
-    public void acceptDraw(UUID acceptingDrawPlayerId) {
+    public Game acceptDraw(UUID acceptingDrawPlayerId) {
         validateActiveGame();
 
         if (!drawOfferMatchesOpponent(acceptingDrawPlayerId)) {
-            return;
+            return game;
         }
 
         game.drawByAgreement();
         finishGame();
+
+        return game;
     }
 
     private boolean drawOfferMatchesOpponent(UUID offeringPlayerId) {
-        UUID opponentId = PlayerSessionValidator.getOpponentId(offeringPlayerId, whitePlayerId, blackPlayerId);
+        UUID opponentId = PlayerSessionValidator.getOpponentId(offeringPlayerId, playersIDs);
         return drawOfferPlayerId != null && drawOfferPlayerId.equals(opponentId);
     }
 
@@ -198,7 +205,7 @@ public class GameSession {
 
     private void finishGame() {
         timerManager.cancelAllTimers(sessionId);
-        gameManager.saveGame(this);
+        onGameFinished.accept(this);
     }
 
 }

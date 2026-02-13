@@ -175,7 +175,7 @@ public class MoveValidator {
             boardToSimulate = (Board) board;
         }
 
-        BoardBuilder newBoard = new MoveExecutor().executeMove(boardToSimulate, move);
+        BoardBuilder newBoard = MoveExecutor.executeMove(boardToSimulate, move);
 
         return BoardAnalyzer.isInCheck(newBoard, board.getCurrentPlayer());
     }

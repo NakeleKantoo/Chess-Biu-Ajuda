@@ -2,6 +2,7 @@ package com.chess.api.dto.response.game;
 
 import java.util.List;
 
+import com.chess.api.dto.response.game.base.MoveDTO;
 import com.chess.domain.model.game.GameEndReason;
 import com.chess.domain.model.game.GameState;
 import com.chess.domain.model.game.GameConfig.GameType;
