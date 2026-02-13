@@ -23,10 +23,13 @@ import com.chess.api.mapper.GameApiMapper;
 import com.chess.api.mapper.SavedGameApiMapper;
 import com.chess.app.service.game.GameManagerService;
 import com.chess.app.service.game.GamePersistenceService;
-import com.chess.app.session.GameSession;
+import com.chess.app.session.GameSessionManager;
 import com.chess.domain.model.base.Position;
+import com.chess.domain.model.game.Game;
 import com.chess.domain.model.game.GameConfig;
+import com.chess.domain.model.game.PendingGame;
 import com.chess.domain.model.piece.Piece;
+import com.chess.infrastructure.persistence.entity.GameEntity;
 import com.chess.infrastructure.security.service.UserDetailsImpl;
 
 import jakarta.validation.Valid;
@@ -36,7 +39,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/games")
 public class GameController {
     
-    @Autowired GameManagerService gameManager;
+    @Autowired GameManagerService gameManagerService;
+    @Autowired GameSessionManager gameSessionManager;
     @Autowired GamePersistenceService gamePersistenceService;
 
     @PostMapping
@@ -46,26 +50,28 @@ public class GameController {
     ) {
 
         GameConfig config = GameApiMapper.fromGameConfigDTO(configDTO);
-        PendingGameDTO pendingGameDTO = gameManager.createGame(config, user.getId());
+        PendingGame pendingGame = gameSessionManager.createGame(config, user.getId());
 
-        return ResponseEntity.ok(pendingGameDTO);
+        return ResponseEntity.ok(new PendingGameDTO(pendingGame));
     }
 
     @PostMapping("/join")
-    public ResponseEntity<UUID> joinGame(
+    public ResponseEntity<PendingGameDTO> joinGame(
         @RequestBody JoinGameRequest joinGameDTO,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
 
-        UUID gameId = gameManager.joinGame(joinGameDTO.gameCode(), user.getId());
-        URI location = URI.create(String.format("/api/games/%s", gameId));
+        PendingGame pendingGame = gameSessionManager.joinGame(joinGameDTO.gameCode(), user.getId());
+        URI location = URI.create(String.format("/api/games/%s", pendingGame.gameId()));
 
-        return ResponseEntity.created(location).body(gameId);
+        return ResponseEntity.created(location).body(new PendingGameDTO(pendingGame));
     }
 
     @GetMapping("/{gameId}")
     public ResponseEntity<GameDTO> getGameById(@PathVariable UUID gameId) {
-        return ResponseEntity.ok(GameApiMapper.toDTO(gameManager.getGameSession(gameId).getGame(), gameId));
+        Game game = gameManagerService.getGameById(gameId);
+
+        return ResponseEntity.ok(GameApiMapper.toDTO(game, gameId));
     }
 
     @PostMapping("/{gameId}/move")
@@ -74,14 +80,13 @@ public class GameController {
         @RequestBody @Valid MoveDTO moveDTO,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
-        GameSession gameSession = gameManager.getGameSession(gameId);
         Position from = Position.at(moveDTO.from());
         Position to = Position.at(moveDTO.to());
         Piece promotionPiece = moveDTO.promotion() != null ? Piece.create(moveDTO.promotion().charAt(0)) : null;
 
-        gameSession.makeMove(from, to, promotionPiece, user.getId());
+        Game game = gameManagerService.makeMove(from, to, promotionPiece, gameId);
 
-        return ResponseEntity.ok(GameApiMapper.toDTO(gameSession.getGame(), gameId));
+        return ResponseEntity.ok(GameApiMapper.toDTO(game, gameId));
     }
 
     @PostMapping("/{gameId}/{action}")
@@ -90,28 +95,16 @@ public class GameController {
         @PathVariable String action,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
-        GameSession gameSession = gameManager.getGameSession(gameId);
-        UUID playerId = user.getId();
-        
-        switch (action.toLowerCase()) {
-            case "offer-draw":
-                gameSession.offerDraw(playerId);
-                break;
-            case "resign":
-                gameSession.resign(playerId);
-                break;
-            case "accept-draw":
-                gameSession.acceptDraw(playerId);
-                break;
-            default:
-                return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(GameApiMapper.toDTO(gameSession.getGame(), gameId));
+        Game game = gameManagerService.performAction(action, gameId, user.getId());
+
+        return ResponseEntity.ok(GameApiMapper.toDTO(game, gameId));
     }
 
     @GetMapping("/saved/{gameId}")
     public ResponseEntity<SavedGameDTO> getGameEntityById(@PathVariable UUID gameId) {
-        return ResponseEntity.ok(SavedGameApiMapper.toDTO(gamePersistenceService.getGameById(gameId)));
+        GameEntity game = gamePersistenceService.getGameById(gameId);
+
+        return ResponseEntity.ok(SavedGameApiMapper.toDTO(game));
     }
     
 
