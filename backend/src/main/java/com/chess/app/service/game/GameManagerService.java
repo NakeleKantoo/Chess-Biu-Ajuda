@@ -9,13 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.chess.api.dto.response.game.PendingGameDTO;
+import com.chess.app.session.GameSession;
+import com.chess.app.session.GameTimerManager;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.player.SelfJoinGameException;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.game.PendingGame;
-import com.chess.infrastructure.persistence.entity.GameEntity;
 
 @Service
 public class GameManagerService {
@@ -117,10 +118,6 @@ public class GameManagerService {
         } while (pendingGames.containsKey(code.toString()));
 
         return code.toString();
-    }
-
-    public GameEntity getSavedGameEntity(UUID gameId) {
-        return gamePersistenceService.getGameById(gameId);
     }
 
 }

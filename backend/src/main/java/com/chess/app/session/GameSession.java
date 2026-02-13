@@ -1,8 +1,9 @@
-package com.chess.app.service.game;
+package com.chess.app.session;
 
 import java.util.Objects;
 import java.util.UUID;
 
+import com.chess.app.service.game.GameManagerService;
 import com.chess.app.service.move.MoveExecutor;
 import com.chess.app.service.move.MoveValidator;
 import com.chess.domain.exception.game.InvalidGameStateException;

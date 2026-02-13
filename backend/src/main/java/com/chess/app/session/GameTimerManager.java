@@ -1,4 +1,4 @@
-package com.chess.app.service.game;
+package com.chess.app.session;
 
 import java.util.Map;
 import java.util.UUID;

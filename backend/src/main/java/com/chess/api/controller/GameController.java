@@ -22,7 +22,8 @@ import com.chess.api.dto.response.game.SavedGameDTO;
 import com.chess.api.mapper.GameApiMapper;
 import com.chess.api.mapper.SavedGameApiMapper;
 import com.chess.app.service.game.GameManagerService;
-import com.chess.app.service.game.GameSession;
+import com.chess.app.service.game.GamePersistenceService;
+import com.chess.app.session.GameSession;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.piece.Piece;
@@ -35,8 +36,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/games")
 public class GameController {
     
-    @Autowired
-    GameManagerService gameManager;
+    @Autowired GameManagerService gameManager;
+    @Autowired GamePersistenceService gamePersistenceService;
 
     @PostMapping
     public ResponseEntity<PendingGameDTO> createGame(
@@ -110,7 +111,7 @@ public class GameController {
 
     @GetMapping("/saved/{gameId}")
     public ResponseEntity<SavedGameDTO> getGameEntityById(@PathVariable UUID gameId) {
-        return ResponseEntity.ok(SavedGameApiMapper.toDTO(gameManager.getSavedGameEntity(gameId)));
+        return ResponseEntity.ok(SavedGameApiMapper.toDTO(gamePersistenceService.getGameById(gameId)));
     }
     
 
