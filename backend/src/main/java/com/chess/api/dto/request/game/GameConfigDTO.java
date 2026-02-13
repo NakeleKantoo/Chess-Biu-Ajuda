@@ -1,5 +1,6 @@
 package com.chess.api.dto.request.game;
 
+import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig.GameType;
 import com.chess.domain.model.game.GameConfig.TimeControl;
 
@@ -17,6 +18,8 @@ public record GameConfigDTO(
 
     @NotNull(message = "A preferência de cor é obrigatória")
     PlayerColorPreference playerColorPreference,
+
+    Color startingColor,
 
     @Positive(message = "O tempo para as brancas deve ser positivo")
     Long whiteTimeRemaining,

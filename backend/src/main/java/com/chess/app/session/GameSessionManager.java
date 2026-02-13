@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import com.chess.domain.event.GameFinishedEvent;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
 import com.chess.domain.exception.player.SelfJoinGameException;
-import com.chess.domain.model.base.Color;
 import com.chess.domain.model.game.GameConfig;
 import com.chess.domain.model.game.PendingGame;
 
@@ -41,12 +40,17 @@ public class GameSessionManager {
         if (pendingGame == null) {
             throw new PendingGameNotFoundException(gameCode);
         }
-
-        UUID whitePlayerId = pendingGame.config().getStartingColor() == Color.WHITE ? pendingGame.creatorId() : joiningPlayerId;
-        UUID blackPlayerId = whitePlayerId == joiningPlayerId ? pendingGame.creatorId() : joiningPlayerId;
-
-        if (whitePlayerId.equals(blackPlayerId)) {
+        if (joiningPlayerId.equals(pendingGame.creatorId())) {
             throw new SelfJoinGameException(joiningPlayerId);
+        }
+
+        UUID whitePlayerId, blackPlayerId;
+        if (pendingGame.config().getCreatorColor().isWhite()) {
+            whitePlayerId = pendingGame.creatorId();
+            blackPlayerId = joiningPlayerId;
+        } else {
+            whitePlayerId = joiningPlayerId;
+            blackPlayerId = pendingGame.creatorId();
         }
 
         GameSession gameSession = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, pendingGame.gameId(), timerManager, this::onGameFinished);
@@ -79,6 +83,7 @@ public class GameSessionManager {
     }
 
     private void onGameFinished(GameSession gameSession) {
+        activeGames.remove(gameSession.getSessionId());
         applicationEventPublisher.publishEvent(new GameFinishedEvent(gameSession));
     }
 

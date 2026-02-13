@@ -22,25 +22,25 @@ public class GameManagerService {
         return sessionManager.getGameSession(gameId).getGame();
     }
 
-    public Game makeMove(Position from, Position to, Piece promotionPiece, UUID gameId) {
+    public Game makeMove(Position from, Position to, Piece promotionPiece, UUID gameId, UUID userId) {
         GameSession session = sessionManager.getGameSession(gameId);
 
-        return session.makeMove(from, to, promotionPiece, gameId);
+        return session.makeMove(from, to, promotionPiece, userId);
     }
 
-    public Game performAction(String action, UUID gameId, UUID playerId) {
+    public Game performAction(String action, UUID gameId, UUID userId) {
         GameSession session = sessionManager.getGameSession(gameId);
 
         Game game;
         switch (action.toLowerCase()) {
             case "offer-draw":
-                game = session.offerDraw(playerId);
+                game = session.offerDraw(userId);
                 break;
             case "resign":
-                game = session.resign(playerId);
+                game = session.resign(userId);
                 break;
             case "accept-draw":
-                game = session.acceptDraw(playerId);
+                game = session.acceptDraw(userId);
                 break;
             default:
                 throw new IllegalArgumentException("Ação inválida"); // TODO: exceção própria

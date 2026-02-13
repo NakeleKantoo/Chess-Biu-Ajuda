@@ -27,7 +27,8 @@ public class GameApiMapper {
     public static GameConfig fromGameConfigDTO(GameConfigDTO configDTO) {
         GameType gameType = configDTO.gameType();
         TimeControl timeControl = configDTO.timeControl();
-        Color startingColor = Color.fromPlayerColorPreference(configDTO.playerColorPreference());
+        Color startingColor = configDTO.startingColor() == null ? Color.WHITE : configDTO.startingColor();
+        Color creatorColor = Color.fromPlayerColorPreference(configDTO.playerColorPreference());
 
         GameConfig config;
 
@@ -41,11 +42,12 @@ public class GameApiMapper {
                 configDTO.whiteTimeRemaining(),
                 configDTO.blackTimeRemaining(),
                 configDTO.incrementMillis(),
-                startingColor
+                startingColor,
+                creatorColor
             );
         } else {
             // Para controles de tempo pré-definidos, os tempos serão definidos pelo ChessClockBuilder, então passamos null aqui.
-            config = GameConfig.of(timeControl, gameType, startingColor);
+            config = GameConfig.of(timeControl, gameType, startingColor, creatorColor);
         }
 
         return config;

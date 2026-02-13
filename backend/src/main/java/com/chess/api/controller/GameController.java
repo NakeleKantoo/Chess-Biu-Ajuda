@@ -84,7 +84,7 @@ public class GameController {
         Position to = Position.at(moveDTO.to());
         Piece promotionPiece = moveDTO.promotion() != null ? Piece.create(moveDTO.promotion().charAt(0)) : null;
 
-        Game game = gameManagerService.makeMove(from, to, promotionPiece, gameId);
+        Game game = gameManagerService.makeMove(from, to, promotionPiece, gameId, user.getId());
 
         return ResponseEntity.ok(GameApiMapper.toDTO(game, gameId));
     }
