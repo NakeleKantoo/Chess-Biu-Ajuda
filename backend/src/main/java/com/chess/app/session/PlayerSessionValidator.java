@@ -12,50 +12,59 @@ public class PlayerSessionValidator {
     private PlayerSessionValidator() {
         throw new UnsupportedOperationException("Classe utilitária não pode ser instanciada");
     }
+
+    public static void validatePlayerInSession(UUID userId, PlayersIDs playersIDs) {
+        Objects.requireNonNull(userId, "O ID do usuário não pode ser nulo.");
+        Objects.requireNonNull(playersIDs, "Os IDs dos jogadores não podem ser nulos.");
+
+        if (!playersIDs.isPlayer(userId)) {
+            throw new PlayerNotInGameException(userId);
+        }
+    }
     
-    public static void validatePlayerTurn(UUID playerId, UUID currentPlayerId) {
-        Objects.requireNonNull(playerId, "O ID do jogador não pode ser nulo.");
+    public static void validatePlayerTurn(UUID userId, UUID currentPlayerId, PlayersIDs playersIDs) {
+        Objects.requireNonNull(userId, "O ID do usuário não pode ser nulo.");
         Objects.requireNonNull(currentPlayerId, "O ID do jogador atual não pode ser nulo.");
+        Objects.requireNonNull(playersIDs, "Os IDs dos jogadores não podem ser nulos.");
 
-        if (!playerId.equals(currentPlayerId)) {
-            throw new NotPlayerTurnException(playerId);
+        validatePlayerInSession(userId, playersIDs);
+
+        if (!userId.equals(currentPlayerId)) {
+            throw new NotPlayerTurnException(userId);
         }
     }
 
-    public static Color getPlayerColor(UUID playerId, UUID whitePlayerId, UUID blackPlayerId) {
-        Objects.requireNonNull(playerId, "O ID do jogador não pode ser nulo.");
-        Objects.requireNonNull(whitePlayerId, "O ID do jogador branco não pode ser nulo.");
-        Objects.requireNonNull(blackPlayerId, "O ID do jogador preto não pode ser nulo.");
+    public static Color getPlayerColor(UUID userId, PlayersIDs playersIDs) {
+        Objects.requireNonNull(userId, "O ID do usuário não pode ser nulo.");
+        Objects.requireNonNull(playersIDs, "Os IDs dos jogadores não podem ser nulos.");
 
-        if (playerId.equals(whitePlayerId)) {
+        validatePlayerInSession(userId, playersIDs);
+
+        if (userId.equals(playersIDs.white())) {
             return Color.WHITE;
-        } else if (playerId.equals(blackPlayerId)) {
+        } else {
             return Color.BLACK;
-        } else {
-            throw new PlayerNotInGameException(playerId);
         }
     }
 
-    public static UUID getOpponentId(UUID playerId, UUID whitePlayerId, UUID blackPlayerId) {
-        Objects.requireNonNull(playerId, "O ID do jogador não pode ser nulo.");
-        Objects.requireNonNull(whitePlayerId, "O ID do jogador branco não pode ser nulo.");
-        Objects.requireNonNull(blackPlayerId, "O ID do jogador preto não pode ser nulo.");
+    public static UUID getOpponentId(UUID userId, PlayersIDs playersIDs) {
+        Objects.requireNonNull(userId, "O ID do usuário não pode ser nulo.");
+        Objects.requireNonNull(playersIDs, "Os IDs dos jogadores não podem ser nulos.");
 
-        if (playerId.equals(whitePlayerId)) {
-            return blackPlayerId;
-        } else if (playerId.equals(blackPlayerId)) {
-            return whitePlayerId;
+        validatePlayerInSession(userId, playersIDs);
+
+        if (userId.equals(playersIDs.white())) {
+            return playersIDs.black();
         } else {
-            throw new PlayerNotInGameException(playerId);
-        }
+            return playersIDs.white();
+        } 
     }
 
-    public static UUID getCurrentPlayerId(Color currentPlayerColor, UUID whitePlayerId, UUID blackPlayerId) {
+    public static UUID getCurrentPlayerId(Color currentPlayerColor, PlayersIDs playersIDs) {
         Objects.requireNonNull(currentPlayerColor, "A cor do jogador atual não pode ser nula.");
-        Objects.requireNonNull(whitePlayerId, "O ID do jogador branco não pode ser nulo.");
-        Objects.requireNonNull(blackPlayerId, "O ID do jogador preto não pode ser nulo.");
+        Objects.requireNonNull(playersIDs, "Os IDs dos jogadores não podem ser nulos.");
 
-        UUID currentPlayerId = currentPlayerColor.isWhite() ? whitePlayerId : blackPlayerId;
+        UUID currentPlayerId = currentPlayerColor.isWhite() ? playersIDs.white() : playersIDs.black();
         
         return currentPlayerId;
     }

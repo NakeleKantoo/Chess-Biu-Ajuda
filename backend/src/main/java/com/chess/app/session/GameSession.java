@@ -32,15 +32,13 @@ public class GameSession {
     private final GameTimerManager timerManager;
     private final Consumer<GameSession> onGameFinished;
 
-    private final UUID whitePlayerId;
-    private final UUID blackPlayerId;
+    private final PlayersIDs playersIDs;
 
     private UUID drawOfferPlayerId;
 
     public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, UUID sessionId, GameTimerManager timerManager, Consumer<GameSession> onGameFinished) {
         this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
-        this.whitePlayerId = whitePlayerId;
-        this.blackPlayerId = blackPlayerId;
+        this.playersIDs = new PlayersIDs(whitePlayerId, blackPlayerId);
         this.sessionId = sessionId;
         this.timerManager = timerManager;
         this.onGameFinished = onGameFinished;
@@ -54,8 +52,8 @@ public class GameSession {
     public GameState getGameState() { return game.getGameState(); }
     public GameEndReason getGameEndReason() { return game.getGameEndReason(); }
     public UUID getSessionId() { return sessionId; }
-    public UUID getWhitePlayerId() { return whitePlayerId; }
-    public UUID getBlackPlayerId() { return blackPlayerId; }
+    public UUID getWhitePlayerId() { return playersIDs.white(); }
+    public UUID getBlackPlayerId() { return playersIDs.black(); }
 
     private record MoveResult(Move move, Board nextBoard) {}
 
@@ -94,8 +92,8 @@ public class GameSession {
         Objects.requireNonNull(playerId, "ID do jogador não pode ser nulo.");
         validateActiveGame();
 
-        UUID currentPlayerId = PlayerSessionValidator.getCurrentPlayerId(getCurrentPlayerColor(), whitePlayerId, blackPlayerId);
-        PlayerSessionValidator.validatePlayerTurn(playerId, currentPlayerId);
+        UUID currentPlayerId = PlayerSessionValidator.getCurrentPlayerId(getCurrentPlayerColor(), playersIDs);
+        PlayerSessionValidator.validatePlayerTurn(playerId, currentPlayerId, playersIDs);
 
         timerManager.cancelAutoStart(sessionId);
     }
@@ -134,7 +132,7 @@ public class GameSession {
         Objects.requireNonNull(resigningPlayer, "O ID do jogador que desiste não pode ser nulo.");
         validateActiveGame();
 
-        Color resigningColor = PlayerSessionValidator.getPlayerColor(resigningPlayer, whitePlayerId, blackPlayerId);
+        Color resigningColor = PlayerSessionValidator.getPlayerColor(resigningPlayer, playersIDs);
         game.resign(resigningColor);
 
         finishGame();
@@ -168,7 +166,7 @@ public class GameSession {
     }
 
     private boolean drawOfferMatchesOpponent(UUID offeringPlayerId) {
-        UUID opponentId = PlayerSessionValidator.getOpponentId(offeringPlayerId, whitePlayerId, blackPlayerId);
+        UUID opponentId = PlayerSessionValidator.getOpponentId(offeringPlayerId, playersIDs);
         return drawOfferPlayerId != null && drawOfferPlayerId.equals(opponentId);
     }
 
