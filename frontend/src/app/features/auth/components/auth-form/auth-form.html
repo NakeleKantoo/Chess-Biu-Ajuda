@@ -1,0 +1,35 @@
+<div class="auth-form h-100 w-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="container container__auth-form">
+        <h2 class="text-center">
+            @if(type === 'register') {
+                Crie uma Conta
+            } @else {
+                Entre na sua Conta
+            }
+        </h2>
+        <p class="text-center mb-4">
+            @if(type === 'register') {
+                Escreva o usuário e a senha para criar sua conta
+            } @else {
+                Escreva o usuário e a senha para entrar na sua conta
+            }
+        </p>
+    
+        <form (ngSubmit)="onFormSubmit()">
+            <fieldset>
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="usernameInput" id="usernameInput" placeholder="Nome de Usuário" [(ngModel)]="username">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" name="passwordInput" id="passwordInput" placeholder="Senha" [(ngModel)]="password">
+                </div>
+                @if(type === 'register') {
+                    <div class="mb-3">
+                        <input type="password" class="form-control" name="confirmPasswordInput" id="confirmPasswordInput" placeholder="Confirme sua Senha" [(ngModel)]="confirmPassword">
+                    </div>
+                }
+            </fieldset>
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+    </div>
+</div>
