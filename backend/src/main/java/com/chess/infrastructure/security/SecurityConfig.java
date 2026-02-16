@@ -60,6 +60,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/{action}").hasAnyRole("ADMIN", "USER") // Ações especiais (desistir, pedir empate, etc)
                         .requestMatchers(HttpMethod.GET, "/api/games/saved/{gameId}").permitAll() // Ver jogo salvo (pode ser público, sem autenticação)
 
+                        // WebSocket (STOMP) para o jogo em tempo real
+                        .requestMatchers("/ws/**").permitAll() // O acesso ao WebSocket é controlado dentro do próprio handler, usando o token do usuário
+
                         // Qualquer outra rota não listada acima EXIGE autenticação por padrão
                         .anyRequest().authenticated()
                 )
