@@ -28,7 +28,7 @@ public class GameSocketController {
     @Autowired private SimpMessagingTemplate messagingTemplate;
     @Autowired private GameManagerService gameManagerService;
     
-    @MessageMapping("/{gameId}/move")
+    @MessageMapping("/game/{gameId}/move")
     public void handleMove(
         @DestinationVariable UUID gameId,
         @Payload @Valid MoveDTO moveDTO,
@@ -60,7 +60,7 @@ public class GameSocketController {
     }
 
     // Faça o mesmo ajuste para handleAction se necessário
-    @MessageMapping("/{gameId}/{action}")
+    @MessageMapping("/game/{gameId}/{action}")
     public void handleAction(
         @DestinationVariable UUID gameId,
         @DestinationVariable String action,
