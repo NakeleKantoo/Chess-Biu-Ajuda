@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.chess.app.session.game.GameSession;
 import com.chess.app.session.game.GameSessionManager;
-import com.chess.domain.exception.game.InvalidGameAction;
+import com.chess.domain.exception.game.InvalidGameActionException;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.Game;
 import com.chess.domain.model.piece.Piece;
@@ -44,7 +44,7 @@ public class GameManagerService {
                 game = session.acceptDraw(userId);
                 break;
             default:
-                throw new InvalidGameAction(action);
+                throw new InvalidGameActionException(action);
         }
 
         return game;
