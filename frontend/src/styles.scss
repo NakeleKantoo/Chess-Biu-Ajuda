@@ -16,10 +16,21 @@
     $input-color: $text-default,
     $input-focus-bg: $canvas-default,
     $link-color: $accent-fg,
+
+    // Customização do Alert para o modo Dark GitHub
+    $alert-padding-y: 0.4rem,
+    $alert-padding-x: 1rem,
+    $alert-margin-bottom: 1.5rem,
+    $alert-border-radius: 6px,
+    $alert-border-width: 1px,
+
+    $danger: #bf352d,
 );
 
 // Estilos Globais e Resets
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -51,6 +62,7 @@ body {
         background-color: $secondary-bg;
         border-color: $border-default;
         color: $accent-fg; // Texto azul no fundo azul escuro
+
         &:hover {
             background-color: color.adjust($secondary-bg, $lightness: 5%);
             border-color: #8b949e;
@@ -61,6 +73,7 @@ body {
 // Inputs para não ficarem brancos nunca
 .form-control {
     border-radius: 6px;
+    
     &:focus {
         background-color: $canvas-default;
         border-color: $accent-fg;

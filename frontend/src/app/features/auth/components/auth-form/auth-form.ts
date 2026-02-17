@@ -9,23 +9,40 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './auth-form.scss',
 })
 export class AuthForm {
-  username: string = '';
-  password: string = '';
-  confirmPassword: string = '';
+  username = '';
+  password = '';
+  confirmPassword = '';
 
-  @Input({required: true, alias: 'type'}) type: 'login' | 'register' = 'login';
+  @Input({required: true}) type: 'login' | 'register' = 'login';
+  @Input() errorMessage: string | null = null;
   @Output() onSubmit = new EventEmitter<IAuthFormData>();
 
+  get textLabel(): string {
+    return this.type === 'register' ? 'Crie uma Conta' : 'Entre na sua Conta';
+  }
+
+  get descriptionLabel(): string {
+    return `Escreva o usuário e a senha para ${this.type === 'register' ? 'criar' : 'entrar na'} sua conta`;
+  }
+
+  get buttonLabel(): string {
+    return this.type === 'register' ? 'Cadastrar' : 'Entrar';
+  }
+
   onFormSubmit() {
-    let formData: IAuthFormData = {
+    // Validação básica de frontend
+    if (this.type === 'register' && this.password !== this.confirmPassword) {
+      this.errorMessage = 'As senhas não coincidem.';
+      return;
+    }
+
+    const formData: IAuthFormData = {
       username: this.username,
       password: this.password,
       confirmPassword: this.confirmPassword
     };
 
-    if (this.type === 'login') {
-      delete formData.confirmPassword;
-    }
+    if (this.type === 'login') delete formData.confirmPassword;
     
     this.onSubmit.emit(formData);
   }
