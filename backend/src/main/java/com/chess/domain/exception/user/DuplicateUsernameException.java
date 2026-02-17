@@ -14,7 +14,7 @@ public class DuplicateUsernameException extends ChessException {
     private final String username;
 
     public DuplicateUsernameException(String username) {
-        super("Duplicate username: " + username);
+        super("Já existe um usuário com o nick: " + username);
         this.username = username;
     }
 
