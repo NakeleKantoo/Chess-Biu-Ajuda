@@ -1,15 +1,9 @@
 @use "sass:color";
 
-// 1. Definição das cores base (GitHub Dark Mode)
-$canvas-default: #0d1117; // Fundo mais escuro
-$canvas-overlay: #161b22; // Fundo de cards
-$border-default: #30363d; // Bordas GitHub
-$text-default:   #c9d1d9; // Cinza claro para texto
-$accent-fg:      #489eff; // Azul brilhante (Primário)
-$secondary-bg:   #1f2937; // Azul escuro/Marinho (Secundário)
-$success-fg:     #238636; // Verde GitHub
+// Definição das cores base (GitHub Dark Mode)
+@use "variables" as *;
 
-// 2. Passando as configurações para o módulo do Bootstrap
+// Passando as configurações para o módulo do Bootstrap
 @use "bootstrap/scss/bootstrap" with (
     $body-bg: $canvas-default,
     $body-color: $text-default,
@@ -24,7 +18,7 @@ $success-fg:     #238636; // Verde GitHub
     $link-color: $accent-fg,
 );
 
-// 3. Estilos Globais e Resets
+// Estilos Globais e Resets
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
