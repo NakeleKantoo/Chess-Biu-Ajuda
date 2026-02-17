@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,29 +36,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Desabilita CSRF (Cross-Site Request Forgery). Como usamos JWT (stateless), não precisamos disso.
+                // Ativa as configurações de CORS definidas no CorsConfig
+                .cors(Customizer.withDefaults())
+
+                // Desabilita CSRF (Cross-Site Request Forgery). Como usamos JWT (stateless), não precisamos disso.
                 // Se fosse uma aplicação MVC clássica com sessão no servidor, precisaria manter ativado.
                 .csrf(csrf -> csrf.disable())
                 
-                // 2. Define as regras de quem pode acessar qual URL
+                // Define as regras de quem pode acessar qual URL
                 .authorizeHttpRequests(auth -> auth
                         // APIs públicas (sem autenticação)
                         .requestMatchers("/h2-console/**").permitAll() // Banco de dados em memória
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Documentação da API
 
                         // APIs de Usuário
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll() // Cadastro de usuários
-                        .requestMatchers(HttpMethod.GET, "/users").hasAnyRole("ADMIN") // Listar usuários
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Cadastro de usuários
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasAnyRole("ADMIN") // Listar usuários
 
                         // APIs de Autenticação
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Login de usuários
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() // Login de usuários
 
                         // APIs de Jogo
                         .requestMatchers(HttpMethod.POST, "/api/games").hasAnyRole("ADMIN", "USER") // Criar jogo
                         .requestMatchers(HttpMethod.POST, "/api/games/join").hasAnyRole("ADMIN", "USER") // Entrar em jogo
                         .requestMatchers(HttpMethod.GET, "/api/games/{gameId}").hasAnyRole("ADMIN", "USER") // Ver detalhes do jogo
-                        .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/move").hasAnyRole("ADMIN", "USER") // Fazer movimento
-                        .requestMatchers(HttpMethod.POST, "/api/games/{gameId}/{action}").hasAnyRole("ADMIN", "USER") // Ações especiais (desistir, pedir empate, etc)
                         .requestMatchers(HttpMethod.GET, "/api/games/saved/{gameId}").permitAll() // Ver jogo salvo (pode ser público, sem autenticação)
 
                         // WebSocket (STOMP) para o jogo em tempo real
@@ -67,15 +69,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 
-                // 3. Configurações Especiais para o Console do H2 funcionar (ele usa iframes)
+                // Configurações Especiais para o Console do H2 funcionar (ele usa iframes)
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 
-                // 4. Gerenciamento de Sessão: STATELESS
+                // Gerenciamento de Sessão: STATELESS
                 // Diz para o Spring Security: "Não crie JSESSIONID, não guarde estado no servidor".
                 // Toda requisição é independente e deve trazer o token.
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 
-                // 5. Instala nosso Filtro JWT ANTES do filtro padrão de usuário/senha do Spring
+                // Instala nosso Filtro JWT ANTES do filtro padrão de usuário/senha do Spring
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
