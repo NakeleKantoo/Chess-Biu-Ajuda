@@ -18,7 +18,7 @@ import com.chess.app.service.user.UserService;
 import com.chess.domain.model.user.User;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 public class UserController {
 
     @Autowired

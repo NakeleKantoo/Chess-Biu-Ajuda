@@ -12,7 +12,7 @@ import com.chess.api.dto.response.auth.LoginResponse;
 import com.chess.app.service.auth.AuthService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/auth")
 public class AuthController {
 
     @Autowired

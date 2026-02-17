@@ -1,0 +1,31 @@
+<div class="auth-form h-100 w-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="container container__auth-form">
+        <h2 class="text-center">{{ textLabel }}</h2>
+        <p class="text-center mb-4 text-muted">
+            {{ descriptionLabel }}
+        </p>
+
+        @if (errorMessage) {
+            <div class="alert alert-danger text-center" role="alert">
+                ⓘ {{ errorMessage }}
+            </div>
+        }
+    
+        <form (ngSubmit)="onFormSubmit()">
+            <fieldset>
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="usernameInput" placeholder="Nome de Usuário" [(ngModel)]="username" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" name="passwordInput" placeholder="Senha" [(ngModel)]="password" required>
+                </div>
+                @if(type === 'register') {
+                    <div class="mb-3">
+                        <input type="password" class="form-control" name="confirmPasswordInput" placeholder="Confirme sua Senha" [(ngModel)]="confirmPassword" required>
+                    </div>
+                }
+            </fieldset>
+            <button type="submit" class="btn btn-primary w-100">{{ buttonLabel }}</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="login w-100 h-100 container position-relative">
+    <app-auth-navigate-button [type]="'login'"></app-auth-navigate-button>
+    
+    <app-auth-form 
+        type="login"
+        [errorMessage]="errorMessage"
+        (onSubmit)="login($event)"
+    ></app-auth-form>
+</div>
