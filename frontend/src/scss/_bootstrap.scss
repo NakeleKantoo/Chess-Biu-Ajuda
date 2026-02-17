@@ -1,0 +1,26 @@
+@use "variables" as *;
+
+@use "bootstrap/scss/bootstrap" with (
+    $body-bg: $canvas-default,
+    $body-secondary-bg: $canvas-overlay,
+    $body-color: $text-default,
+    $border-color: $border-default,
+    $primary: $accent-fg,
+    $secondary: $secondary-bg, // Nossa cor azul escuro
+    $card-bg: $canvas-overlay,
+    $card-border-color: $border-default,
+    $input-bg: $canvas-default,
+    $input-border-color: $border-default,
+    $input-color: $text-default,
+    $input-focus-bg: $canvas-default,
+    $link-color: $accent-fg,
+
+    // Customização do Alert para o modo Dark GitHub
+    $alert-padding-y: 0.4rem,
+    $alert-padding-x: 1rem,
+    $alert-margin-bottom: 1.5rem,
+    $alert-border-radius: 6px,
+    $alert-border-width: 1px,
+
+    $danger: #bf352d,
+);
