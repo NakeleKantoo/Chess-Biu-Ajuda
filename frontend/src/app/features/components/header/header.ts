@@ -1,27 +1,14 @@
-import { Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink } from "@angular/router";
-import { filter, map } from 'rxjs';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from "@angular/router";
+import { AuthService } from '../../../core/auth/auth.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
 export class Header {
-  private router = inject(Router);
-
-  private urlSignal = toSignal(
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.router.url)
-    ),
-    { initialValue: this.router.url }
-  );
-
-  showHomeButton = computed(() => {
-    const url = this.urlSignal();
-    return url !== '/' && url !== '/home';
-  });
+  authService = inject(AuthService);
 }

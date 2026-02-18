@@ -1,13 +1,18 @@
-<div class="header w-100 p-3 d-flex align-items-center border-bottom bg-body-secondary">
-    <div class="d-flex align-items-center justify-content-between container">
+<nav class="navbar fixed-top custom-navbar border-bottom bg-body">
+    <div class="container d-flex justify-content-between">
         <div class="d-flex align-items-center">
             <img src="/logo.png" alt="Logo" class="me-2" />
-            <h2 class="m-0 fs-3">ChessHub</h2>
+            <a class="navbar-brand m-0 fs-4 text-white" routerLink="/">ChessHub</a>
         </div>
-        @if (showHomeButton()) {
-            <a routerLink="home" class="d-flex align-items-center justify-content-center hover-up">
-                <img src="/home.png" alt="Home" class="" style="width: 28px; height: 28px;"/>
-            </a>
-        }
+
+        <div class="d-flex align-items-center flex-nowrap gap-2">
+            @if (authService.isAuthenticated$ | async) {
+            <a class="nav-link me-2 px-2 py-1" routerLink="/dashboard">Meus Jogos</a>
+            <button class="btn btn-outline-light px-2 py-1" (click)="authService.logout()">Sair</button>
+            } @else {
+            <a class="btn btn-secondary px-2 py-1" routerLink="/login">Entrar</a>
+            <a class="btn btn-primary px-2 py-1" routerLink="/register">Criar Conta</a>
+            }
+        </div>
     </div>
-</div>
+</nav>
