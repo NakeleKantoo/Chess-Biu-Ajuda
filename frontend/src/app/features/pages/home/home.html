@@ -1,19 +1,22 @@
-<div class="home">
-    <div class="container d-flex flex-column h-100 align-items-center justify-content-center">
-        <h1 class="display-3 fw-bold mb-4 animate-fade-in-up animate-delay-100">
-            Jogue xadrez com<br><span class="colored-text">quem você quiser</span>
-        </h1>
-        <p class="fs-5 text-center animate-fade-in-up animate-delay-300">Cadastre-se, crie uma partida, compartilhe<br>o código e comece a jogar.</p>
-    </div>
-    <div class="d-flex flex-row align-items-center justify-content-center gap-5 mt-5 mb-5 animate-fade-in-up animate-delay-500">
-        <button (click)="createGame()" class="btn btn-primary py-2 px-4 fs-5">
-            Criar uma partida
-        </button>
-        <button (click)="enterGame()" class="btn btn-secondary py-2 px-4 fs-5">
-            Entrar na partida
-        </button>
-    </div>
-    <div class="d-flex flex-row align-items-center justify-content-center gap-5 mt-5">
-        
-    </div>
+<div class="home d-flex flex-column min-vh-100 w-100">
+    <app-header />
+    <main class="flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+        <div class="container d-flex flex-column h-100 align-items-center justify-content-center">
+            <h1 class="display-3 fw-bold mb-4 animate-fade-in-up animate-delay-100">
+                Jogue xadrez com<br><span class="colored-text">quem você quiser</span>
+            </h1>
+            <p class="fs-5 text-center animate-fade-in-up animate-delay-300">Cadastre-se, crie uma partida,
+                compartilhe<br>o código e comece a jogar.</p>
+        </div>
+        <div
+            class="d-flex flex-row align-items-center justify-content-center gap-5 mt-5 mb-5 animate-fade-in-up animate-delay-500">
+            <button (click)="createGame()" class="btn btn-primary py-2 px-4 fs-5">
+                Criar uma partida
+            </button>
+            <button (click)="enterGame()" class="btn btn-secondary py-2 px-4 fs-5">
+                Entrar na partida
+            </button>
+        </div>
+    </main>
+    <app-footer />
 </div>

@@ -1,8 +1,10 @@
 @use "scss/variables" as *;
 
-.custom-navbar {
-    background-color: rgba($canvas-default, 0.75) !important;
+.header {
+    background-color: rgba($canvas-default, 0.4) !important;
 
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(white, 0.1);
+
+    animation-duration: 1s;
 }

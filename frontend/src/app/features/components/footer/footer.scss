@@ -1,7 +1,7 @@
 @use "scss/variables" as *;
 
 .footer {
-    background-color: rgba($canvas-default, 0.75) !important;
+    background-color: rgba($canvas-default, 0.4) !important;
 
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(white, 0.1);

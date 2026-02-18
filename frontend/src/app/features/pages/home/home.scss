@@ -4,11 +4,11 @@
 .colored-text {
     // 1. Aplica o gradiente como FUNDO (onde imagens são permitidas)
     background: linear-gradient(to right, $accent-fg, #15cec1);
-    
+
     // 2. Recorta o fundo para aparecer apenas nos pixels das letras
     -webkit-background-clip: text;
     background-clip: text;
-    
+
     // 3. Torna o preenchimento do texto transparente para revelar o fundo abaixo
     -webkit-text-fill-color: transparent;
     color: transparent;
