@@ -14,6 +14,18 @@ export class AuthService {
 
     private authStatus = new BehaviorSubject<boolean>(this.hasToken());
 
+    public isAuthenticated$ = this.authStatus.asObservable();
+    get isAuthenticated(): boolean {
+        const isLogged = this.authStatus.value;
+        const hasToken = !!this.getToken();
+
+        if (isLogged && !hasToken) {
+            this.authStatus.next(false);
+            return false;
+        }
+        return isLogged;
+    }
+
     login(credentials: ILoginRequest): Observable<ILoginResponse> {
         return this.http.post<ILoginResponse>(`${this.API_URL}/auth/login`, credentials).pipe(
             tap(res => this.setSession(res))
@@ -41,10 +53,7 @@ export class AuthService {
     }
 
     private hasToken(): boolean {
-        return !!localStorage.getItem(this.TOKEN_KEY);
+        return !!this.getToken();
     }
 
-    isLoggedIn(): Observable<boolean> {
-        return this.authStatus.asObservable();
-    }
 }
