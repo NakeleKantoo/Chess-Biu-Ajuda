@@ -1,3 +1,48 @@
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 2s ease-out forwards;
+}
+
+.animate-fade-in-down {
+    animation: fade-in-down 2s ease-out forwards;
+}
+
+.animate-delay-100 {
+    opacity: 0;
+    animation-delay: 0.1s;
+}
+
+.animate-delay-300 {
+    opacity: 0;
+    animation-delay: 0.3s;
+}
+
+.animate-delay-500 {
+    opacity: 0;
+    animation-delay: 0.5s;
+}
+
 .hover-up {
     transition: all 0.3s ease-in-out;
     &:hover {
