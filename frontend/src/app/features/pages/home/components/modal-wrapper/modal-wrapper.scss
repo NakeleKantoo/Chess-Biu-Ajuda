@@ -1,0 +1,44 @@
+.modal-overlay {
+    // Fixa o fundo em toda a tela
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    // Centraliza o conteúdo (o modal-card)
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // O "borrão" e a cor escura do fundo
+    background-color: rgba(0, 0, 0, 0.5); // Escurece um pouco
+    backdrop-filter: blur(8px); // Borra o que está atrás
+    -webkit-backdrop-filter: blur(8px); // Suporte para Safari
+
+    z-index: 1050; // Garante que fique acima de tudo
+
+    // Animação de entrada suave
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-card {
+    background-color: #1a1d21; // Cor escura do seu ChessHub
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    width: 95%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
