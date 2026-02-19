@@ -1,0 +1,17 @@
+@use "scss/variables" as *;
+
+.btn {
+    &-secondary {
+        color: #fff;
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+        &.active {
+            opacity: 1;
+            color: $accent-fg;
+            border-color: $accent-fg;
+        }
+    }
+}

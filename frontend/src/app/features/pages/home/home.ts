@@ -5,10 +5,13 @@ import { map, take } from 'rxjs';
 import { Header } from "../../components/header/header";
 import { Footer } from "../../components/footer/footer";
 import { ModalWrapper } from "./components/modal-wrapper/modal-wrapper";
+import { CreateGameForm } from "./components/create-game-form/create-game-form";
+import { JoinGameForm } from "./components/join-game-form/join-game-form";
+import { GameConfig } from '../../../shared/models/create-game.model';
 
 @Component({
   selector: 'app-home',
-  imports: [Header, Footer, ModalWrapper],
+  imports: [Header, Footer, ModalWrapper, CreateGameForm, JoinGameForm],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -18,12 +21,8 @@ export class Home {
 
   activeModal: 'create' | 'join' | null = null;
 
-  createGame() {
-    console.log('Criando partida');
-  }
-
-  joinGame() {
-    console.log('Entrando na partida');
+  createGame(gameConfig: GameConfig) {
+    console.log(gameConfig);
   }
 
   authenticated() : boolean {
