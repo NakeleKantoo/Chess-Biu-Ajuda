@@ -20,6 +20,14 @@
 
     // Animação de entrada suave
     animation: fadeIn 0.2s ease-out;
+
+    &.closing {
+        animation: fadeOut 0.2s ease-in forwards;
+        
+        .modal-card {
+            animation: scaleOut 0.2s ease-in forwards;
+        }
+    }
 }
 
 .modal-card {
@@ -41,4 +49,16 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+// Animação de Saída do Fundo
+@keyframes fadeOut {
+    from { opacity: 1; backdrop-filter: blur(8px); }
+    to { opacity: 0; backdrop-filter: blur(0); }
+}
+
+// Animação de Saída do Card (diminuindo)
+@keyframes scaleOut {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(0.95); opacity: 0; }
 }

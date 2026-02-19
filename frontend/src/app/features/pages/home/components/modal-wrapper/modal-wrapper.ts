@@ -12,6 +12,8 @@ export class ModalWrapper {
   @Output() close = new EventEmitter<void>();
   @Output() submit = new EventEmitter<void>();
 
+  isClosing = false;
+
   get title() {
     switch (this.type) {
       case 'join':
@@ -35,7 +37,12 @@ export class ModalWrapper {
   }
 
   onClose() {
-    this.close.emit();
+    this.isClosing = true;
+    
+    setTimeout(() => {
+      this.close.emit();
+      this.isClosing = false;
+    }, 200); 
   }
 
   onSubmit() {
