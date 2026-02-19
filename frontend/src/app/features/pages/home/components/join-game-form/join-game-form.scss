@@ -12,12 +12,12 @@
 }
 
 .code-box {
+    outline: none !important;
     width: 55px;
     height: 55px;
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     background: #2c3136;
-    color: #fff;
     font-size: 1.5rem;
     font-weight: bold;
     display: flex;
@@ -25,10 +25,10 @@
     justify-content: center;
     transition: all 0.2s;
     z-index: 1;
+    color: white;
 
     &.filled {
-        border-color: $accent-fg;
-        color: $accent-fg;
+        border-color: rgba($accent-fg, 0.5);
     }
     
     &.active {

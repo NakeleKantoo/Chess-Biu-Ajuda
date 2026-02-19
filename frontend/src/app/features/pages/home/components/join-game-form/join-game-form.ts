@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -7,7 +7,9 @@ import { ReactiveFormsModule } from '@angular/forms';
   templateUrl: './join-game-form.html',
   styleUrl: './join-game-form.scss',
 })
-export class JoinGameForm {
+export class JoinGameForm implements AfterViewInit {
+  @ViewChild('hiddenInput') inputElement!: ElementRef<HTMLInputElement>;
+
   @Output() submit = new EventEmitter<string>();
   
   code: string = "";
@@ -29,5 +31,15 @@ export class JoinGameForm {
 
   get isValid(): boolean {
     return this.code.length === 6;
+  }
+
+  ngAfterViewInit() {
+    this.focusInput();
+  }
+
+  focusInput() {
+    if (this.inputElement) {
+      this.inputElement.nativeElement.focus();
+    }
   }
 }
