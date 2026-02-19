@@ -19,8 +19,14 @@
         </div>
 
         @if (activeModal === 'create') {
-        <app-modal-wrapper type="create" (close)="closeModals()" (submit)="gameForm.onSubmit()">
-            <app-create-game-form #gameForm (submit)="createGame($event)" />
+        <app-modal-wrapper type="create" (close)="closeModals()" (submit)="createGameForm.onSubmit()">
+            <app-create-game-form #createGameForm (submit)="createGame($event)" />
+        </app-modal-wrapper>
+        }
+
+        @if (activeModal === 'join') {
+        <app-modal-wrapper type="join" (close)="closeModals()" (submit)="joinGameForm.onSubmit()" [disabled]="joinGameForm.isValid == false">
+            <app-join-game-form #joinGameForm (submit)="joinGame($event)" />
         </app-modal-wrapper>
         }
 

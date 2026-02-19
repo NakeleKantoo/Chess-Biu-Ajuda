@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Router } from '@angular/router';
-import { map, take } from 'rxjs';
 import { Header } from "../../components/header/header";
 import { Footer } from "../../components/footer/footer";
 import { ModalWrapper } from "./components/modal-wrapper/modal-wrapper";
@@ -23,6 +22,10 @@ export class Home {
 
   createGame(gameConfig: GameConfig) {
     console.log(gameConfig);
+  }
+
+  joinGame(gameCode: string) {
+    console.log(gameCode);
   }
 
   authenticated() : boolean {
