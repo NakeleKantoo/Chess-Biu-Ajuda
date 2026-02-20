@@ -1,7 +1,7 @@
-export interface GameConfig {
-    gameType: GameType;
-    timeControl: TimeControl;
-    playerColorPreference: PlayerColorPreference;
+export interface IGameConfigDTO {
+    gameType: EGameType;
+    timeControl: ETimeControl;
+    playerColorPreference: EPlayerColorPreference;
 
     startingColor?: 'WHITE' | 'BLACK';
     whiteTimeRemaining?: number;
@@ -9,14 +9,30 @@ export interface GameConfig {
     increment?: number;
 }
 
-export interface GameType {
-    type: 'STANDARD' | 'CHESS960';
+export interface IPendingGameDTO {
+    gameId: string;
+    gameCode: string;
 }
 
-export interface TimeControl {
-    type: 'BULLET' | 'BLITZ' | 'RAPID' | 'CLASSICAL' | 'CUSTOM';
+export interface IJoinGameRequest {
+    gameCode: string;
 }
 
-export interface PlayerColorPreference {
-    color: 'WHITE' | 'BLACK' | 'RANDOM';
+export enum EGameType {
+    STANDARD = 'STANDARD',
+    CHESS960 = 'CHESS960'
+}
+
+export enum ETimeControl {
+    BULLET = 'BULLET',
+    BLITZ = 'BLITZ',
+    RAPID = 'RAPID',
+    CLASSICAL = 'CLASSICAL',
+    CUSTOM = 'CUSTOM'
+}
+
+export enum EPlayerColorPreference {
+    WHITE = 'WHITE',
+    BLACK = 'BLACK',
+    RANDOM = 'RANDOM'
 }

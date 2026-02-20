@@ -3,14 +3,14 @@
         <small class="opacity-75 ms-2">TIPO DE PARTIDA</small>
         <div class="row mt-2 m-0 gap-5">
             <button type="button" class="btn btn-secondary col"
-                [class.active]="selectedGameType.type === 'STANDARD'"
-                (click)="selectGameType({type: 'STANDARD'})">
+                [class.active]="selectedGameType === 'STANDARD'"
+                (click)="selectGameType('STANDARD')">
                 <i class="bi bi-trophy me-2"></i> Normal
             </button>
             <button type="button" class="btn btn-secondary col btn-disabled"
                 [disabled]="true"
-                [class.active]="selectedGameType.type === 'CHESS960'"
-                (click)="selectGameType({type: 'CHESS960'})">
+                [class.active]="selectedGameType === 'CHESS960'"
+                (click)="selectGameType('CHESS960')">
                 <i class="bi bi-shuffle me-2"></i> Chess960
             </button>
         </div>
@@ -19,32 +19,32 @@
         <small class="opacity-75 ms-2">CONTROLE DE TEMPO</small>
         <div class="row gap-2 mt-2 m-0">
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedTimeControl.type === 'BULLET'"
-                (click)="selectTimeControl({type: 'BULLET'})"
+                [class.active]="selectedTimeControl === 'BULLET'"
+                (click)="selectTimeControl('BULLET')"
             >
                 <i class="bi bi-fire"></i> <span>Bullet</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedTimeControl.type === 'BLITZ'"
-                (click)="selectTimeControl({type: 'BLITZ'})"
+                [class.active]="selectedTimeControl === 'BLITZ'"
+                (click)="selectTimeControl('BLITZ')"
             >
                 <i class="bi bi-lightning-charge-fill"></i> <span>Blitz</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedTimeControl.type === 'RAPID'"
-                (click)="selectTimeControl({type: 'RAPID'})"
+                [class.active]="selectedTimeControl === 'RAPID'"
+                (click)="selectTimeControl('RAPID')"
             >
                 <i class="bi bi-clock-history"></i> <span>Rápida</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedTimeControl.type === 'CLASSICAL'"
-                (click)="selectTimeControl({type: 'CLASSICAL'})"
+                [class.active]="selectedTimeControl === 'CLASSICAL'"
+                (click)="selectTimeControl('CLASSICAL')"
             >
                 <i class="bi bi-hourglass-split"></i> <span>Clássica</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedTimeControl.type === 'CUSTOM'"
-                (click)="selectTimeControl({type: 'CUSTOM'})"
+                [class.active]="selectedTimeControl === 'CUSTOM'"
+                (click)="selectTimeControl('CUSTOM')"
             >
                 <i class="bi bi-sliders"></i> <span>Custom.</span>
             </button>
@@ -54,20 +54,20 @@
         <small class="opacity-75 ms-2">COR</small>
         <div class="row gap-2 mt-2 m-0">
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedColorPreference.color === 'WHITE'"
-                (click)="selectColorPreference({color: 'WHITE'})"
+                [class.active]="selectedColorPreference === 'WHITE'"
+                (click)="selectColorPreference('WHITE')"
             >
                 <i class="bi bi-circle"></i> <span>Brancas</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedColorPreference.color === 'RANDOM'"
-                (click)="selectColorPreference({color: 'RANDOM'})"
+                [class.active]="selectedColorPreference === 'RANDOM'"
+                (click)="selectColorPreference('RANDOM')"
             >
                 <i class="bi bi-circle-half"></i> <span>Aleatório</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
-                [class.active]="selectedColorPreference.color === 'BLACK'"
-                (click)="selectColorPreference({color: 'BLACK'})"
+                [class.active]="selectedColorPreference === 'BLACK'"
+                (click)="selectColorPreference('BLACK')"
             >
                 <i class="bi bi-circle-fill"></i> <span>Pretas</span>
             </button>
