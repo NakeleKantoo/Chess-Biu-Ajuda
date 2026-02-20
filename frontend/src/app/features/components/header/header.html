@@ -1,0 +1,18 @@
+<nav class="header navbar fixed-top border-bottom bg-body animate-fade-in-down">
+    <div class="container d-flex justify-content-between">
+        <div class="d-flex align-items-center">
+            <img src="/logo.png" alt="Logo" class="me-2" style="width: 30px; height: 30px;"/>
+            <a class="navbar-brand m-0 fs-4 text-white" routerLink="/">ChessHub</a>
+        </div>
+
+        <div class="d-flex align-items-center flex-nowrap gap-2">
+            @if (authService.isAuthenticated$ | async) {
+            <a class="nav-link me-2 px-2 py-1" routerLink="/dashboard">Meus Jogos</a>
+            <button class="btn btn-outline-light px-2 py-1" (click)="authService.logout()">Sair</button>
+            } @else {
+            <a class="btn btn-secondary px-2 py-1" routerLink="/login">Entrar</a>
+            <a class="btn btn-primary px-2 py-1" routerLink="/register">Criar Conta</a>
+            }
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,19 @@
+@use "variables" as *;
+
+// Estilos Globais e Resets
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    min-height: 100vh;
+    background-color: $canvas-overlay;
+    color: $text-default;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    -webkit-font-smoothing: antialiased; // Deixa a fonte mais nítida no Mac/Chrome
+}

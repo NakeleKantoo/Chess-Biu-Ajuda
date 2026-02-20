@@ -1,0 +1,18 @@
+<form class="join-game-form d-flex flex-column">
+    <div class="game-type py-3 px-4 d-flex flex-column">
+        <small class="opacity-75 ms-2 mb-2">CÓDIGO DA PARTIDA</small>
+        <small class="opacity-50">Digite o código de 6 caracteres para entrar na partida</small>
+    </div>
+
+    <input #hiddenInput type="text" maxlength="6"
+        class="real-input position-absolute top-0 left-0 w-100 h-100 opacity-0" (input)="onInput($event)"
+        (focus)="isFocused = true" (blur)="isFocused = false" autocomplete="off" autofocus />
+
+    <div class="code-display d-flex gap-2 justify-content-center pb-3" (click)="focusInput()">
+        @for (i of [0,1,2,3,4,5]; track i) {
+        <div class="code-box btn btn-secondary" [class.active]="isFocused && code.length === i" [class.filled]="code.length > i">
+            {{ code[i] || '' }}
+        </div>
+        }
+    </div>
+</form>
