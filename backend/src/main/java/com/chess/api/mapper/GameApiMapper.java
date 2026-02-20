@@ -23,7 +23,7 @@ import com.chess.domain.model.game.GameConfig.TimeControl;
 import com.chess.domain.model.move.Move;
 
 public class GameApiMapper {
-    
+
     public static GameConfig fromGameConfigDTO(GameConfigDTO configDTO) {
         GameType gameType = configDTO.gameType();
         TimeControl timeControl = configDTO.timeControl();

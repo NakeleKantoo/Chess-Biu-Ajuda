@@ -24,23 +24,28 @@ public class GameSessionManager {
     private final GameTimerManager timerManager;
     
     private final Map<UUID, GameSession> activeGames = new ConcurrentHashMap<>();
-    private final Map<String, PendingGame> pendingGames = new ConcurrentHashMap<>();
+
+    private final Map<String, PendingGame> pendingGamesByCode = new ConcurrentHashMap<>();
+    private final Map<UUID, PendingGame> pendingGamesById = new ConcurrentHashMap<>();
 
     public PendingGame createGame(GameConfig config, UUID creatorId) {
         UUID gameId = UUID.randomUUID();
         String gameCode = generateGameCode();
         PendingGame pendingGame = new PendingGame(gameId, creatorId, config, gameCode);
         
-        pendingGames.put(gameCode, pendingGame);
+        pendingGamesByCode.put(gameCode, pendingGame);
+        pendingGamesById.put(gameId, pendingGame);
 
         return pendingGame;
     }
 
     public PendingGame joinGame(String gameCode, UUID joiningPlayerId) {
-        PendingGame pendingGame = pendingGames.remove(gameCode);
+        PendingGame pendingGame = pendingGamesByCode.remove(gameCode);
         if (pendingGame == null) {
             throw new PendingGameNotFoundException(gameCode);
         }
+        pendingGamesById.remove(pendingGame.gameId());
+
         if (joiningPlayerId.equals(pendingGame.creatorId())) {
             throw new SelfJoinGameException(joiningPlayerId);
         }
@@ -60,7 +65,7 @@ public class GameSessionManager {
         return pendingGame;
     }
 
-    public GameSession getGameSession(UUID sessionId) {
+    public GameSession getGameSessionById(UUID sessionId) {
         GameSession gameSession = activeGames.get(sessionId);
 
         if (gameSession == null) {
@@ -68,6 +73,16 @@ public class GameSessionManager {
         }
 
         return gameSession;
+    }
+
+    public PendingGame getPendingGameById(UUID gameId) {
+        PendingGame pendingGame = pendingGamesById.get(gameId);
+
+        if (pendingGame == null) {
+            throw new PendingGameNotFoundException(gameId.toString());
+        }
+
+        return pendingGame;
     }
 
     private String generateGameCode() {
@@ -84,7 +99,7 @@ public class GameSessionManager {
                 int index = (int) (Math.random() * chars.length());
                 code.append(chars.charAt(index));
             }
-        } while (pendingGames.containsKey(code.toString()));
+        } while (pendingGamesByCode.containsKey(code.toString()));
 
         return code.toString();
     }

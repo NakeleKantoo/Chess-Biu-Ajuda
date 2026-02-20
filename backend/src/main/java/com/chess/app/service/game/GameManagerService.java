@@ -9,6 +9,7 @@ import com.chess.app.session.game.GameSessionManager;
 import com.chess.domain.exception.game.InvalidGameActionException;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.Game;
+import com.chess.domain.model.game.PendingGame;
 import com.chess.domain.model.piece.Piece;
 
 import lombok.AllArgsConstructor;
@@ -19,18 +20,22 @@ public class GameManagerService {
 
     private final GameSessionManager sessionManager;
 
-    public Game getGameById(UUID gameId) {
-        return sessionManager.getGameSession(gameId).getGame();
+    public Game getGameSessionById(UUID gameId) {
+        return sessionManager.getGameSessionById(gameId).getGame();
+    }
+
+    public PendingGame getPendingGameById(UUID gameId) {
+        return sessionManager.getPendingGameById(gameId);
     }
 
     public Game makeMove(Position from, Position to, Piece promotionPiece, UUID gameId, UUID userId) {
-        GameSession session = sessionManager.getGameSession(gameId);
+        GameSession session = sessionManager.getGameSessionById(gameId);
 
         return session.makeMove(from, to, promotionPiece, userId);
     }
 
     public Game performAction(String action, UUID gameId, UUID userId) {
-        GameSession session = sessionManager.getGameSession(gameId);
+        GameSession session = sessionManager.getGameSessionById(gameId);
 
         Game game;
         switch (action.toLowerCase()) {

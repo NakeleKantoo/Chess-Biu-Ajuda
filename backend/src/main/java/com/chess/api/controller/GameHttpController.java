@@ -65,10 +65,17 @@ public class GameHttpController {
     }
 
     @GetMapping("/{gameId}")
-    public ResponseEntity<GameDTO> getGameById(@PathVariable UUID gameId) {
-        Game game = gameManagerService.getGameById(gameId);
+    public ResponseEntity<GameDTO> getGameSessionById(@PathVariable UUID gameId) {
+        Game game = gameManagerService.getGameSessionById(gameId);
 
         return ResponseEntity.ok(GameApiMapper.toDTO(game, gameId));
+    }
+
+    @GetMapping("/pending/{gameId}")
+    public ResponseEntity<PendingGameDTO> getPendingGameById(@PathVariable UUID gameId) {
+        PendingGame pendingGame = gameManagerService.getPendingGameById(gameId);
+
+        return ResponseEntity.ok(new PendingGameDTO(pendingGame));
     }
 
     @GetMapping("/saved/{gameId}")
