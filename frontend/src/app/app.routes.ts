@@ -27,7 +27,7 @@ export const routes: Routes = [
         title: 'Register Page'
     },
     {
-        path: 'game',
+        path: 'game/:id',
         component: Game,
         title: 'Game Page',
         canActivate: [authGuard]

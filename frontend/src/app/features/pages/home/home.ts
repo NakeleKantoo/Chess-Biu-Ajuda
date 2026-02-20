@@ -6,7 +6,9 @@ import { Footer } from "../../components/footer/footer";
 import { ModalWrapper } from "./components/modal-wrapper/modal-wrapper";
 import { CreateGameForm } from "./components/create-game-form/create-game-form";
 import { JoinGameForm } from "./components/join-game-form/join-game-form";
-import { GameConfig } from '../../../shared/models/create-game.model';
+import { GameService } from '../../../core/service/game.service';
+import { IGameConfigDTO, IPendingGameDTO } from '../../../shared/models/create-game.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -16,16 +18,30 @@ import { GameConfig } from '../../../shared/models/create-game.model';
 })
 export class Home {
   private authService = inject(AuthService);
+  private gameService = inject(GameService);
   private router = inject(Router);
 
   activeModal: 'create' | 'join' | null = null;
 
-  createGame(gameConfig: GameConfig) {
-    console.log(gameConfig);
+  createGame(gameConfig: IGameConfigDTO) {
+    const pendingGameDTO: Observable<IPendingGameDTO> = this.gameService.createGame(gameConfig);
+    this.subscribeToGame(pendingGameDTO);
   }
 
   joinGame(gameCode: string) {
-    console.log(gameCode);
+    const pendingGameDTO: Observable<IPendingGameDTO> = this.gameService.joinGame({ gameCode });
+    this.subscribeToGame(pendingGameDTO);
+  }
+
+  subscribeToGame(pendingGameDTO: Observable<IPendingGameDTO>) {
+    pendingGameDTO.subscribe({
+      next: (pendingGame) => {
+        this.router.navigate(['/game', pendingGame.gameId]);
+      },
+      error: (err) => {
+        alert('Ocorreu um erro ao entrar no jogo. Verifique o código e tente novamente.');
+      }
+    });
   }
 
   authenticated() : boolean {
