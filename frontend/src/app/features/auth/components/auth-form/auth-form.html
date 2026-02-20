@@ -1,16 +1,16 @@
 <div class="auth-form container vh-100 vw-100 d-flex flex-column justify-content-center align-items-center">
-    <div class="d-flex align-items-center mb-5">
+    <div class="d-flex align-items-center mb-5 animate-fade-in-up">
         <img src="/logo.png" alt="Logo" class="me-2" style="width: 30px; height: 30px;"/>
         <a class="navbar-brand m-0 fs-4 text-white" routerLink="/">ChessHub</a>
     </div>
-    <div class="container container__auth-form">
-        <div>
+    <div class="container container__auth-form pb-5">
+        <div class="animate-fade-in-up animate-delay-100">
             <h2 class="text-center">{{ textLabel }}</h2>
             <p class="text-center mb-4 text-muted">
                 {{ descriptionLabel }}
             </p>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 animate-fade-in-up animate-delay-300">
             @if (errorMessage) {
                 <div class="alert alert-danger text-center" role="alert">
                     ⓘ {{ errorMessage }}
