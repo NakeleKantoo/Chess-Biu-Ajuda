@@ -24,7 +24,12 @@ export class GameService {
     }
 
     // GET /api/games/{gameId}
-    getGame(gameId: string): Observable<IGameDTO> {
+    getGameSession(gameId: string): Observable<IGameDTO> {
         return this.http.get<IGameDTO>(`${this.API_URL}/${gameId}`);
+    }
+
+    // GET /api/games/pending/{gameId}
+    getPendingGame(gameId: string): Observable<IPendingGameDTO> {
+        return this.http.get<IPendingGameDTO>(`${this.API_URL}/pending/${gameId}`);
     }
 }
