@@ -1,0 +1,92 @@
+@use "scss/variables" as *;
+
+$square-size: 40px;
+
+.mini-board {
+    display: grid;
+    grid-template-columns: repeat(4, $square-size);
+    grid-template-rows: repeat(4, $square-size);
+    width: fit-content;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 auto;
+    animation: up-down 3s ease-in-out infinite;
+
+    .square {
+        width: $square-size;
+        height: $square-size;
+        background-color: $light-square;
+
+        &.dark {
+            background-color: $dark-square;
+        }
+    }
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.minimal-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top: 3px solid $accent-fg;
+    border-right: 3px solid $accent-fg;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.dots::after {
+    content: '\a0\a0\a0';
+    animation: dots 2.4s steps(4, end) infinite;
+    font-family: monospace;
+}
+
+@keyframes dots {
+
+    0% {
+        content: '\a0\a0\a0';
+    }
+
+    25% {
+        content: '.\a0\a0';
+    }
+
+    50% {
+        content: '..\a0';
+    }
+
+    75% {
+        content: '...';
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes up-down {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
