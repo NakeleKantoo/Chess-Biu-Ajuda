@@ -1,3 +1,9 @@
+export interface IPendingGameDTO {
+    gameId: string;
+    gameCode: string;
+    gameConfig: IGameConfigDTO;
+}
+
 export interface IGameConfigDTO {
     gameType: EGameType;
     timeControl: ETimeControl;
@@ -7,11 +13,6 @@ export interface IGameConfigDTO {
     whiteTimeRemaining?: number;
     blackTimeRemaining?: number;
     increment?: number;
-}
-
-export interface IPendingGameDTO {
-    gameId: string;
-    gameCode: string;
 }
 
 export interface IJoinGameRequest {
