@@ -55,18 +55,20 @@ public class GameApiMapper {
 
     public static GameDTO toDTO(Game game, UUID gameId) {
         UUID id = gameId;
-        BoardDTO boardDTO = getBoardDTO(game.getCurrentBoard());
+        BoardDTO boardDTO = getBoardDTO(game);
         GameState state = game.getGameState();
         GameEndReason endReason = game.getGameEndReason();
         ClockDTO clockDTO = getClockDTO(game);
         List<MoveDTO> moveHistory = getMoveHistory(game.getMoveHistory());
-        Map<String, List<String>> legalMoves = getLegalMoves(game.getCurrentBoard());
 
-        return new GameDTO(id, boardDTO, state, endReason, clockDTO, moveHistory, legalMoves);
+        return new GameDTO(id, boardDTO, state, endReason, clockDTO, moveHistory);
     }
 
-    private static BoardDTO getBoardDTO(Board board) {
-        return new BoardDTO(board.toFen());
+    private static BoardDTO getBoardDTO(Game game) {
+        Board board = game.getCurrentBoard();
+        return new BoardDTO(
+            board.toFen(),
+            getLegalMoves(board));
     }
 
     private static ClockDTO getClockDTO(Game game) {

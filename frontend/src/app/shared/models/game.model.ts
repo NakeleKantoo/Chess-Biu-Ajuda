@@ -7,12 +7,11 @@ export interface IGameDTO {
 
     clock: IClockDTO;
     moveHistory: IMoveResponse[];
-
-    legalMoves: Map<string, string[]>;
 }
 
 export interface IBoardDTO {
     fen: string;
+    legalMoves: Map<string, string[]>;
 }
 
 export interface IClockDTO {

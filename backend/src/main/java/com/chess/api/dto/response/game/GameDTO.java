@@ -1,7 +1,6 @@
 package com.chess.api.dto.response.game;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.chess.api.dto.response.game.base.BoardDTO;
@@ -18,7 +17,5 @@ public record GameDTO(
     GameEndReason endReason,
 
     ClockDTO clock,
-    List<MoveDTO> moveHistory,
-
-    Map<String, List<String>> legalMoves
+    List<MoveDTO> moveHistory
 ) {}
