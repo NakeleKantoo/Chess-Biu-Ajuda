@@ -1,0 +1,53 @@
+@use "scss/variables" as *;
+
+$square-size: 100px;
+
+.square {
+    width: $square-size;
+    height: $square-size;
+    font-size: $square-size * 0.2;
+
+    &.light {
+        color: $dark-square;
+        background-color: $light-square;
+    }
+
+    &.dark {
+        color: $light-square;
+        background-color: $dark-square;
+    }
+
+    &.pointer {
+        &:hover {
+            cursor: pointer;
+            filter: brightness(1.05);
+        }
+    }
+}
+
+.highlight {
+    width: 100%;
+    height: 100%;
+
+    &-move {
+        width: calc(100% * 0.32);
+        height: calc(100% * 0.32);
+        border-radius: 50%;
+        background-color: rgba(black, 0.2);
+    }
+
+    &-capture {
+        border-radius: 50%;
+        border: 5px solid rgba(black, 0.2);
+    }
+
+    &-last_move {
+        background-color: rgba(yellow, 0.2);
+    }
+}
+
+p {
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+}
