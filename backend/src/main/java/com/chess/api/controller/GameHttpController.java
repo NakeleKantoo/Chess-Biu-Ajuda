@@ -74,6 +74,7 @@ public class GameHttpController {
     @GetMapping("/pending/{gameId}")
     public ResponseEntity<PendingGameDTO> getPendingGameById(@PathVariable UUID gameId) {
         PendingGame pendingGame = gameManagerService.getPendingGameById(gameId);
+        System.out.println(pendingGame.config());
 
         return ResponseEntity.ok(new PendingGameDTO(pendingGame));
     }

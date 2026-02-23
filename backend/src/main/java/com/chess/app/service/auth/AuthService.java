@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.chess.api.dto.response.auth.LoginResponse;
 import com.chess.domain.exception.user.InvalidLoginException;
+import com.chess.domain.model.user.Role;
 import com.chess.infrastructure.security.jwt.JwtProvider;
 import com.chess.infrastructure.security.service.UserDetailsImpl;
 
@@ -37,6 +38,16 @@ public class AuthService {
     
             return new LoginResponse(jwt, userDetails.getUsername(), userDetails.getRole());
         } catch (AuthenticationException e) {
+            throw new InvalidLoginException();
+        }
+    }
+
+    public LoginResponse authenticateUser(String token) {
+        if (tokenProvider.validateToken(token)) {
+            String username = tokenProvider.getUsernameFromJWT(token);
+            Role role = tokenProvider.getRoleFromJWT(token);
+            return new LoginResponse(token, username, role, "Bearer");
+        } else {
             throw new InvalidLoginException();
         }
     }
