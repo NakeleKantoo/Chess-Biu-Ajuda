@@ -32,7 +32,8 @@ export class Waiting {
   }
 
   getTimeControlLabel(): string {
-    const timeControl = this.pendingGame.gameConfig.timeControl;
+    if (!this.pendingGame) return '---';
+    const timeControl = this.pendingGame.config.timeControl;
     switch (timeControl) {
       case 'BULLET':
         return '1 min';

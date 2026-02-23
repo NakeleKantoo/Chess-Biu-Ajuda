@@ -1,7 +1,7 @@
 export interface IPendingGameDTO {
     gameId: string;
     gameCode: string;
-    gameConfig: IGameConfigDTO;
+    config: IGameConfigDTO;
 }
 
 export interface IGameConfigDTO {
