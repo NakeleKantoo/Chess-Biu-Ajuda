@@ -1,0 +1,20 @@
+<div class="board d-flex align-items-center justify-content-center" [class.flipped]="isFlipped">
+@for (row of boardSquares; track $index; let rowIndex = $index) {
+    <div class="row" [class.flipped]="isFlipped">
+    @for (piece of row; track $index; let colIndex = $index) {
+        <app-square
+        class="col p-0"
+        [position]="getPosition(rowIndex, colIndex)"
+        [pointer]="true"
+        (squareClicked)="onClick($event)"
+        [isFlipped]="isFlipped"
+        [isMove]="isMove(rowIndex, colIndex)"
+        [isCapture]="isCapture(rowIndex, colIndex)"
+        [isLastMove]="isLastMove(rowIndex, colIndex)"
+    >
+        <app-piece [pieceType]="piece" />
+    </app-square>
+    }
+    </div>
+}
+</div>

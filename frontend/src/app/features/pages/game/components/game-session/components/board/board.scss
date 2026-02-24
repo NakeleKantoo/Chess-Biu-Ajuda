@@ -1,0 +1,10 @@
+.board {
+    flex-direction: column;
+
+    &.flipped {
+        flex-direction: column-reverse;
+    }
+}
+.row.flipped {
+    flex-direction: row-reverse;
+}
