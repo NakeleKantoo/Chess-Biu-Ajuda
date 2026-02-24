@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Square } from "../square/square";
-import { Piece } from "../piece/piece";
-import { IBoardDTO, IMoveResponse } from '../../../../../../../shared/models/game.model';
+import { Square } from "./components/square/square";
+import { Piece } from "./components/piece/piece";
+import { IBoardDTO } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 
 @Component({

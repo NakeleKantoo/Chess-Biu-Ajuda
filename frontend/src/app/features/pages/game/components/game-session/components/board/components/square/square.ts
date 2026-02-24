@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Position } from '../../../../../../../shared/models/position.model';
+import { Position } from '../../../../../../../../../shared/models/position.model';
 
 @Component({
   selector: 'app-square',
