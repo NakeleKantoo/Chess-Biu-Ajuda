@@ -3,6 +3,13 @@
 
 $promotion-square-bg: $border-default;
 
+:host {
+    display: block;
+    position: absolute; // Garante que o binding [style.left] funcione
+    width: var(--square-size); // Faz o componente ter a largura de uma casa
+    z-index: 10;
+}
+
 .promotion app-square {
     ::ng-deep .square {
         background-color: $promotion-square-bg !important;
@@ -19,9 +26,8 @@ $promotion-square-bg: $border-default;
 .promotion {
     top: 0;
     left: 0;
-    width: $square-size;
+    width: 100%;
     height: calc($square-size * 4.5);
-    z-index: 10;
 }
 
 .btn {
