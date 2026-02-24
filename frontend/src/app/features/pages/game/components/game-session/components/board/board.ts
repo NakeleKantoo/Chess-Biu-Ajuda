@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Square } from "./components/square/square";
 import { Piece } from "./components/piece/piece";
 import { IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
@@ -31,10 +31,16 @@ export class Board {
     return this.promotionTarget.col;
   }
 
-  ngOnChanges(): void {
-    const fen: string = this.boardDTO.fen;
-    this.boardSquares = this.parseFEN(fen);
-    this.currentPlayer = fen.split(' ')[1] === 'w' ? 'white' : 'black';
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['boardDTO'] && changes['boardDTO'].currentValue !== changes['boardDTO'].previousValue) {
+      const fen: string = this.boardDTO.fen;
+      this.boardSquares = this.parseFEN(fen);
+      this.currentPlayer = fen.split(' ')[1] === 'w' ? 'white' : 'black';
+
+      if (!this.canMove()) {
+        this.boardDTO.legalMoves.clear();
+      }
+    }
   }
 
   getPosition(row: number, col: number): Position {
@@ -152,6 +158,12 @@ export class Board {
   closePromotionModal(): void {
     this.promotionModal = false;
     this.promotionTarget = null;
+  }
+
+  canMove(): boolean {
+    const isWhite: boolean = this.currentPlayer === 'white';
+    const isMyTurn: boolean = (isWhite && !this.isFlipped) || (!isWhite && this.isFlipped);
+    return isMyTurn;
   }
 
 }
