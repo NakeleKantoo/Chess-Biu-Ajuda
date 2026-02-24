@@ -24,4 +24,11 @@ export class Position {
         const row = ranks.indexOf(notation[1]);
         return new Position(row, col);
     }
+
+    static fromUci(uci: string): { from: Position, to: Position } {
+        const from = Position.fromNotation(uci.slice(0, 2));
+        const to = Position.fromNotation(uci.slice(2, 4));
+        return { from, to };
+    }
+
 }

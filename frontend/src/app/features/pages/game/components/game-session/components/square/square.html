@@ -10,7 +10,14 @@
         <p class="col position-absolute bottom-0 end-0 pe-1">{{ colLabel }}</p>
     </div>
     <div class="w-100 h-100 position-absolute d-flex align-items-center justify-content-center">
-        <div class="highlight" [ngClass]="highlightClass"></div>
+        @if (isCapture) {
+        <div class="highlight highlight-capture"></div>
+        } @else if (isMove) {
+        <div class="highlight highlight-move"></div>
+        }
+        @if (isLastMove) {
+        <div class="highlight highlight-last_move"></div>
+        }
     </div>
     <ng-content></ng-content>
 </div>
