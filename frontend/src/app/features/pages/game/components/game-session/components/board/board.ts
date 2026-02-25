@@ -38,7 +38,7 @@ export class Board {
       this.currentPlayer = fen.split(' ')[1] === 'w' ? 'white' : 'black';
 
       if (!this.canMove()) {
-        this.boardDTO.legalMoves.clear();
+        this.boardDTO.legalMoves = {};
       }
     }
   }
@@ -88,7 +88,7 @@ export class Board {
 
     const currentPositionNotation: string = this.currentPosition.toNotation();
     const targetPositionNotation: string = position.toNotation();
-    const legalMoves: string[] | undefined = this.boardDTO.legalMoves.get(currentPositionNotation);
+    const legalMoves: string[] | undefined = this.boardDTO.legalMoves[currentPositionNotation];
 
     if (!legalMoves || !legalMoves.includes(targetPositionNotation)) {
       this.currentPosition = position;
@@ -118,7 +118,7 @@ export class Board {
     if (this.currentPosition === null) return false;
     if (this.promotionTarget !== null) return false;
 
-    const legalMoves = this.boardDTO.legalMoves.get(this.currentPosition.toNotation());
+    const legalMoves = this.boardDTO.legalMoves[this.currentPosition.toNotation()];
     if (!legalMoves) return false;
     
     const position: Position = new Position(row, col);
