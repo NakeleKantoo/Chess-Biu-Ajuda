@@ -11,12 +11,12 @@
     </div>
     <div class="w-100 h-100 position-absolute d-flex align-items-center justify-content-center">
         @if (isCapture) {
-        <div class="highlight highlight-capture"></div>
+        <div class="highlight highlight-capture position-absolute"></div>
         } @else if (isMove) {
-        <div class="highlight highlight-move"></div>
+        <div class="highlight highlight-move position-absolute"></div>
         }
         @if (isLastMove) {
-        <div class="highlight highlight-last_move"></div>
+        <div class="highlight highlight-last_move position-absolute"></div>
         }
     </div>
     <ng-content></ng-content>
