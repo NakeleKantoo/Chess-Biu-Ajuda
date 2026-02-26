@@ -66,9 +66,11 @@ public class GameApiMapper {
 
     private static BoardDTO getBoardDTO(Game game) {
         Board board = game.getCurrentBoard();
+        MoveDTO lastMove = getMoveDTO(game.getLastMove());
         return new BoardDTO(
             board.toFen(),
-            getLegalMoves(board));
+            getLegalMoves(board),
+            lastMove);
     }
 
     private static ClockDTO getClockDTO(Game game) {
@@ -81,6 +83,7 @@ public class GameApiMapper {
     }
 
     private static MoveDTO getMoveDTO(Move move) {
+        if (move == null) return null;
         String san = move.getSan();
         String uci = move.getUci();
         return new MoveDTO(san, uci);
