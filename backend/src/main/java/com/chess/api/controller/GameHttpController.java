@@ -21,6 +21,7 @@ import com.chess.api.dto.response.game.SavedGameDTO;
 import com.chess.api.mapper.GameApiMapper;
 import com.chess.api.mapper.SavedGameApiMapper;
 import com.chess.app.service.game.GameManagerService;
+import com.chess.app.service.game.GameNotificationService;
 import com.chess.app.service.game.GamePersistenceService;
 import com.chess.app.session.game.GameSessionManager;
 import com.chess.domain.model.game.Game;
@@ -39,6 +40,7 @@ public class GameHttpController {
     @Autowired private GameManagerService gameManagerService;
     @Autowired private GameSessionManager gameSessionManager;
     @Autowired private GamePersistenceService gamePersistenceService;
+    @Autowired private GameNotificationService gameNotificationService;
 
     @PostMapping
     public ResponseEntity<PendingGameDTO> createGame(
@@ -57,18 +59,36 @@ public class GameHttpController {
         @RequestBody JoinGameRequest joinGameDTO,
         @AuthenticationPrincipal UserDetailsImpl user
     ) {
-
         PendingGame pendingGame = gameSessionManager.joinGame(joinGameDTO.gameCode(), user.getId());
-        URI location = URI.create(String.format("/api/games/%s", pendingGame.gameId()));
 
+        UUID gameId = pendingGame.gameId();
+        Game game = gameManagerService.getGameSessionById(gameId);
+        gameNotificationService.notifyGameUpdate(game, gameId);
+
+        URI location = URI.create(String.format("/api/games/%s", pendingGame.gameId()));
         return ResponseEntity.created(location).body(new PendingGameDTO(pendingGame));
     }
 
+    @GetMapping("/{gameId}/players")
+    public ResponseEntity<?> getPlayersInGame(@PathVariable UUID gameId) {
+        var players = gameManagerService.getPlayersInGame(gameId);
+
+        return ResponseEntity.ok(players);
+    }
+
     @GetMapping("/{gameId}")
-    public ResponseEntity<GameDTO> getGameById(@PathVariable UUID gameId) {
-        Game game = gameManagerService.getGameById(gameId);
+    public ResponseEntity<GameDTO> getGameSessionById(@PathVariable UUID gameId) {
+        Game game = gameManagerService.getGameSessionById(gameId);
 
         return ResponseEntity.ok(GameApiMapper.toDTO(game, gameId));
+    }
+
+    @GetMapping("/pending/{gameId}")
+    public ResponseEntity<PendingGameDTO> getPendingGameById(@PathVariable UUID gameId) {
+        PendingGame pendingGame = gameManagerService.getPendingGameById(gameId);
+        System.out.println(pendingGame.config());
+
+        return ResponseEntity.ok(new PendingGameDTO(pendingGame));
     }
 
     @GetMapping("/saved/{gameId}")

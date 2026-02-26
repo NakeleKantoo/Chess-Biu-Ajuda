@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -11,6 +11,8 @@ export class JoinGameForm implements AfterViewInit {
   @ViewChild('hiddenInput') inputElement!: ElementRef<HTMLInputElement>;
 
   @Output() submit = new EventEmitter<string>();
+
+  private cdRef = inject(ChangeDetectorRef);
   
   code: string = "";
   isFocused: boolean = false;
@@ -35,6 +37,7 @@ export class JoinGameForm implements AfterViewInit {
 
   ngAfterViewInit() {
     this.focusInput();
+    this.cdRef.detectChanges();
   }
 
   focusInput() {

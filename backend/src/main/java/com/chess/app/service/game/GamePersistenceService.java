@@ -2,13 +2,10 @@ package com.chess.app.service.game;
 
 import java.util.UUID;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chess.app.service.user.UserService;
-import com.chess.app.session.game.GameSession;
-import com.chess.domain.event.GameFinishedEvent;
 import com.chess.domain.exception.game.DuplicateGameException;
 import com.chess.domain.exception.game.GameNotFoundException;
 import com.chess.domain.exception.game.InvalidGameStateException;
@@ -54,17 +51,6 @@ public class GamePersistenceService {
 
     public boolean existsById(UUID id) {
         return gameRepository.existsById(id);
-    }
-
-    @EventListener
-    public void handleGameFinished(GameFinishedEvent event) {
-        GameSession session = event.getGameSession();
-        this.saveCompletedGame(
-            session.getGame(),
-            session.getWhitePlayerId(),
-            session.getBlackPlayerId(),
-            session.getSessionId()
-        );
     }
 
 }

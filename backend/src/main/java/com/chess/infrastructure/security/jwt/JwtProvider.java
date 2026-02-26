@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.chess.domain.model.user.Role;
 import com.chess.infrastructure.security.service.UserDetailsImpl;
 
 import io.jsonwebtoken.JwtException;
@@ -61,6 +62,22 @@ public class JwtProvider {
                 .parseSignedClaims(token)   // Abre o token (se a assinatura for válida)
                 .getPayload()               // Pega o recheio (Payload)
                 .getSubject();              // Pega o "subject" (que definimos como username)
+    }
+
+    public Role getRoleFromJWT(String token) {
+        String rolesString = Jwts.parser()
+                .verifyWith(this.key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("roles", String.class);
+
+        String[] rolesArray = rolesString.split(",");
+        String roleName = rolesArray[0];
+        if (roleName.startsWith("ROLE_")) {
+            roleName = roleName.substring(5);
+        }
+        return Role.valueOf(roleName);
     }
 
     // 3. VALIDAÇÃO: Verifica se o crachá é verdadeiro e não expirou

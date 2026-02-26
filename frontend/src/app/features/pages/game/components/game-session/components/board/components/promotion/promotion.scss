@@ -1,0 +1,47 @@
+@use "scss/variables" as *;
+@use "../square/square.scss" as *;
+
+$promotion-square-bg: $border-default;
+
+:host {
+    display: block;
+    position: absolute; // Garante que o binding [style.left] funcione
+    width: var(--square-size); // Faz o componente ter a largura de uma casa
+    z-index: 10;
+}
+
+.promotion app-square {
+    ::ng-deep .square {
+        background-color: $promotion-square-bg !important;
+
+        &.pointer {
+            &:hover {
+                cursor: pointer;
+                filter: brightness(1.1);
+            }
+        }
+    }
+}
+
+.promotion {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc($square-size * 4.5);
+}
+
+.btn {
+    background-color: $canvas-default !important;
+    height: calc($square-size * 0.5);
+    border-radius: 0%;
+    border: none !important;
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+
+    &:active {
+        filter: none !important;
+        background-color: $canvas-default !important;
+    }
+}

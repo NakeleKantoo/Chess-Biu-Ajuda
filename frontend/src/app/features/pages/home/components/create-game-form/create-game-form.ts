@@ -1,34 +1,35 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { GameConfig, GameType, PlayerColorPreference, TimeControl } from '../../../../../shared/models/create-game.model';
+import { IGameConfigDTO, EGameType, EPlayerColorPreference, ETimeControl } from '../../../../../shared/models/create-game.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-create-game-form',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './create-game-form.html',
   styleUrl: './create-game-form.scss',
 })
 export class CreateGameForm {
 
-  @Output() submit = new EventEmitter<GameConfig>();
+  @Output() submit = new EventEmitter<IGameConfigDTO>();
 
-  selectedGameType: GameType = { type: 'STANDARD' };
-  selectedTimeControl: TimeControl = { type: 'RAPID' };
-  selectedColorPreference: PlayerColorPreference = { color: 'RANDOM' };
+  selectedGameType: EGameType = EGameType.STANDARD;
+  selectedTimeControl: ETimeControl = ETimeControl.RAPID;
+  selectedColorPreference: EPlayerColorPreference = EPlayerColorPreference.RANDOM;
 
-  selectGameType(type: GameType) {
-    this.selectedGameType = type;
+  selectGameType(type: string) {
+    this.selectedGameType = type as EGameType;
   }
 
-  selectTimeControl(type: TimeControl) {
-    this.selectedTimeControl = type;
+  selectTimeControl(type: string) {
+    this.selectedTimeControl = type as ETimeControl;
   }
 
-  selectColorPreference(color: PlayerColorPreference) {
-    this.selectedColorPreference = color;
+  selectColorPreference(color: string) {
+    this.selectedColorPreference = color as EPlayerColorPreference;
   }
 
   onSubmit() {
-    const gameConfig: GameConfig = {
+    const gameConfig: IGameConfigDTO = {
       gameType: this.selectedGameType,
       timeControl: this.selectedTimeControl,
       playerColorPreference: this.selectedColorPreference,

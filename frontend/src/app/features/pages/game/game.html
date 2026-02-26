@@ -1,0 +1,16 @@
+<div class="game">
+    @if (game()) {
+        <app-game-session 
+            [gameDTO]="game()!" 
+            [gamePlayers]="gamePlayers()"
+            [isFlipped]="isFlipped()" 
+            (move)="executeMove($event)" 
+            (action)="executeAction($event)" />
+    } 
+    @else if (pendingGame()) {
+        <app-waiting [pendingGame]="pendingGame()!" />
+    } 
+    @else {
+        <app-loading />
+    }
+</div>

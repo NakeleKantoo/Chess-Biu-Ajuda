@@ -55,6 +55,7 @@ public class SecurityConfig {
 
                         // APIs de Autenticação
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll() // Login de usuários
+                        .requestMatchers(HttpMethod.GET, "/api/auth/validate").authenticated() // Validação de token
 
                         // APIs de Jogo
                         .requestMatchers(HttpMethod.POST, "/api/games").hasAnyRole("ADMIN", "USER") // Criar jogo

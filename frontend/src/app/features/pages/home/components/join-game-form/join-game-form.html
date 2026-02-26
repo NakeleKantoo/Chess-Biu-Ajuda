@@ -4,7 +4,7 @@
         <small class="opacity-50">Digite o código de 6 caracteres para entrar na partida</small>
     </div>
 
-    <input #hiddenInput type="text" maxlength="6"
+    <input #hiddenInput type="text" maxlength="6" id="code-input"
         class="real-input position-absolute top-0 left-0 w-100 h-100 opacity-0" (input)="onInput($event)"
         (focus)="isFocused = true" (blur)="isFocused = false" autocomplete="off" autofocus />
 

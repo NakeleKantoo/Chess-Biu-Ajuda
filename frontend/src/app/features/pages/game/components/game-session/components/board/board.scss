@@ -1,0 +1,21 @@
+@use "./components/square/square.scss" as *;
+
+.board {
+    --square-size: #{$square-size};
+
+    width: calc($square-size * 8);
+    height: calc($square-size * 8);
+
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;
+
+    flex-direction: column;
+
+    &.flipped {
+        flex-direction: column-reverse;
+    }
+}
+.row.flipped {
+    flex-direction: row-reverse;
+}

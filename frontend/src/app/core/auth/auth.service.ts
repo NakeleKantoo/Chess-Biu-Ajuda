@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { ILoginRequest, ILoginResponse, IRegisterRequest } from '../../shared/models/auth.model';
 import { appSettings } from '../../app.config';
 
@@ -35,6 +35,16 @@ export class AuthService {
     register(userData: IRegisterRequest): Observable<ILoginResponse> {
         return this.http.post<ILoginResponse>(`${this.API_URL}/users`, userData).pipe(
             tap(res => this.setSession(res))
+        );
+    }
+
+    validateToken(): Observable<ILoginResponse> {
+        return this.http.get<ILoginResponse>(`${this.API_URL}/auth/validate`, {}).pipe(
+            tap(res => this.setSession(res)),
+            catchError(error => {
+                this.logout();
+                return throwError(() => error);
+            })
         );
     }
 

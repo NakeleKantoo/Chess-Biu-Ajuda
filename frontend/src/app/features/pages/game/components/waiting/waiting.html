@@ -1,0 +1,45 @@
+<div class="waiting container vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex align-items-center mb-5">
+        <img src="/logo.png" alt="Logo" class="me-2" style="width: 30px; height: 30px;" />
+        <a class="navbar-brand m-0 fs-4 text-white" routerLink="/">ChessHub</a>
+    </div>
+
+    <div class="card w-100 p-3 d-flex flex-column align-items-center mb-4">
+        <div class="d-flex flex-row gap-2 mb-4">
+            <i class="bi bi-record-fill"></i>
+            <p class="mb-3 opacity-25">Partida criada</p>
+        </div>
+        <h4 class="mb-3">Aguardando oponente</h4>
+        <p class="opacity-50 w-100 px-5 text-center mb-5">
+            Envie o código abaixo para seu amigo entrar na partida.
+            Assim que ele se conectar, o jogo começará automaticamente.
+        </p>
+        <small class="px-5 opacity-25 font-monospace">CÓDIGO DA SALA</small>
+        <div class="code-display d-flex gap-2 justify-content-center mt-2">
+            @for (i of [0,1,2,3,4,5]; track i) {
+            <div class="code-box">
+                {{ getCode(i) }}
+            </div>
+            }
+        </div>
+        <button class="btn btn-primary my-4" (click)="copyToClipboard()"><i [classList]="copyIconClass"></i>{{ copyText
+            }}</button>
+    </div>
+    <div class="d-flex flex-row justify-content-center align-items-center gap-5 p-3 opacity-50">
+        <small>
+            <i class="bi bi-people pe-2"></i>
+            <span>1/2 Jogadores</span>
+        </small>
+        <small>
+            <i class="bi bi-clock pe-2"></i>
+            <span>{{ getTimeControlLabel() }}</span>
+        </small>
+    </div>
+    <div class="waiting-container">
+        <div class="bouncing-loader">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+</div>
