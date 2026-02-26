@@ -32,7 +32,7 @@ export class Board {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['boardDTO'] && changes['boardDTO'].currentValue !== changes['boardDTO'].previousValue) {
+    if (changes['boardDTO'] && changes['boardDTO'].currentValue !== changes['boardDTO'].previousValue || changes['isFlipped']) {
       const fen: string = this.boardDTO.fen;
       this.boardSquares = this.parseFEN(fen);
       this.currentPlayer = fen.split(' ')[1] === 'w' ? 'white' : 'black';

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, NgZone, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { interval, Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -11,6 +11,7 @@ export class Timer implements OnInit, OnDestroy {
   @Input({ required: true }) isWhite: boolean = true;
   @Input({ required: true }) playerName: string = '';
   @Input({ required: true }) time: number = 0;
+  @Input({ required: true }) lastMoveTimestamp: number = 0;
   @Input({ required: true }) isActive: boolean = false;
 
   private destroy$ = new Subject<void>();
@@ -18,6 +19,17 @@ export class Timer implements OnInit, OnDestroy {
   timeRemaining: number = 0;
 
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['time'] || changes['isActive']) {
+      if (changes['isActive'] && changes['isActive'].currentValue === false) {
+        this.timeRemaining = this.time;
+      } else {
+        const delta = Date.now() - this.lastMoveTimestamp;
+        this.timeRemaining = this.time - (this.isActive ? delta : 0);
+      }
+    }
+  }
 
   ngOnInit() {
     this.timeRemaining = this.time;
