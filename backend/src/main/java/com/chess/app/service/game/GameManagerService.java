@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.chess.api.dto.response.game.player.GamePlayersDTO;
+import com.chess.api.dto.response.game.player.PlayerDTO;
+import com.chess.app.service.user.UserService;
 import com.chess.app.session.game.GameSession;
 import com.chess.app.session.game.GameSessionManager;
 import com.chess.domain.exception.game.InvalidGameActionException;
@@ -19,6 +22,14 @@ import lombok.AllArgsConstructor;
 public class GameManagerService {
 
     private final GameSessionManager sessionManager;
+    private final UserService userService;
+
+    public GamePlayersDTO getPlayersInGame(UUID gameId) {
+        GameSession game = sessionManager.getGameSessionById(gameId);
+        PlayerDTO whitePlayer = new PlayerDTO(game.getWhitePlayerId(), userService.getUsernameById(game.getWhitePlayerId()));
+        PlayerDTO blackPlayer = new PlayerDTO(game.getBlackPlayerId(), userService.getUsernameById(game.getBlackPlayerId()));
+        return new GamePlayersDTO(whitePlayer, blackPlayer);
+    }
 
     public Game getGameSessionById(UUID gameId) {
         return sessionManager.getGameSessionById(gameId).getGame();

@@ -54,6 +54,12 @@ public class UserService {
                 .toList();
     }
 
+    public String getUsernameById(UUID id) {
+        return userRepository.findById(id)
+                .map(UserEntity::getUsername)
+                .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
     public UserEntity getUserEntityById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

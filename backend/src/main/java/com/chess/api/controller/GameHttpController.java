@@ -64,6 +64,13 @@ public class GameHttpController {
         return ResponseEntity.created(location).body(new PendingGameDTO(pendingGame));
     }
 
+    @GetMapping("/{gameId}/players")
+    public ResponseEntity<?> getPlayersInGame(@PathVariable UUID gameId) {
+        var players = gameManagerService.getPlayersInGame(gameId);
+
+        return ResponseEntity.ok(players);
+    }
+
     @GetMapping("/{gameId}")
     public ResponseEntity<GameDTO> getGameSessionById(@PathVariable UUID gameId) {
         Game game = gameManagerService.getGameSessionById(gameId);
