@@ -1,3 +1,13 @@
+export interface IGamePlayersDTO {
+    whitePlayer: IPlayerDTO;
+    blackPlayer: IPlayerDTO;
+}
+
+export interface IPlayerDTO {
+    id: string;
+    name: string;
+}
+
 export interface IGameDTO {
     id: string;
 
