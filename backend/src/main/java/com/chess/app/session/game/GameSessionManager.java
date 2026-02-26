@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import com.chess.domain.event.GameAutoStartEvent;
 import com.chess.domain.event.GameFinishedEvent;
 import com.chess.domain.exception.game.GameSessionNotFoundException;
 import com.chess.domain.exception.game.PendingGameNotFoundException;
@@ -59,7 +60,8 @@ public class GameSessionManager {
             blackPlayerId = pendingGame.creatorId();
         }
 
-        GameSession gameSession = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId, pendingGame.gameId(), timerManager, this::onGameFinished);
+        GameSession gameSession = new GameSession(pendingGame.config(), whitePlayerId, blackPlayerId,
+            pendingGame.gameId(), timerManager, this::onGameFinished, this::onGameAutoStart);
         activeGames.put(pendingGame.gameId(), gameSession);
 
         return pendingGame;
@@ -107,6 +109,10 @@ public class GameSessionManager {
     private void onGameFinished(GameSession gameSession) {
         activeGames.remove(gameSession.getSessionId());
         applicationEventPublisher.publishEvent(new GameFinishedEvent(gameSession));
+    }
+
+    private void onGameAutoStart(GameSession gameSession) {
+        applicationEventPublisher.publishEvent(new GameAutoStartEvent(gameSession));
     }
 
 }
