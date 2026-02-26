@@ -1,35 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { appSettings } from '../../app.config';
-import { IGameDTO } from '../../shared/models/game.model';
+import { IGameDTO, IGamePlayersDTO } from '../../shared/models/game.model';
 import { IGameConfigDTO, IJoinGameRequest, IPendingGameDTO } from '../../shared/models/create-game.model';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class GameService {
+    private http = inject(HttpClient);
     private readonly API_URL = `${appSettings.API_URL}/games`;
 
-    constructor(private http: HttpClient) { }
+    createGame = (config: IGameConfigDTO) =>
+        this.http.post<IPendingGameDTO>(this.API_URL, config);
 
-    // POST /api/games
-    createGame(config: IGameConfigDTO): Observable<IPendingGameDTO> {
-        return this.http.post<IPendingGameDTO>(this.API_URL, config);
-    }
+    joinGame = (request: IJoinGameRequest) =>
+        this.http.post<IPendingGameDTO>(`${this.API_URL}/join`, request);
 
-    // POST /api/games/join
-    joinGame(request: IJoinGameRequest): Observable<IPendingGameDTO> {
-        return this.http.post<IPendingGameDTO>(`${this.API_URL}/join`, request);
-    }
+    getGameSession = (id: string) =>
+        this.http.get<IGameDTO>(`${this.API_URL}/${id}`);
 
-    // GET /api/games/{gameId}
-    getGameSession(gameId: string): Observable<IGameDTO> {
-        return this.http.get<IGameDTO>(`${this.API_URL}/${gameId}`);
-    }
+    getPendingGame = (id: string) =>
+        this.http.get<IPendingGameDTO>(`${this.API_URL}/pending/${id}`);
 
-    // GET /api/games/pending/{gameId}
-    getPendingGame(gameId: string): Observable<IPendingGameDTO> {
-        return this.http.get<IPendingGameDTO>(`${this.API_URL}/pending/${gameId}`);
-    }
+    getPlayersInGame = (id: string) =>
+        this.http.get<IGamePlayersDTO>(`${this.API_URL}/${id}/players`);
 }
