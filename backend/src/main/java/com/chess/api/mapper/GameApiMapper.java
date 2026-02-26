@@ -67,9 +67,17 @@ public class GameApiMapper {
     private static BoardDTO getBoardDTO(Game game) {
         Board board = game.getCurrentBoard();
         MoveResponse lastMove = getMoveDTO(game.getLastMove());
+        Map<String, List<String>> legalMoves;
+
+        if (game.getGameEndReason() != null) {
+            legalMoves = Map.of();
+        } else {
+            legalMoves = getLegalMoves(board);
+        }
+        
         return new BoardDTO(
             board.toFen(),
-            getLegalMoves(board),
+            legalMoves,
             lastMove);
     }
 
