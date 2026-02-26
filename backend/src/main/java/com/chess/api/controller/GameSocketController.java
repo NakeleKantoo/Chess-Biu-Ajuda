@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import com.chess.api.dto.request.game.MoveDTO;
-import com.chess.api.mapper.GameApiMapper;
 import com.chess.app.service.game.GameManagerService;
+import com.chess.app.service.game.GameNotificationService;
 import com.chess.domain.exception.player.PlayerNotInGameException;
 import com.chess.domain.model.base.Position;
 import com.chess.domain.model.game.Game;
@@ -25,7 +24,7 @@ import jakarta.validation.Valid;
 @Controller
 public class GameSocketController {
 
-    @Autowired private SimpMessagingTemplate messagingTemplate;
+    @Autowired private GameNotificationService gameNotificationService;
     @Autowired private GameManagerService gameManagerService;
     
     @MessageMapping("/game/{gameId}/move")
@@ -56,7 +55,7 @@ public class GameSocketController {
 
         Game game = gameManagerService.makeMove(from, to, promotionPiece, gameId, user.getId());
 
-        messagingTemplate.convertAndSend("/topic/game/" + gameId, GameApiMapper.toDTO(game, gameId));
+        gameNotificationService.notifyGameUpdate(game, gameId);
     }
 
     // Faça o mesmo ajuste para handleAction se necessário
@@ -74,7 +73,7 @@ public class GameSocketController {
         
         Game game = gameManagerService.performAction(action, gameId, user.getId());
 
-        messagingTemplate.convertAndSend("/topic/game/" + gameId, GameApiMapper.toDTO(game, gameId));
+        gameNotificationService.notifyGameUpdate(game, gameId);
     }
 
 }
