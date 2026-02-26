@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.chess.api.dto.response.game.base.BoardDTO;
 import com.chess.api.dto.response.game.base.ClockDTO;
-import com.chess.api.dto.response.game.base.MoveDTO;
+import com.chess.api.dto.response.game.base.MoveResponse;
 import com.chess.domain.model.game.GameEndReason;
 import com.chess.domain.model.game.GameState;
 
@@ -17,5 +17,5 @@ public record GameDTO(
     GameEndReason endReason,
 
     ClockDTO clock,
-    List<MoveDTO> moveHistory
+    List<MoveResponse> moveHistory
 ) {}

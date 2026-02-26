@@ -10,7 +10,7 @@ import com.chess.api.dto.request.game.GameConfigDTO;
 import com.chess.api.dto.response.game.GameDTO;
 import com.chess.api.dto.response.game.base.BoardDTO;
 import com.chess.api.dto.response.game.base.ClockDTO;
-import com.chess.api.dto.response.game.base.MoveDTO;
+import com.chess.api.dto.response.game.base.MoveResponse;
 import com.chess.app.service.move.MoveValidator;
 import com.chess.domain.model.base.Color;
 import com.chess.domain.model.board.Board;
@@ -59,14 +59,14 @@ public class GameApiMapper {
         GameState state = game.getGameState();
         GameEndReason endReason = game.getGameEndReason();
         ClockDTO clockDTO = getClockDTO(game);
-        List<MoveDTO> moveHistory = getMoveHistory(game.getMoveHistory());
+        List<MoveResponse> moveHistory = getMoveHistory(game.getMoveHistory());
 
         return new GameDTO(id, boardDTO, state, endReason, clockDTO, moveHistory);
     }
 
     private static BoardDTO getBoardDTO(Game game) {
         Board board = game.getCurrentBoard();
-        MoveDTO lastMove = getMoveDTO(game.getLastMove());
+        MoveResponse lastMove = getMoveDTO(game.getLastMove());
         return new BoardDTO(
             board.toFen(),
             getLegalMoves(board),
@@ -82,14 +82,14 @@ public class GameApiMapper {
         );
     }
 
-    private static MoveDTO getMoveDTO(Move move) {
+    private static MoveResponse getMoveDTO(Move move) {
         if (move == null) return null;
         String san = move.getSan();
         String uci = move.getUci();
-        return new MoveDTO(san, uci);
+        return new MoveResponse(san, uci);
     }
 
-    private static List<MoveDTO> getMoveHistory(List<Move> moveHistory) {
+    private static List<MoveResponse> getMoveHistory(List<Move> moveHistory) {
         return moveHistory.stream()
             .map(GameApiMapper::getMoveDTO)
             .toList();

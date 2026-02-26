@@ -10,7 +10,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
-import com.chess.api.dto.request.game.MoveDTO;
+import com.chess.api.dto.request.game.MoveRequest;
 import com.chess.app.service.game.GameManagerService;
 import com.chess.app.service.game.GameNotificationService;
 import com.chess.domain.exception.player.PlayerNotInGameException;
@@ -30,7 +30,7 @@ public class GameSocketController {
     @MessageMapping("/game/{gameId}/move")
     public void handleMove(
         @DestinationVariable UUID gameId,
-        @Payload @Valid MoveDTO moveDTO,
+        @Payload @Valid MoveRequest moveDTO,
         Principal principal // Alterado de @AuthenticationPrincipal UserDetailsImpl para Principal
     ) {
 

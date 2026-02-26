@@ -6,5 +6,5 @@ import java.util.Map;
 public record BoardDTO(
     String fen,
     Map<String, List<String>> legalMoves,
-    MoveDTO lastMove
+    MoveResponse lastMove
 ) {}
