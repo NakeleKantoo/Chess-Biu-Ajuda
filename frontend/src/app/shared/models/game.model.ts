@@ -22,6 +22,7 @@ export interface IGameDTO {
 export interface IBoardDTO {
     fen: string;
     legalMoves: Record<string, string[]>;
+    lastMove?: IMoveResponse;
 }
 
 export interface IClockDTO {

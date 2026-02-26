@@ -14,7 +14,6 @@ import { Promotion } from "./components/promotion/promotion";
 export class Board {
   @Input({required: true}) boardDTO!: IBoardDTO;
   @Input({required: false}) isFlipped: boolean = false;
-  @Input({required: false}) lastMove: {from: Position, to: Position} | null = null;
 
   @Output() move = new EventEmitter<IMoveRequest>();
 
@@ -135,10 +134,16 @@ export class Board {
   }
 
   isLastMove(row: number, col: number): boolean {
-    if (this.lastMove === null) return false;
-    const { from, to } = this.lastMove;
+    const lastMove = this.boardDTO.lastMove;
+    if (!lastMove) return false;
+    const { uci } = lastMove;
+
+    const from = Position.fromNotation(uci.substring(0, 2));
+    const to = Position.fromNotation(uci.substring(2, 4));
+
     const isFrom = from.row === row && from.col === col;
     const isTo = to.row === row && to.col === col;
+    
     return isFrom || isTo;
   }
 
