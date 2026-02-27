@@ -78,7 +78,9 @@ public class GameApiMapper {
         return new BoardDTO(
             board.toFen(),
             legalMoves,
-            lastMove);
+            lastMove,
+            board.getBoardState()
+        );
     }
 
     private static ClockDTO getClockDTO(Game game) {
