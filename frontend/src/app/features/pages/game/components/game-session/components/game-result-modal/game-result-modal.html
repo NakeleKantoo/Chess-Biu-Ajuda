@@ -1,0 +1,32 @@
+<div
+    class="game-result-modal position-fixed top-0 start-0 vw-100 vh-100 d-flex align-items-center justify-content-center z-3"
+    [class.closing]="isClosing">
+    <div class="card w-100 overflow-hidden m-3">
+        <div class="card__header container p-3">
+            <div class="row align-items-center">
+                <div class="col p-0 d-flex justify-content-center">
+                    <i class="bi fs-2" [class.bi-trophy-fill]="isWinner()" [class.bi-yin-yang]="isDraw()"
+                        [class.bi-hand-thumbs-down]="isLoser()" [class.bi-door-open]="isAborted()">
+                    </i>
+                </div>
+
+                <div class="col-8 p-0 text-center">
+                    <h4 class="m-0 fw-bold">{{ title() }}</h4>
+                    <p class="opacity-50 m-0 small">{{ subtitle() }}</p>
+                </div>
+
+                <div class="col p-0 d-flex justify-content-center">
+                    <button class="btn-close btn-close-white" (click)="onClose()"></button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body text-center">
+            <p class="m-0 opacity-75">{{ description() }}</p>
+        </div>
+        <div class="d-grid gap-2 my-3 px-3">
+            <button type="button" class="btn btn-primary btn-lg" (click)="goHome()">
+                Voltar ao Menu
+            </button>
+        </div>
+    </div>
+</div>

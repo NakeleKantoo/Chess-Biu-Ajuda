@@ -19,5 +19,13 @@
         />
     </div>
 
-    <!-- TODO: adicionar histórico de movimentos, botões para desistência e empate -->
+    @if (gameDTO.endReason && canModalOpen) {
+        <app-game-result-modal
+            [state]="gameDTO.state"
+            [endReason]="gameDTO.endReason"
+            [isWhite]="!isFlipped"
+            (close)="onModalClose()"
+            (home)="goHome()"
+        />
+    }
 </div>
