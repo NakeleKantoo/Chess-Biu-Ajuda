@@ -18,6 +18,9 @@
         @if (isLastMove) {
         <div class="highlight highlight-last_move position-absolute"></div>
         }
+        @if (isCheck) {
+        <div class="highlight highlight-check position-absolute"></div>
+        }
     </div>
     <ng-content></ng-content>
 </div>

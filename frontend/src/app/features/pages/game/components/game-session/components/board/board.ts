@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Square } from "./components/square/square";
 import { Piece } from "./components/piece/piece";
-import { IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
+import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
 
@@ -14,7 +14,6 @@ import { Promotion } from "./components/promotion/promotion";
 export class Board {
   @Input({required: true}) boardDTO!: IBoardDTO;
   @Input({required: false}) isFlipped: boolean = false;
-  @Input({required: false}) lastMove: {from: Position, to: Position} | null = null;
 
   @Output() move = new EventEmitter<IMoveRequest>();
 
@@ -135,11 +134,25 @@ export class Board {
   }
 
   isLastMove(row: number, col: number): boolean {
-    if (this.lastMove === null) return false;
-    const { from, to } = this.lastMove;
+    const lastMove = this.boardDTO.lastMove;
+    if (!lastMove) return false;
+    const { uci } = lastMove;
+
+    const from = Position.fromNotation(uci.substring(0, 2));
+    const to = Position.fromNotation(uci.substring(2, 4));
+
     const isFrom = from.row === row && from.col === col;
     const isTo = to.row === row && to.col === col;
+    
     return isFrom || isTo;
+  }
+
+  isCheck(row: number, col: number): boolean {
+    const position: Position = new Position(row, col);
+    const kingPosition = this.getPieceAtPosition(position);
+    const currentPlayerKing = this.currentPlayer === 'white' ? 'K' : 'k';
+    const isCheck = this.boardDTO.boardState === EBoardState.CHECK;
+    return kingPosition === currentPlayerKing && isCheck;
   }
 
   isPromotion(from: Position, to: Position): boolean {

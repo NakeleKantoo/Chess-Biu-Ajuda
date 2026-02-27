@@ -50,6 +50,7 @@ public class Game {
     public List<Board> getBoardHistory() { return Collections.unmodifiableList(boardHistory); }
     public long getTimeRemaining(Color color) { return chessClock.getTimeRemaining(color); }
     public long getLastMoveTimestamp() { return chessClock.getLastMoveTimestamp(); }
+    public Move getLastMove() { return moveHistory.isEmpty() ? null : moveHistory.getLast(); }
     public boolean isClockRunning() { return chessClock.isRunning(); }
     public GameState getGameState() { return gameState; }
     public GameEndReason getGameEndReason() { return gameEndReason; }

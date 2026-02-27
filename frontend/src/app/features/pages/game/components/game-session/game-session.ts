@@ -1,16 +1,20 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, SimpleChanges } from '@angular/core';
 import { IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
 import { Board } from "./components/board/board";
 import { Position } from '../../../../../shared/models/position.model';
 import { Timer } from './components/timer/timer';
+import { GameResultModal } from "./components/game-result-modal/game-result-modal";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game-session',
-  imports: [Board, Timer],
+  imports: [Board, Timer, GameResultModal],
   templateUrl: './game-session.html',
   styleUrl: './game-session.scss',
 })
 export class GameSession {
+  private router = inject(Router);
+
   @Input({ required: true }) gameDTO!: IGameDTO;
   @Input({ required: false }) isFlipped: boolean = false;
   @Input({ required: false }) gamePlayers: IGamePlayersDTO | null = null;
@@ -21,6 +25,8 @@ export class GameSession {
   lastMove: { from: Position, to: Position } | null = null;
   currentPlayer: 'white' | 'black' = 'white';
   isRunning: boolean = false;
+
+  canModalOpen: boolean = true;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['gameDTO'] && changes['gameDTO'].currentValue !== changes['gameDTO'].previousValue) {
@@ -65,6 +71,14 @@ export class GameSession {
 
   finishGame() {
     this.isRunning = false;
+  }
+
+  onModalClose() {
+    this.canModalOpen = false;
+  }
+
+  goHome() {
+    this.router.navigate(['/home']);
   }
 
 }

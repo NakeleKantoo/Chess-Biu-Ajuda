@@ -44,6 +44,10 @@ $square-size: 100px;
     &-last_move {
         background-color: rgba(yellow, 0.2);
     }
+
+    &-check {
+        background-color: rgba(red, 0.2);
+    }
 }
 
 p {

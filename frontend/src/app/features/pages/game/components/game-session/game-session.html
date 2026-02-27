@@ -8,7 +8,7 @@
             [lastMoveTimestamp]="lastMoveTimestamp"
         />
 
-        <app-board [boardDTO]="gameDTO.board" [lastMove]="lastMove" [isFlipped]="isFlipped" (move)="executeMove($event)" />
+        <app-board [boardDTO]="gameDTO.board" [isFlipped]="isFlipped" (move)="executeMove($event)" />
         
         <app-timer class="mt-3"
             [isWhite]="!isFlipped"
@@ -19,5 +19,13 @@
         />
     </div>
 
-    <!-- TODO: adicionar histórico de movimentos, botões para desistência e empate -->
+    @if (gameDTO.endReason && canModalOpen) {
+        <app-game-result-modal
+            [state]="gameDTO.state"
+            [endReason]="gameDTO.endReason"
+            [isWhite]="!isFlipped"
+            (close)="onModalClose()"
+            (home)="goHome()"
+        />
+    }
 </div>

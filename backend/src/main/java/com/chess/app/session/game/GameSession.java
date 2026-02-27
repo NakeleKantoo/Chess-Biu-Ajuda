@@ -32,18 +32,22 @@ public class GameSession {
     private Game game;
 
     private final GameTimerManager timerManager;
+
     private final Consumer<GameSession> onGameFinished;
+    private final Consumer<GameSession> onGameAutoStart;
 
     private final PlayersIDs playersIDs;
 
     private UUID drawOfferPlayerId;
 
-    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, UUID sessionId, GameTimerManager timerManager, Consumer<GameSession> onGameFinished) {
+    public GameSession(GameConfig config, UUID whitePlayerId, UUID blackPlayerId, UUID sessionId,
+            GameTimerManager timerManager, Consumer<GameSession> onGameFinished, Consumer<GameSession> onGameAutoStart) {
         this.game = GameBuilder.create(config.getGameType(), config.getTimeControl(), config.getStartingColor());
         this.playersIDs = new PlayersIDs(whitePlayerId, blackPlayerId);
         this.sessionId = sessionId;
         this.timerManager = timerManager;
         this.onGameFinished = onGameFinished;
+        this.onGameAutoStart = onGameAutoStart;
         this.scheduleAutoStart();
     }
 
@@ -177,6 +181,8 @@ public class GameSession {
 
         game.startClock();
         this.scheduleTimeout();
+
+        autoStart();
     }
 
     private synchronized void handleTimeout() {
@@ -206,6 +212,10 @@ public class GameSession {
     private void finishGame() {
         timerManager.cancelAllTimers(sessionId);
         onGameFinished.accept(this);
+    }
+
+    private void autoStart() {
+        onGameAutoStart.accept(this);
     }
 
 }
