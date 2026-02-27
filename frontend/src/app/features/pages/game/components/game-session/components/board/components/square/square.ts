@@ -16,6 +16,7 @@ export class Square {
   @Input({required: false}) isMove: boolean = false;
   @Input({required: false}) isCapture: boolean = false;
   @Input({required: false}) isLastMove: boolean = false;
+  @Input({required: false}) isCheck: boolean = false;
   
   @Output() squareClicked = new EventEmitter<Position>();
 

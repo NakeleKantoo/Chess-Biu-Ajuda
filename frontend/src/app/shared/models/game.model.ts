@@ -23,6 +23,7 @@ export interface IBoardDTO {
     fen: string;
     legalMoves: Record<string, string[]>;
     lastMove?: IMoveResponse;
+    boardState: EBoardState;
 }
 
 export interface IClockDTO {
@@ -36,6 +37,18 @@ export interface IClockDTO {
 export interface IMoveResponse {
     san: string;
     uci: string;
+}
+
+export enum EBoardState {
+    IN_PROGRESS = 'IN_PROGRESS',
+    CHECK = 'CHECK',
+    
+    CHECKMATE = 'CHECKMATE',
+    STALEMATE = 'STALEMATE',
+
+    DRAW_BY_INSUFFICIENT_MATERIAL = 'DRAW_BY_INSUFFICIENT_MATERIAL',
+    DRAW_BY_FIFTY_MOVE_RULE = 'DRAW_BY_FIFTY_MOVE_RULE',
+    DRAW_BY_THREEFOLD_REPETITION = 'DRAW_BY_THREEFOLD_REPETITION'
 }
 
 export enum EGameState {

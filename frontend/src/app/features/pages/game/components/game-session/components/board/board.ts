@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Square } from "./components/square/square";
 import { Piece } from "./components/piece/piece";
-import { IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
+import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
 
@@ -145,6 +145,14 @@ export class Board {
     const isTo = to.row === row && to.col === col;
     
     return isFrom || isTo;
+  }
+
+  isCheck(row: number, col: number): boolean {
+    const position: Position = new Position(row, col);
+    const kingPosition = this.getPieceAtPosition(position);
+    const currentPlayerKing = this.currentPlayer === 'white' ? 'K' : 'k';
+    const isCheck = this.boardDTO.boardState === EBoardState.CHECK;
+    return kingPosition === currentPlayerKing && isCheck;
   }
 
   isPromotion(from: Position, to: Position): boolean {
