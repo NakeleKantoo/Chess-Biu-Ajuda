@@ -1,7 +1,6 @@
-import { Component, EventEmitter, inject, Input, Output, SimpleChanges } from '@angular/core';
-import { IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { EGameEndReason, IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
 import { Board } from "./components/board/board";
-import { Position } from '../../../../../shared/models/position.model';
 import { Timer } from './components/timer/timer';
 import { GameResultModal } from "./components/game-result-modal/game-result-modal";
 import { Router } from '@angular/router';
@@ -15,35 +14,30 @@ import { Router } from '@angular/router';
 export class GameSession {
   private router = inject(Router);
 
-  @Input({ required: true }) gameDTO!: IGameDTO;
-  @Input({ required: false }) isFlipped: boolean = false;
-  @Input({ required: false }) gamePlayers: IGamePlayersDTO | null = null;
+  gameDTO = input.required<IGameDTO>();
+  isFlipped = input<boolean>(false);
+  gamePlayers = input<IGamePlayersDTO | null>(null);
 
-  @Output() move = new EventEmitter<IMoveRequest>();
-  @Output() action = new EventEmitter<string>();
+  move = output<IMoveRequest>();
+  action = output<string>();
 
-  lastMove: { from: Position, to: Position } | null = null;
-  currentPlayer: 'white' | 'black' = 'white';
-  isRunning: boolean = false;
+  canModalOpen = signal<boolean>(true);
 
-  canModalOpen: boolean = true;
+  currentPlayer = computed<'white' | 'black'>(() => {
+    const fen: string = this.gameDTO().board.fen;
+    return fen.split(' ')[1] === 'w' ? 'white' : 'black';
+  });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['gameDTO'] && changes['gameDTO'].currentValue !== changes['gameDTO'].previousValue) {
-      if (this.gameDTO.endReason) {
-        this.finishGame();
-      }
+  isRunning = computed<boolean>(() => {
+    return this.gameDTO().clock.isRunning;
+  });
 
-      const fen: string = this.gameDTO.board.fen;
-      this.currentPlayer = fen.split(' ')[1] === 'w' ? 'white' : 'black';
-      this.isRunning = this.gameDTO.clock.isRunning;
-    }
-  }
+  endReason = computed<EGameEndReason | null>(() => {
+    const endReason = this.gameDTO().endReason;
+    return endReason ? endReason : null;
+  });
 
   executeMove(moveRequest: IMoveRequest): void {
-    const from = Position.fromNotation(moveRequest.from);
-    const to = Position.fromNotation(moveRequest.to);
-    this.lastMove = { from: from, to: to };
     this.move.emit(moveRequest);
   }
 
@@ -52,29 +46,26 @@ export class GameSession {
   }
 
   isTimerActive(isWhite: boolean): boolean {
-    return this.isRunning && this.currentPlayer === (isWhite ? 'white' : 'black');
+    return this.isRunning() && this.currentPlayer() === (isWhite ? 'white' : 'black');
   }
 
   getTimerTime(isWhite: boolean): number {
-    return isWhite ? this.gameDTO.clock.whiteTimeRemaining : this.gameDTO.clock.blackTimeRemaining;
+    return isWhite ? this.gameDTO().clock.whiteTimeRemaining : this.gameDTO().clock.blackTimeRemaining;
   }
 
   getPlayerName(isWhite: boolean): string {
-    if (!this.gamePlayers) return isWhite ? 'White' : 'Black';
-    const player = isWhite ? this.gamePlayers.whitePlayer : this.gamePlayers.blackPlayer;
+    if (!this.gamePlayers()) return isWhite ? 'White' : 'Black';
+    const gamePlayers = this.gamePlayers() as IGamePlayersDTO;
+    const player = isWhite ? gamePlayers.whitePlayer : gamePlayers.blackPlayer;
     return player ? player.name : (isWhite ? 'White' : 'Black');
   }
 
-  get lastMoveTimestamp(): number {
-    return this.gameDTO.clock.lastMoveTimestamp;
-  }
-
-  finishGame() {
-    this.isRunning = false;
-  }
+  lastMoveTimestamp = computed<number>(() => {
+    return this.gameDTO().clock.lastMoveTimestamp;
+  });
 
   onModalClose() {
-    this.canModalOpen = false;
+    this.canModalOpen.set(false);
   }
 
   goHome() {
