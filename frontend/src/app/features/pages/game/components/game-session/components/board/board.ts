@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Square } from "./components/square/square";
-import { Piece } from "./components/piece/piece";
+import { BoardSymbol, Piece, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
@@ -17,7 +17,7 @@ export class Board {
 
   @Output() move = new EventEmitter<IMoveRequest>();
 
-  boardSquares: string[][] = [];
+  boardSquares: BoardSymbol = [];
   currentPlayer: 'white' | 'black' = 'white';
 
   currentPosition: Position | null = null;
@@ -46,22 +46,22 @@ export class Board {
     return new Position(row, col);
   }
 
-  getPieceAtPosition(position: Position): string {
+  getPieceAtPosition(position: Position): PieceSymbol | null {
     const row = this.boardSquares[position.row];
-    if (!row) return '';
-    return row[position.col] || '';
+    if (!row) return null;
+    return row[position.col] || null;
   }
 
-  parseFEN(fen: string): string[][] {
+  parseFEN(fen: string): BoardSymbol {
     const [position] = fen.split(' ');
     const rows = position.split('/');
     return rows.map(row => {
-      const squares: string[] = [];
+      const squares: PieceSymbol[] = [];
       for (const char of row) {
         if (isNaN(Number(char))) {
-          squares.push(char);
+          squares.push(char as PieceSymbol);
         } else {
-          squares.push(...Array(Number(char)).fill(''));
+          squares.push(...Array(Number(char)).fill(null));
         }
       }
       return squares;
@@ -103,7 +103,7 @@ export class Board {
     this.movePiece(this.currentPosition, position);
   }
 
-  movePiece(from: Position, to: Position, promotion?: string): void {
+  movePiece(from: Position, to: Position, promotion?: PieceSymbol): void {
     const moveRequest: IMoveRequest = {
       from: from.toNotation(),
       to: to.toNotation(),
@@ -163,8 +163,8 @@ export class Board {
     return isPawn && to.row === promotionRank;
   }
 
-  promote(pieceType: string): void {
-    this.movePiece(this.currentPosition!, this.promotionTarget!, pieceType);
+  promote(pieceSymbol: PieceSymbol): void {
+    this.movePiece(this.currentPosition!, this.promotionTarget!, pieceSymbol);
     this.closePromotionModal();
   }
 

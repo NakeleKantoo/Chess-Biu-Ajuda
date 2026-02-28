@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Square } from "../square/square";
 import { Position } from '../../../../../../../../../shared/models/position.model';
-import { Piece } from "../piece/piece";
+import { Piece, PieceSymbol } from "../piece/piece";
 
 @Component({
   selector: 'app-promotion',
@@ -12,14 +12,14 @@ import { Piece } from "../piece/piece";
 export class Promotion {
   @Input() color: 'white' | 'black' = 'white';
 
-  @Output() promotionSelected = new EventEmitter<string>();
+  @Output() promotionSelected = new EventEmitter<PieceSymbol>();
   @Output() promotionCancelled = new EventEmitter<void>();
 
-  private pieces: string[] = ['Q', 'R', 'B', 'N'];
+  private pieces: PieceSymbol[] = ['Q', 'R', 'B', 'N'];
 
-  get promotionPieces(): string[] {
+  get promotionPieces(): PieceSymbol[] {
     if (this.color === 'black') {
-      return this.pieces.map(piece => piece.toLowerCase());
+      return this.pieces.map(piece => piece.toLowerCase() as PieceSymbol);
     }
     return this.pieces;
   }
@@ -28,8 +28,8 @@ export class Promotion {
     return new Position(1, index + 1);
   }
 
-  selectPromotion(pieceType: string): void {
-    this.promotionSelected.emit(pieceType);
+  selectPromotion(pieceSymbol: PieceSymbol): void {
+    this.promotionSelected.emit(pieceSymbol);
   }
 
   cancelSelection(): void {
