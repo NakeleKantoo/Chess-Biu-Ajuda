@@ -1,13 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { Square } from "./components/square/square";
-import { BoardSymbol, Piece, PieceSymbol } from "./components/piece/piece";
+import { BoardSymbol, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
+import { SquareView } from '../../../../../../../shared/models/chess-view.model';
 
 @Component({
   selector: 'app-board',
-  imports: [Square, Piece, Promotion],
+  imports: [Square, Promotion],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
@@ -17,9 +18,21 @@ export class Board {
 
   move = output<IMoveRequest>();
 
-  boardSquares = computed<BoardSymbol>(() => {
-    const fen: string = this.boardDTO().fen;
-    return this.parseFEN(fen);
+  boardSymbol = computed<BoardSymbol>(() => {
+    return this.parseFEN(this.boardDTO().fen);
+  });
+
+  boardSquares = computed<SquareView[][]>(() => {
+    return this.boardSymbol().map((row, rowIndex) => {
+      return row.map((piece, colIndex) => ({
+        piece: piece,
+        position: this.getPosition(rowIndex, colIndex),
+        isMove: this.isMove(rowIndex, colIndex),
+        isCapture: this.isCapture(rowIndex, colIndex),
+        isLastMove: this.isLastMove(rowIndex, colIndex),
+        isCheck: this.isCheck(rowIndex, colIndex)
+      }));
+    });
   });
 
   currentPlayer = computed<'white' | 'black'>(() => {
@@ -49,7 +62,7 @@ export class Board {
   }
 
   getPieceAtPosition(position: Position): PieceSymbol | null {
-    const row = this.boardSquares()[position.row];
+    const row = this.boardSymbol()[position.row];
     if (!row) return null;
     return row[position.col] || null;
   }

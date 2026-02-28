@@ -11,20 +11,14 @@
     }
 @for (row of boardSquares(); track $index; let rowIndex = $index) {
     <div class="row" [class.flipped]="isFlipped()">
-    @for (piece of row; track $index; let colIndex = $index) {
+    @for (squareView of row; track $index; let colIndex = $index) {
         <app-square
         class="col p-0"
-        [position]="getPosition(rowIndex, colIndex)"
+        [squareView]="squareView"
         [pointer]="true"
-        (squareClicked)="onClick($event)"
         [isFlipped]="isFlipped()"
-        [isMove]="isMove(rowIndex, colIndex)"
-        [isCapture]="isCapture(rowIndex, colIndex)"
-        [isLastMove]="isLastMove(rowIndex, colIndex)"
-        [isCheck]="isCheck(rowIndex, colIndex)"
-    >
-        <app-piece [pieceSymbol]="piece" />
-    </app-square>
+        (squareClicked)="onClick($event)"
+    />
     }
     </div>
 }
