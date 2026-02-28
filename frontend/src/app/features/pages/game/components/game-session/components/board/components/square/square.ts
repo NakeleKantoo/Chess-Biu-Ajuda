@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Position } from '../../../../../../../../../shared/models/position.model';
+
+type file = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+type rank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 
 @Component({
   selector: 'app-square',
@@ -9,40 +12,43 @@ import { Position } from '../../../../../../../../../shared/models/position.mode
   styleUrl: './square.scss',
 })
 export class Square {
-  @Input({required: true}) position!: Position;
-  @Input({required: false}) pointer: boolean = true;
-  @Input({required: false}) isFlipped: boolean = false;
+  position = input.required<Position>();
+  pointer = input<boolean>(true);
+  isFlipped = input<boolean>(false);
 
-  @Input({required: false}) isMove: boolean = false;
-  @Input({required: false}) isCapture: boolean = false;
-  @Input({required: false}) isLastMove: boolean = false;
-  @Input({required: false}) isCheck: boolean = false;
-  
-  @Output() squareClicked = new EventEmitter<Position>();
+  isMove = input<boolean>(false);
+  isCapture = input<boolean>(false);
+  isLastMove = input<boolean>(false);
+  isCheck = input<boolean>(false);
 
-  get colLabel(): string {
-    const rowIndex = this.isFlipped ? 0 : 7;
-    if (this.position.row !== rowIndex) return '';
-    return String.fromCharCode(97 + this.position.col);
-  }
+  squareClicked = output<Position>();
 
-  get rowLabel(): string {
-    const colIndex = this.isFlipped ? 7 : 0;
-    if (this.position.col !== colIndex) return '';
-    return (8 - this.position.row).toString();
-  }
+  private readonly fileLabels: file[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
+  private readonly rankLabels: rank[] = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 
-  isLightSquare(): boolean {
-    const { row, col } = this.position;
+  colLabel = computed<file | null>(() => {
+    const rowIndex = this.isFlipped() ? 0 : 7;
+    if (this.position().row !== rowIndex) return null;
+    return this.fileLabels[this.position().col];
+  });
+
+  rowLabel = computed<rank | null>(() => {
+    const colIndex = this.isFlipped() ? 7 : 0;
+    if (this.position().col !== colIndex) return null;
+    return this.rankLabels[7 - this.position().row];
+  });
+
+  isLightSquare = computed<boolean>(() => {
+    const { row, col } = this.position();
     return (row + col) % 2 === 0;
-  }
+  });
 
-  isDarkSquare(): boolean {
+  isDarkSquare = computed<boolean>(() => {
     return !this.isLightSquare();
-  }
+  });
 
   onSquareClick(): void {
-    this.squareClicked.emit(this.position);
-  }
+    return this.squareClicked.emit(this.position());
+  };
 
 }
