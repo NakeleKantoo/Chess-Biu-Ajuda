@@ -58,7 +58,7 @@ export class Board {
   }
 
   getPosition(row: number, col: number): Position {
-    return new Position(row, col);
+    return Position.at(row, col);
   }
 
   getPieceAtPosition(position: Position): PieceSymbol | null {
@@ -96,7 +96,7 @@ export class Board {
     }
     const currentPosition = this.currentPosition() as Position;
 
-    if (position.equals(currentPosition)) {
+    if (position === currentPosition) {
       this.currentPosition.set(null);
       return;
     }
@@ -136,14 +136,14 @@ export class Board {
     const legalMoves = this.legalMoves()[this.currentPosition()!.toNotation()];
     if (!legalMoves) return false;
     
-    const position: Position = new Position(row, col);
+    const position: Position = Position.at(row, col);
     return legalMoves.includes(position.toNotation());
   }
 
   isCapture(row: number, col: number): boolean {
     if (!this.isMove(row, col)) return false;
 
-    const position: Position = new Position(row, col);
+    const position: Position = Position.at(row, col);
     const hasPiece: boolean = !!this.getPieceAtPosition(position);
   
     return hasPiece;
@@ -164,7 +164,7 @@ export class Board {
   }
 
   isCheck(row: number, col: number): boolean {
-    const position: Position = new Position(row, col);
+    const position: Position = Position.at(row, col);
     const kingPosition = this.getPieceAtPosition(position);
     const currentPlayerKing = this.currentPlayer() === 'white' ? 'K' : 'k';
     const isCheck = this.boardDTO().boardState === EBoardState.CHECK;

@@ -25,7 +25,7 @@ export class Promotion {
     
     return symbols.map((symbol, index) => ({
       piece: symbol,
-      position: new Position(1, index + 1),
+      position: Position.at(1, index + 1),
       isMove: false,
       isCapture: false,
       isLastMove: false,

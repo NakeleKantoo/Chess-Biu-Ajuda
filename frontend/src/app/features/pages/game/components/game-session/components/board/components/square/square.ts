@@ -20,15 +20,12 @@ export class Square {
 
   squareClicked = output<Position>();
 
-  private readonly fileLabels: file[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
-  private readonly rankLabels: rank[] = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
-
   colLabel = computed<file | null>(() => {
     const position = this.squareView().position;
     const rowIndex = this.isFlipped() ? 0 : 7;
     
     if (position.row !== rowIndex) return null;
-    return this.fileLabels[position.col];
+    return Position.FILES[position.col] as file;
   });
 
   rowLabel = computed<rank | null>(() => {
@@ -36,7 +33,7 @@ export class Square {
     const colIndex = this.isFlipped() ? 7 : 0;
 
     if (position.col !== colIndex) return null;
-    return this.rankLabels[7 - position.row];
+    return Position.RANKS[position.row] as rank;
   });
 
   isLightSquare = computed<boolean>(() => {
