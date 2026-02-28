@@ -5,8 +5,8 @@
         <app-timer class="mt-3" [timerView]="timersView()[1]" />
     </div>
 
-    @if (endReason() && canModalOpen()) {
-    <app-game-result-modal [state]="gameDTO().state" [endReason]="endReason()!" [isWhite]="!isFlipped()"
+    @if (gameDTO().endReason && canModalOpen()) {
+    <app-game-result-modal [state]="gameDTO().state" [endReason]="gameDTO().endReason!" [isWhite]="!isFlipped()"
         (close)="onModalClose()" (home)="goHome()" />
     }
 </div>

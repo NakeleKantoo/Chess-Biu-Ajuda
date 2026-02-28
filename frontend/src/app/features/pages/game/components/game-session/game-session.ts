@@ -5,6 +5,8 @@ import { Timer } from './components/timer/timer';
 import { GameResultModal } from "./components/game-result-modal/game-result-modal";
 import { Router } from '@angular/router';
 import { TimerView } from '../../../../../shared/models/chess-view.model';
+import { Clock } from '../../../../../shared/models/clock.model';
+import { GamePlayers } from '../../../../../shared/models/game-players.model';
 
 @Component({
   selector: 'app-game-session',
@@ -29,35 +31,30 @@ export class GameSession {
     return fen.split(' ')[1] === 'w' ? 'white' : 'black';
   });
 
-  endReason = computed<EGameEndReason | null>(() => {
-    const endReason = this.gameDTO().endReason;
-    return endReason ? endReason : null;
-  });
+  clock = computed(() => new Clock(this.gameDTO().clock));
+  players = computed(() => new GamePlayers(this.gamePlayers()));
 
   timersView = computed<TimerView[]>(() => {
-    const isTopWhite: boolean = this.isFlipped();
-    const isBottomWhite = !isTopWhite;
-    const gamePlayers = this.gamePlayers();
-    const clock = this.gameDTO().clock;
+    const clock = this.clock();
+    const players = this.players();
+    const isFlipped = this.isFlipped();
     const currentPlayer = this.currentPlayer();
 
     return [
-      {
-        isWhite: isTopWhite,
-        playerName: this.getPlayerName(isTopWhite, gamePlayers),
-        time: this.getTimerTime(isTopWhite, clock),
-        lastMoveTimestamp: clock.lastMoveTimestamp,
-        isActive: this.isTimerActive(clock.isRunning, isTopWhite, currentPlayer)
-      },
-      {
-        isWhite: isBottomWhite,
-        playerName: this.getPlayerName(isBottomWhite, gamePlayers),
-        time: this.getTimerTime(isBottomWhite, clock),
-        lastMoveTimestamp: clock.lastMoveTimestamp,
-        isActive: this.isTimerActive(clock.isRunning, isBottomWhite, currentPlayer)
-      }
+      this.createTimerView(!isFlipped, clock, players, currentPlayer),
+      this.createTimerView(isFlipped, clock, players, currentPlayer)
     ];
   });
+
+  private createTimerView(isWhite: boolean, clock: Clock, players: GamePlayers, current: 'white' | 'black'): TimerView {
+    return {
+      isWhite,
+      playerName: players.getName(isWhite),
+      time: clock.getTime(isWhite),
+      lastMoveTimestamp: clock.lastMoveTimestamp,
+      isActive: clock.isActive(isWhite, current)
+    };
+  }
 
   executeMove(moveRequest: IMoveRequest): void {
     this.move.emit(moveRequest);
@@ -65,23 +62,6 @@ export class GameSession {
 
   executeAction(action: string): void {
     this.action.emit(action);
-  }
-
-  isTimerActive(isRunning: boolean, isWhite: boolean, currentPlayer: 'white' | 'black'): boolean {
-    const player = isWhite ? 'white' : 'black';
-    return isRunning && currentPlayer === player;
-  }
-
-  getTimerTime(isWhite: boolean, clock: IClockDTO): number {
-    return isWhite ? clock.whiteTimeRemaining : clock.blackTimeRemaining;
-  }
-
-  getPlayerName(isWhite: boolean, gamePlayers: IGamePlayersDTO | null): string {
-    const defaultName = isWhite ? 'White' : 'Black';
-    if (!gamePlayers) return defaultName;
-
-    const player = isWhite ? gamePlayers.whitePlayer : gamePlayers.blackPlayer;
-    return player.name || defaultName;
   }
 
   onModalClose(): void {
