@@ -1,5 +1,5 @@
 <div class="promotion position-absolute d-flex flex-column align-items-center justify-content-start">
-    @for (item of promotionPieces; track $index) {
+    @for (item of promotionPieces(); track $index) {
         <app-square [position]="getPosition($index)" [pointer]="true" (squareClicked)="selectPromotion(item)">
             <app-piece [pieceSymbol]="item"></app-piece>
         </app-square>
