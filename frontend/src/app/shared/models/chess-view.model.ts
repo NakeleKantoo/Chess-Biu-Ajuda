@@ -9,3 +9,11 @@ export interface SquareView {
     isLastMove: boolean;
     isCheck: boolean;
 }
+
+export interface TimerView {
+    isWhite: boolean;
+    playerName: string;
+    time: number;
+    lastMoveTimestamp: number;
+    isActive: boolean;
+}

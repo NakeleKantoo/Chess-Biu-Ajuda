@@ -1,23 +1,12 @@
 <div class="game-session vh-100 vw-100 d-flex align-items-center justify-content-center">
     <div class="container__board d-flex align-items-center justify-content-center flex-column">
-        <app-timer class="mb-3"
-            [isWhite]="isFlipped()"
-            [playerName]="getPlayerName(isFlipped())"
-            [time]="getTimerTime(isFlipped())"
-            [isActive]="isTimerActive(isFlipped())"
-            [lastMoveTimestamp]="lastMoveTimestamp()" />
-
+        <app-timer class="mb-3" [timerView]="timersView()[0]" />
         <app-board [boardDTO]="gameDTO().board" [isFlipped]="isFlipped()" (move)="executeMove($event)" />
-
-        <app-timer class="mt-3" [isWhite]="!isFlipped()" [playerName]="getPlayerName(!isFlipped())"
-            [time]="getTimerTime(!isFlipped())" [isActive]="isTimerActive(!isFlipped())"
-            [lastMoveTimestamp]="lastMoveTimestamp()" />
-
+        <app-timer class="mt-3" [timerView]="timersView()[1]" />
     </div>
 
     @if (endReason() && canModalOpen()) {
     <app-game-result-modal [state]="gameDTO().state" [endReason]="endReason()!" [isWhite]="!isFlipped()"
         (close)="onModalClose()" (home)="goHome()" />
     }
-
 </div>

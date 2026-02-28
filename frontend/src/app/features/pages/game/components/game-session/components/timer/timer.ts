@@ -1,5 +1,6 @@
-import { Component, computed, effect, inject, input, NgZone, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, NgZone, OnDestroy, OnInit, signal, untracked } from '@angular/core';
 import { interval, Subject, takeUntil } from 'rxjs';
+import { TimerView } from '../../../../../../../shared/models/chess-view.model';
 
 @Component({
   selector: 'app-timer',
@@ -8,16 +9,15 @@ import { interval, Subject, takeUntil } from 'rxjs';
   styleUrl: './timer.scss',
 })
 export class Timer implements OnInit, OnDestroy {
-  private zone = inject(NgZone); // Injeção moderna (estilo Java Dependency Injection)
+  private zone = inject(NgZone);
 
-  isWhite = input.required<boolean>();
-  playerName = input.required<string>();
-  time = input.required<number>();
-  lastMoveTimestamp = input.required<number>();
-  isActive = input.required<boolean>();
+  timerView = input.required<TimerView>();
 
   timeRemaining = signal<number>(0);
 
+  isActive = computed(() => this.timerView().isActive);
+  isWhite = computed(() => this.timerView().isWhite)
+  playerName = computed(() => this.timerView().playerName);
   displayTime = computed(() => this.formatTime(this.timeRemaining()));
 
   private destroy$ = new Subject<void>();
@@ -25,15 +25,13 @@ export class Timer implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      const active = this.isActive();
-      const baseTime = this.time();
-      const lastMove = this.lastMoveTimestamp();
+      const { time, lastMoveTimestamp, isActive } = this.timerView();
 
-      if (!active) {
-        this.timeRemaining.set(baseTime);
+      if (!isActive) {
+        this.timeRemaining.set(time);
       } else {
-        const delta = Date.now() - lastMove;
-        this.timeRemaining.set(Math.max(0, baseTime - delta));
+        const delta = Date.now() - lastMoveTimestamp;
+        this.timeRemaining.set(Math.max(0, time - delta));
       }
     }, { allowSignalWrites: true });
   }

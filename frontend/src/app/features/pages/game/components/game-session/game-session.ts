@@ -1,9 +1,10 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { EGameEndReason, IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
+import { EGameEndReason, IClockDTO, IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
 import { Board } from "./components/board/board";
 import { Timer } from './components/timer/timer';
 import { GameResultModal } from "./components/game-result-modal/game-result-modal";
 import { Router } from '@angular/router';
+import { TimerView } from '../../../../../shared/models/chess-view.model';
 
 @Component({
   selector: 'app-game-session',
@@ -28,13 +29,34 @@ export class GameSession {
     return fen.split(' ')[1] === 'w' ? 'white' : 'black';
   });
 
-  isRunning = computed<boolean>(() => {
-    return this.gameDTO().clock.isRunning;
-  });
-
   endReason = computed<EGameEndReason | null>(() => {
     const endReason = this.gameDTO().endReason;
     return endReason ? endReason : null;
+  });
+
+  timersView = computed<TimerView[]>(() => {
+    const isTopWhite: boolean = this.isFlipped();
+    const isBottomWhite = !isTopWhite;
+    const gamePlayers = this.gamePlayers();
+    const clock = this.gameDTO().clock;
+    const currentPlayer = this.currentPlayer();
+
+    return [
+      {
+        isWhite: isTopWhite,
+        playerName: this.getPlayerName(isTopWhite, gamePlayers),
+        time: this.getTimerTime(isTopWhite, clock),
+        lastMoveTimestamp: clock.lastMoveTimestamp,
+        isActive: this.isTimerActive(clock.isRunning, isTopWhite, currentPlayer)
+      },
+      {
+        isWhite: isBottomWhite,
+        playerName: this.getPlayerName(isBottomWhite, gamePlayers),
+        time: this.getTimerTime(isBottomWhite, clock),
+        lastMoveTimestamp: clock.lastMoveTimestamp,
+        isActive: this.isTimerActive(clock.isRunning, isBottomWhite, currentPlayer)
+      }
+    ];
   });
 
   executeMove(moveRequest: IMoveRequest): void {
@@ -45,30 +67,28 @@ export class GameSession {
     this.action.emit(action);
   }
 
-  isTimerActive(isWhite: boolean): boolean {
-    return this.isRunning() && this.currentPlayer() === (isWhite ? 'white' : 'black');
+  isTimerActive(isRunning: boolean, isWhite: boolean, currentPlayer: 'white' | 'black'): boolean {
+    const player = isWhite ? 'white' : 'black';
+    return isRunning && currentPlayer === player;
   }
 
-  getTimerTime(isWhite: boolean): number {
-    return isWhite ? this.gameDTO().clock.whiteTimeRemaining : this.gameDTO().clock.blackTimeRemaining;
+  getTimerTime(isWhite: boolean, clock: IClockDTO): number {
+    return isWhite ? clock.whiteTimeRemaining : clock.blackTimeRemaining;
   }
 
-  getPlayerName(isWhite: boolean): string {
-    if (!this.gamePlayers()) return isWhite ? 'White' : 'Black';
-    const gamePlayers = this.gamePlayers() as IGamePlayersDTO;
+  getPlayerName(isWhite: boolean, gamePlayers: IGamePlayersDTO | null): string {
+    const defaultName = isWhite ? 'White' : 'Black';
+    if (!gamePlayers) return defaultName;
+
     const player = isWhite ? gamePlayers.whitePlayer : gamePlayers.blackPlayer;
-    return player ? player.name : (isWhite ? 'White' : 'Black');
+    return player.name || defaultName;
   }
 
-  lastMoveTimestamp = computed<number>(() => {
-    return this.gameDTO().clock.lastMoveTimestamp;
-  });
-
-  onModalClose() {
+  onModalClose(): void {
     this.canModalOpen.set(false);
   }
 
-  goHome() {
+  goHome(): void {
     this.router.navigate(['/home']);
   }
 
