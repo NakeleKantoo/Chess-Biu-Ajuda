@@ -1,11 +1,11 @@
 <div 
     class="timer card d-flex justify-content-between align-items-center flex-row px-5 py-3"
-    [class.active]="isActive">
+    [class.active]="isActive()">
     <div class="player fs-5">
-        <i class="bi" [class.bi-person]="!isWhite" [class.bi-person-fill]="isWhite"></i>
-        {{ playerName }}
+        <i class="bi" [class.bi-person]="!isWhite()" [class.bi-person-fill]="isWhite()"></i>
+        {{ playerName() }}
     </div>
     <div class="timer-display card px-2 fs-4 fw-bold">
-        {{ formatTime(timeRemaining) }}
+        {{ displayTime() }}
     </div>
 </div>

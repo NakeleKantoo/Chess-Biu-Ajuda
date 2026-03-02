@@ -1,28 +1,44 @@
 export class Position {
-    row: number;
-    col: number;
+    static readonly FILES = 'abcdefgh';
+    static readonly RANKS = '87654321';
 
-    constructor(row: number, col: number) {
-        this.row = row;
-        this.col = col;
+    private static readonly cache: Position[][] = this.createCache();
+
+    private constructor(
+        readonly row: number,
+        readonly col: number
+    ) {}
+
+    private static createCache(): Position[][] {
+        const cache: Position[][] = [];
+        for (let row = 0; row < 8; row++) {
+            const rowCache: Position[] = [];
+            for (let col = 0; col < 8; col++) {
+                rowCache.push(new Position(row, col));
+            }
+            cache.push(rowCache);
+        }
+        return cache;
+    }
+
+    static at(row: number, col: number): Position {
+        if (row < 0 || row > 7 || col < 0 || col > 7) {
+            throw new Error(`Posição inválida: (${row}, ${col})`);
+        }
+        return this.cache[row][col];
     }
 
     toNotation(): string {
-        const files = 'abcdefgh';
-        const ranks = '87654321';
-        return `${files[this.col]}${ranks[this.row]}`;
-    }
-
-    equals(other: Position): boolean {
-        return this.row === other.row && this.col === other.col;
+        return `${Position.FILES[this.col]}${Position.RANKS[this.row]}`;
     }
 
     static fromNotation(notation: string): Position {
-        const files = 'abcdefgh';
-        const ranks = '87654321';
-        const col = files.indexOf(notation[0]);
-        const row = ranks.indexOf(notation[1]);
-        return new Position(row, col);
+        const colIndex = Position.FILES.indexOf(notation[0]);
+        const rowIndex = Position.RANKS.indexOf(notation[1]);
+        if (colIndex === -1 || rowIndex === -1) {
+            throw new Error(`Notação inválida: ${notation}`);
+        }
+        return this.at(rowIndex, colIndex);
     }
 
     static fromUci(uci: string): { from: Position, to: Position } {

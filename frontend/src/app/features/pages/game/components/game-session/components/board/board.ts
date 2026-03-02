@@ -1,67 +1,82 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { Square } from "./components/square/square";
-import { Piece } from "./components/piece/piece";
+import { BoardSymbol, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
+import { SquareView } from '../../../../../../../shared/models/chess-view.model';
 
 @Component({
   selector: 'app-board',
-  imports: [Square, Piece, Promotion],
+  imports: [Square, Promotion],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
 export class Board {
-  @Input({required: true}) boardDTO!: IBoardDTO;
-  @Input({required: false}) isFlipped: boolean = false;
+  boardDTO = input.required<IBoardDTO>();
+  isFlipped = input<boolean>(false);
 
-  @Output() move = new EventEmitter<IMoveRequest>();
+  move = output<IMoveRequest>();
 
-  boardSquares: string[][] = [];
-  currentPlayer: 'white' | 'black' = 'white';
+  boardSymbol = computed<BoardSymbol>(() => {
+    return this.parseFEN(this.boardDTO().fen);
+  });
 
-  currentPosition: Position | null = null;
+  boardSquares = computed<SquareView[][]>(() => {
+    return this.boardSymbol().map((row, rowIndex) => {
+      return row.map((piece, colIndex) => ({
+        piece: piece,
+        position: this.getPosition(rowIndex, colIndex),
+        isMove: this.isMove(rowIndex, colIndex),
+        isCapture: this.isCapture(rowIndex, colIndex),
+        isLastMove: this.isLastMove(rowIndex, colIndex),
+        isCheck: this.isCheck(rowIndex, colIndex)
+      }));
+    });
+  });
+
+  currentPlayer = computed<'white' | 'black'>(() => {
+    const fen: string = this.boardDTO().fen;
+    return fen.split(' ')[1] === 'w' ? 'white' : 'black';
+  });
+
+  legalMoves = computed<Record<string, string[]>>(() => {
+    if (!this.canMove()) {
+      return {};
+    }
+    return this.boardDTO().legalMoves;
+  });
+
+  currentPosition = signal<Position | null>(null);
   
-  promotionModal: boolean = false;
-  promotionTarget: Position | null = null;
+  promotionModal = signal<boolean>(false);
+  promotionTarget = signal<Position | null>(null);
 
   get promotionColumn(): number {
-    if (!this.promotionTarget) return 0;
-    return this.promotionTarget.col;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['boardDTO'] && changes['boardDTO'].currentValue !== changes['boardDTO'].previousValue || changes['isFlipped']) {
-      const fen: string = this.boardDTO.fen;
-      this.boardSquares = this.parseFEN(fen);
-      this.currentPlayer = fen.split(' ')[1] === 'w' ? 'white' : 'black';
-
-      if (!this.canMove()) {
-        this.boardDTO.legalMoves = {};
-      }
-    }
+    if (!this.promotionTarget()) return 0;
+    return this.promotionTarget()?.col || 0;
   }
 
   getPosition(row: number, col: number): Position {
-    return new Position(row, col);
+    return Position.at(row, col);
   }
 
-  getPieceAtPosition(position: Position): string {
-    const row = this.boardSquares[position.row];
-    if (!row) return '';
-    return row[position.col] || '';
+  getPieceAtPosition(position: Position): PieceSymbol | null {
+    const row = this.boardSymbol()[position.row];
+    if (!row) return null;
+    return row[position.col] || null;
   }
 
-  parseFEN(fen: string): string[][] {
+  parseFEN(fen: string): BoardSymbol {
     const [position] = fen.split(' ');
     const rows = position.split('/');
     return rows.map(row => {
-      const squares: string[] = [];
+      const squares: PieceSymbol[] = [];
       for (const char of row) {
         if (isNaN(Number(char))) {
-          squares.push(char);
+          squares.push(char as PieceSymbol);
         } else {
-          squares.push(...Array(Number(char)).fill(''));
+          squares.push(...Array(Number(char)).fill(null));
         }
       }
       return squares;
@@ -69,72 +84,73 @@ export class Board {
   }
 
   onClick(position: Position): void {
-    if (this.promotionModal) {
+    if (this.promotionModal()) {
       this.closePromotionModal();
-      this.currentPosition = null;
+      this.currentPosition.set(null);
       return;
     }
 
-    if (this.currentPosition === null) {
-      this.currentPosition = position;
+    if (this.currentPosition() === null) {
+      this.currentPosition.set(position);
+      return;
+    }
+    const currentPosition = this.currentPosition() as Position;
+
+    if (position === currentPosition) {
+      this.currentPosition.set(null);
       return;
     }
 
-    if (position.equals(this.currentPosition)) {
-      this.currentPosition = null;
-      return;
-    }
-
-    const currentPositionNotation: string = this.currentPosition.toNotation();
+    const currentPositionNotation: string = currentPosition.toNotation();
     const targetPositionNotation: string = position.toNotation();
-    const legalMoves: string[] | undefined = this.boardDTO.legalMoves[currentPositionNotation];
+    const legalMoves: string[] | undefined = this.legalMoves()[currentPositionNotation];
 
     if (!legalMoves || !legalMoves.includes(targetPositionNotation)) {
-      this.currentPosition = position;
+      this.currentPosition.set(position);
       return;
     }
 
-    if (this.isPromotion(this.currentPosition, position)) {
-      this.promotionModal = true;
-      this.promotionTarget = position;
+    if (this.isPromotion(currentPosition, position)) {
+      this.promotionModal.set(true);
+      this.promotionTarget.set(position);
       return;
     }
 
-    this.movePiece(this.currentPosition, position);
+    this.movePiece(currentPosition, position);
   }
 
-  movePiece(from: Position, to: Position, promotion?: string): void {
+  movePiece(from: Position, to: Position, promotion?: PieceSymbol): void {
     const moveRequest: IMoveRequest = {
       from: from.toNotation(),
       to: to.toNotation(),
       promotion: promotion
     };
     this.move.emit(moveRequest);
-    this.currentPosition = null;
+    this.currentPosition.set(null);
   }
 
   isMove(row: number, col: number): boolean {
-    if (this.currentPosition === null) return false;
-    if (this.promotionTarget !== null) return false;
+    if (this.currentPosition() === null) return false;
+    if (this.promotionTarget() !== null) return false;
 
-    const legalMoves = this.boardDTO.legalMoves[this.currentPosition.toNotation()];
+    const legalMoves = this.legalMoves()[this.currentPosition()!.toNotation()];
     if (!legalMoves) return false;
     
-    const position: Position = new Position(row, col);
+    const position: Position = Position.at(row, col);
     return legalMoves.includes(position.toNotation());
   }
 
   isCapture(row: number, col: number): boolean {
     if (!this.isMove(row, col)) return false;
 
-    const position: Position = new Position(row, col);
+    const position: Position = Position.at(row, col);
     const hasPiece: boolean = !!this.getPieceAtPosition(position);
   
     return hasPiece;
   }
 
   isLastMove(row: number, col: number): boolean {
-    const lastMove = this.boardDTO.lastMove;
+    const lastMove = this.boardDTO().lastMove;
     if (!lastMove) return false;
     const { uci } = lastMove;
 
@@ -148,10 +164,10 @@ export class Board {
   }
 
   isCheck(row: number, col: number): boolean {
-    const position: Position = new Position(row, col);
+    const position: Position = Position.at(row, col);
     const kingPosition = this.getPieceAtPosition(position);
-    const currentPlayerKing = this.currentPlayer === 'white' ? 'K' : 'k';
-    const isCheck = this.boardDTO.boardState === EBoardState.CHECK;
+    const currentPlayerKing = this.currentPlayer() === 'white' ? 'K' : 'k';
+    const isCheck = this.boardDTO().boardState === EBoardState.CHECK;
     return kingPosition === currentPlayerKing && isCheck;
   }
 
@@ -163,19 +179,19 @@ export class Board {
     return isPawn && to.row === promotionRank;
   }
 
-  promote(pieceType: string): void {
-    this.movePiece(this.currentPosition!, this.promotionTarget!, pieceType);
+  promote(pieceSymbol: PieceSymbol): void {
+    this.movePiece(this.currentPosition()!, this.promotionTarget()!, pieceSymbol);
     this.closePromotionModal();
   }
 
   closePromotionModal(): void {
-    this.promotionModal = false;
-    this.promotionTarget = null;
+    this.promotionModal.set(false);
+    this.promotionTarget.set(null);
   }
 
   canMove(): boolean {
-    const isWhite: boolean = this.currentPlayer === 'white';
-    const isMyTurn: boolean = (isWhite && !this.isFlipped) || (!isWhite && this.isFlipped);
+    const isWhite: boolean = this.currentPlayer() === 'white';
+    const isMyTurn: boolean = (isWhite && !this.isFlipped()) || (!isWhite && this.isFlipped());
     return isMyTurn;
   }
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, computed, ElementRef, inject, output, signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -8,41 +8,37 @@ import { ReactiveFormsModule } from '@angular/forms';
   styleUrl: './join-game-form.scss',
 })
 export class JoinGameForm implements AfterViewInit {
-  @ViewChild('hiddenInput') inputElement!: ElementRef<HTMLInputElement>;
+  readonly inputElement = viewChild.required<ElementRef<HTMLInputElement>>('hiddenInput');
 
-  @Output() submit = new EventEmitter<string>();
+  submit = output<string>();
 
-  private cdRef = inject(ChangeDetectorRef);
-  
-  code: string = "";
-  isFocused: boolean = false;
+  code = signal<string>("");
+  isFocused = signal<boolean>(false);
+
+  isValid = computed<boolean>(() => { return this.code().length === 6; });
 
   onInput(event: any) {
     const val = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    this.code = val;
+    this.code.set(val);
     event.target.value = val;
 
     this.onSubmit();
   }
 
   onSubmit() {
-    if (this.isValid) {
-      this.submit.emit(this.code);
+    if (this.isValid()) {
+      this.submit.emit(this.code());
     }
-  }
-
-  get isValid(): boolean {
-    return this.code.length === 6;
   }
 
   ngAfterViewInit() {
     this.focusInput();
-    this.cdRef.detectChanges();
   }
 
   focusInput() {
-    if (this.inputElement) {
-      this.inputElement.nativeElement.focus();
+    const inputElement = this.inputElement();
+    if (inputElement) {
+      inputElement.nativeElement.focus();
     }
   }
 }

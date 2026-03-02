@@ -1,38 +1,44 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { Square } from "../square/square";
 import { Position } from '../../../../../../../../../shared/models/position.model';
-import { Piece } from "../piece/piece";
+import { PieceSymbol } from "../piece/piece";
+import { SquareView } from '../../../../../../../../../shared/models/chess-view.model';
 
 @Component({
   selector: 'app-promotion',
-  imports: [Square, Piece],
+  imports: [Square],
   templateUrl: './promotion.html',
   styleUrl: './promotion.scss',
 })
 export class Promotion {
-  @Input() color: 'white' | 'black' = 'white';
+  color = input<'white' | 'black'>('white');
 
-  @Output() promotionSelected = new EventEmitter<string>();
-  @Output() promotionCancelled = new EventEmitter<void>();
+  promotionSelected = output<PieceSymbol>();
+  promotionCancelled = output<void>();
 
-  private pieces: string[] = ['Q', 'R', 'B', 'N'];
+  private readonly pieces: PieceSymbol[] = ['Q', 'R', 'B', 'N'] as const;
 
-  get promotionPieces(): string[] {
-    if (this.color === 'black') {
-      return this.pieces.map(piece => piece.toLowerCase());
-    }
-    return this.pieces;
-  }
+  promotionSquares = computed<SquareView[]>(() => {
+    const symbols = this.color() === 'black' 
+      ? this.pieces.map(p => p.toLowerCase() as PieceSymbol) 
+      : this.pieces;
+    
+    return symbols.map((symbol, index) => ({
+      piece: symbol,
+      position: Position.at(1, index + 1),
+      isMove: false,
+      isCapture: false,
+      isLastMove: false,
+      isCheck: false
+    }));
+  });
 
-  getPosition(index: number): Position {
-    return new Position(1, index + 1);
-  }
-
-  selectPromotion(pieceType: string): void {
-    this.promotionSelected.emit(pieceType);
+  selectPromotion(pieceSymbol: PieceSymbol): void {
+    this.promotionSelected.emit(pieceSymbol);
   }
 
   cancelSelection(): void {
     this.promotionCancelled.emit();
   }
+
 }

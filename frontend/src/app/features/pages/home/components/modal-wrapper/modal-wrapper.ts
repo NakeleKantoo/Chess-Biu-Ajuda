@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 
 @Component({
   selector: 'app-modal-wrapper',
@@ -7,15 +7,19 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './modal-wrapper.scss',
 })
 export class ModalWrapper {
-  @Input({ required: false }) disabled = false;
-  @Input({ required: true }) type: 'join' | 'create' | null = null;
-  @Output() close = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<void>();
+  type = input.required<'join' | 'create' | null>();
+  disabled = input<boolean>(false);
 
-  isClosing = false;
+  close = output<void>();
+  submit = output<void>();
 
-  get title() {
-    switch (this.type) {
+  isClosing = signal<boolean>(false);
+
+  title = computed<string>(() => { return this.getTitle(this.type()); });
+  submitButtonText = computed<string>(() => { return this.getButtonText(this.type()); });
+
+  getTitle(type: 'join' | 'create' | null) {
+    switch (type) {
       case 'join':
         return 'Entrar na Partida';
       case 'create':
@@ -25,8 +29,8 @@ export class ModalWrapper {
     }
   }
 
-  get submitButtonText() {
-    switch (this.type) {
+  getButtonText(type: 'join' | 'create' | null) {
+    switch (type) {
       case 'join':
         return 'Entrar';
       case 'create':
@@ -37,15 +41,16 @@ export class ModalWrapper {
   }
 
   onClose() {
-    this.isClosing = true;
+    this.isClosing.set(true);
     
     setTimeout(() => {
+      this.isClosing.set(false);
       this.close.emit();
-      this.isClosing = false;
     }, 200); 
   }
 
   onSubmit() {
     this.submit.emit();
   }
+
 }

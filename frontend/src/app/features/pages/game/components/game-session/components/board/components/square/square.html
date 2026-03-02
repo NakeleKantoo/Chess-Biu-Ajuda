@@ -1,26 +1,23 @@
-<div class="square position-relative"
-    [class.light]="isLightSquare()"
-    [class.dark]="isDarkSquare()"
-    [class.pointer]="pointer"
-    (click)="onSquareClick()"
->
+<div class="square position-relative" [class.light]="isLightSquare()" [class.dark]="isDarkSquare()"
+    [class.pointer]="pointer()" (click)="onSquareClick()">
     <div class="square__label w-100 h-100 position-absolute">
-        <p class="row position-absolute top-0 start-0 ps-1"
-        >{{ rowLabel }}</p>
-        <p class="col position-absolute bottom-0 end-0 pe-1">{{ colLabel }}</p>
+        @if (rowLabel()) {<p class="row position-absolute top-0 start-0 ps-1">{{ rowLabel() }}</p>}
+        @if (colLabel()) {<p class="col position-absolute bottom-0 end-0 pe-1">{{ colLabel() }}</p>}
     </div>
     <div class="w-100 h-100 position-absolute d-flex align-items-center justify-content-center">
-        @if (isCapture) {
+        @if (squareView().isCapture) {
         <div class="highlight highlight-capture position-absolute"></div>
-        } @else if (isMove) {
+        } @else if (squareView().isMove) {
         <div class="highlight highlight-move position-absolute"></div>
         }
-        @if (isLastMove) {
+        @if (squareView().isLastMove) {
         <div class="highlight highlight-last_move position-absolute"></div>
         }
-        @if (isCheck) {
+        @if (squareView().isCheck) {
         <div class="highlight highlight-check position-absolute"></div>
         }
     </div>
-    <ng-content></ng-content>
+    @if (squareView().piece) {
+    <app-piece [pieceSymbol]="squareView().piece" />
+    }
 </div>

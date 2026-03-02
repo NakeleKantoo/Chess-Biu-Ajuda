@@ -1,48 +1,52 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Position } from '../../../../../../../../../shared/models/position.model';
+import { Piece } from '../piece/piece';
+import { SquareView } from '../../../../../../../../../shared/models/chess-view.model';
+
+type file = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+type rank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 
 @Component({
   selector: 'app-square',
-  imports: [CommonModule],
+  imports: [CommonModule, Piece],
   templateUrl: './square.html',
   styleUrl: './square.scss',
 })
 export class Square {
-  @Input({required: true}) position!: Position;
-  @Input({required: false}) pointer: boolean = true;
-  @Input({required: false}) isFlipped: boolean = false;
+  squareView = input.required<SquareView>();
+  pointer = input<boolean>(true);
+  isFlipped = input<boolean>(false);
 
-  @Input({required: false}) isMove: boolean = false;
-  @Input({required: false}) isCapture: boolean = false;
-  @Input({required: false}) isLastMove: boolean = false;
-  @Input({required: false}) isCheck: boolean = false;
-  
-  @Output() squareClicked = new EventEmitter<Position>();
+  squareClicked = output<Position>();
 
-  get colLabel(): string {
-    const rowIndex = this.isFlipped ? 0 : 7;
-    if (this.position.row !== rowIndex) return '';
-    return String.fromCharCode(97 + this.position.col);
-  }
+  colLabel = computed<file | null>(() => {
+    const position = this.squareView().position;
+    const rowIndex = this.isFlipped() ? 0 : 7;
+    
+    if (position.row !== rowIndex) return null;
+    return Position.FILES[position.col] as file;
+  });
 
-  get rowLabel(): string {
-    const colIndex = this.isFlipped ? 7 : 0;
-    if (this.position.col !== colIndex) return '';
-    return (8 - this.position.row).toString();
-  }
+  rowLabel = computed<rank | null>(() => {
+    const position = this.squareView().position;
+    const colIndex = this.isFlipped() ? 7 : 0;
 
-  isLightSquare(): boolean {
-    const { row, col } = this.position;
-    return (row + col) % 2 === 0;
-  }
+    if (position.col !== colIndex) return null;
+    return Position.RANKS[position.row] as rank;
+  });
 
-  isDarkSquare(): boolean {
+  isLightSquare = computed<boolean>(() => {
+    const position = this.squareView().position;
+    return (position.row + position.col) % 2 === 0;
+  });
+
+  isDarkSquare = computed<boolean>(() => {
     return !this.isLightSquare();
-  }
+  });
 
   onSquareClick(): void {
-    this.squareClicked.emit(this.position);
-  }
+    this.squareClicked.emit(this.squareView().position);
+  };
 
 }

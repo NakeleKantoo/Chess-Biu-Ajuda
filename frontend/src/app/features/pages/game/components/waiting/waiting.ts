@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, inject, Input } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IPendingGameDTO } from '../../../../../shared/models/create-game.model';
+import { ETimeControl, IPendingGameDTO } from '../../../../../shared/models/create-game.model';
 
 @Component({
   selector: 'app-waiting',
@@ -9,31 +9,27 @@ import { IPendingGameDTO } from '../../../../../shared/models/create-game.model'
   styleUrl: './waiting.scss',
 })
 export class Waiting {
-  @Input({ required: true }) pendingGame!: IPendingGameDTO;
-  private cdRef = inject(ChangeDetectorRef);
+  pendingGame = input.required<IPendingGameDTO>();
 
-  copyText = 'Copiar Código';
-  copyIconClass = 'bi bi-copy pe-2';
+  timeControl = computed<ETimeControl>(() => { return this.pendingGame().config.timeControl; });
+  gameCode = computed<string>(() => { return this.pendingGame().gameCode; });
 
-  getCode(index: number): string {
-    return this.pendingGame.gameCode[index] || '';
+  copyText = signal<string>('Copiar Código');
+  copyIconClass = signal<string>('bi bi-copy pe-2');
+  
+  timeControlLabel = computed<string>(() => { return this.getTimeControlLabel(this.timeControl()); });
+
+  copyToClipboard(): void {
+    const code = this.pendingGame().gameCode;
+    if (!code) return;
+
+    navigator.clipboard.writeText(code).then(() => {
+      this.copyText.set('Código Copiado!');
+      this.copyIconClass.set('bi bi-check-lg pe-2');
+    });
   }
 
-  copyToClipboard() {
-    const code = this.pendingGame.gameCode;
-
-    if (code) {
-      navigator.clipboard.writeText(code).then(() => {
-        this.copyText = 'Código Copiado!';
-        this.copyIconClass = 'bi bi-check-lg pe-2';
-        this.cdRef.detectChanges();
-      });
-    }
-  }
-
-  getTimeControlLabel(): string {
-    if (!this.pendingGame) return '---';
-    const timeControl = this.pendingGame.config.timeControl;
+  getTimeControlLabel(timeControl: ETimeControl): string {
     switch (timeControl) {
       case 'BULLET':
         return '1 min';

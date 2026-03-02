@@ -6,12 +6,12 @@
 
     <input #hiddenInput type="text" maxlength="6" id="code-input"
         class="real-input position-absolute top-0 left-0 w-100 h-100 opacity-0" (input)="onInput($event)"
-        (focus)="isFocused = true" (blur)="isFocused = false" autocomplete="off" autofocus />
+        (focus)="isFocused.set(true)" (blur)="isFocused.set(false)" autocomplete="off" autofocus />
 
     <div class="code-display d-flex gap-2 justify-content-center pb-3" (click)="focusInput()">
         @for (i of [0,1,2,3,4,5]; track i) {
-        <div class="code-box btn btn-secondary" [class.active]="isFocused && code.length === i" [class.filled]="code.length > i">
-            {{ code[i] || '' }}
+        <div class="code-box btn btn-secondary" [class.active]="isFocused() && code().length === i" [class.filled]="code().length > i">
+            {{ code()[i] || '' }}
         </div>
         }
     </div>
