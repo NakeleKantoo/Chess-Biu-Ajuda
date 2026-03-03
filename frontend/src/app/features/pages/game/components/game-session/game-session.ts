@@ -41,8 +41,8 @@ export class GameSession {
     const currentPlayer = this.currentPlayer();
 
     return [
-      this.createTimerView(!isFlipped, clock, players, currentPlayer),
-      this.createTimerView(isFlipped, clock, players, currentPlayer)
+      this.createTimerView(isFlipped, clock, players, currentPlayer),
+      this.createTimerView(!isFlipped, clock, players, currentPlayer)
     ];
   });
 
