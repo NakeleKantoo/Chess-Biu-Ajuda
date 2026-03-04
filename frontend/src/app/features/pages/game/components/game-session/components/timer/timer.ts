@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, NgZone, OnDestroy, OnInit, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, NgZone, OnDestroy, OnInit, signal } from '@angular/core';
 import { interval, Subject, takeUntil } from 'rxjs';
 import { TimerView } from '../../../../../../../shared/models/chess-view.model';
 
@@ -14,7 +14,8 @@ export class Timer implements OnInit, OnDestroy {
   timerView = input.required<TimerView>();
 
   timeRemaining = signal<number>(0);
-
+  
+  lastMoveTimestamp = computed<number>(() => this.timerView().lastMoveTimestamp);
   isActive = computed(() => this.timerView().isActive);
   isWhite = computed(() => this.timerView().isWhite)
   playerName = computed(() => this.timerView().playerName);
@@ -25,14 +26,7 @@ export class Timer implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      const { time, lastMoveTimestamp, isActive } = this.timerView();
-
-      if (!isActive) {
-        this.timeRemaining.set(time);
-      } else {
-        const delta = Date.now() - lastMoveTimestamp;
-        this.timeRemaining.set(Math.max(0, time - delta));
-      }
+      this.timeRemaining.set(this.timerView().time);
     }, { allowSignalWrites: true });
   }
 
@@ -42,7 +36,10 @@ export class Timer implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe(() => {
           if (this.isActive() && this.timeRemaining() > 0) {
-            this.timeRemaining.update(v => v - this.TICK_MS);
+            const delta = Date.now() - this.lastMoveTimestamp();
+            if (delta > 10) {
+              this.timeRemaining.update(v => v - this.TICK_MS);
+            }
           }
         });
     });
