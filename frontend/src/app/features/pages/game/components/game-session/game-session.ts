@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { EGameEndReason, IClockDTO, IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
+import { GameAction, EGameEndReason, IClockDTO, IGameDTO, IGamePlayersDTO, IMoveRequest } from '../../../../../shared/models/game.model';
 import { Board } from "./components/board/board";
 import { Timer } from './components/timer/timer';
 import { GameResultModal } from "./components/game-result-modal/game-result-modal";
@@ -7,10 +7,11 @@ import { Router } from '@angular/router';
 import { TimerView } from '../../../../../shared/models/chess-view.model';
 import { Clock } from '../../../../../shared/models/clock.model';
 import { GamePlayers } from '../../../../../shared/models/game-players.model';
+import { Actions } from './components/actions/actions';
 
 @Component({
   selector: 'app-game-session',
-  imports: [Board, Timer, GameResultModal],
+  imports: [Board, Timer, GameResultModal, Actions],
   templateUrl: './game-session.html',
   styleUrl: './game-session.scss',
 })
@@ -22,7 +23,7 @@ export class GameSession {
   gamePlayers = input<IGamePlayersDTO | null>(null);
 
   move = output<IMoveRequest>();
-  action = output<string>();
+  action = output<GameAction>();
 
   canModalOpen = signal<boolean>(true);
 
@@ -60,7 +61,7 @@ export class GameSession {
     this.move.emit(moveRequest);
   }
 
-  executeAction(action: string): void {
+  executeAction(action: GameAction): void {
     this.action.emit(action);
   }
 

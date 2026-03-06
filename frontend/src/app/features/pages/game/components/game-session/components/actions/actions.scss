@@ -1,0 +1,12 @@
+.actions {
+    min-width: 232px;
+    height: 100%;
+
+    &__top {
+        overflow: hidden;
+
+        &-title {
+            font-weight: 500;
+        }
+    }
+}
