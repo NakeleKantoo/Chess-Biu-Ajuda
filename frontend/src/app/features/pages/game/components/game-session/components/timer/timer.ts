@@ -15,7 +15,6 @@ export class Timer implements OnInit, OnDestroy {
 
   timeRemaining = signal<number>(0);
   
-  lastMoveTimestamp = computed<number>(() => this.timerView().lastMoveTimestamp);
   isActive = computed(() => this.timerView().isActive);
   isWhite = computed(() => this.timerView().isWhite)
   playerName = computed(() => this.timerView().playerName);
@@ -23,10 +22,12 @@ export class Timer implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private readonly TICK_MS = 10;
+  private lastTickTimestamp = Date.now();
 
   constructor() {
     effect(() => {
       this.timeRemaining.set(this.timerView().time);
+      this.lastTickTimestamp = Date.now();
     }, { allowSignalWrites: true });
   }
 
@@ -35,11 +36,12 @@ export class Timer implements OnInit, OnDestroy {
       interval(this.TICK_MS)
         .pipe(takeUntil(this.destroy$))
         .subscribe(() => {
+          const now = Date.now();
+          const elapsed = now - this.lastTickTimestamp;
+          this.lastTickTimestamp = now;
+
           if (this.isActive() && this.timeRemaining() > 0) {
-            const delta = Date.now() - this.lastMoveTimestamp();
-            if (delta > 10) {
-              this.timeRemaining.update(v => v - this.TICK_MS);
-            }
+            this.timeRemaining.update(v => Math.max(0, v - elapsed));
           }
         });
     });
