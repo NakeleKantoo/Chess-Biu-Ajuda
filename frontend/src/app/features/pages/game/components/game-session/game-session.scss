@@ -1,0 +1,17 @@
+@use "scss/variables" as *;
+
+.container__game-session {
+    gap: 2rem;
+}
+.container__actions {
+    width: 80vmin;
+}
+
+@media (min-width: 992px) {
+    .container__game-session {
+        gap: 1rem;
+    }
+    .container__actions {
+        width: 100%;       
+    }
+}
