@@ -7,3 +7,12 @@ $secondary-bg:   #192331; // Azul escuro/Marinho (Secundário)
 $success-fg:     #238636; // Verde GitHub
 $light-square:   #d8cbb6; // Quadrados claros
 $dark-square:    #364659; // Azul escuro para quadrados
+
+
+:root {
+    --square-size: 12vmin;
+
+    @media (min-width: 768px) {
+        --square-size: 10vmin;
+    }
+}

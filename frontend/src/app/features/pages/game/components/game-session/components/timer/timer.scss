@@ -1,8 +1,7 @@
 @use "scss/variables" as *;
-@use "../board/components/square/square.scss" as *;
 
 .timer {
-    width: calc($square-size * 8);
+    width: calc(var(--square-size) * 8);
     border-color: rgba($border-default, 0.5);
     
     &.active {

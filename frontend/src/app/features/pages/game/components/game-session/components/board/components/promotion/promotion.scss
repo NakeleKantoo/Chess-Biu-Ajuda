@@ -1,5 +1,4 @@
 @use "scss/variables" as *;
-@use "../square/square.scss" as *;
 
 $promotion-square-bg: $border-default;
 
@@ -27,12 +26,12 @@ $promotion-square-bg: $border-default;
     top: 0;
     left: 0;
     width: 100%;
-    height: calc($square-size * 4.5);
+    height: calc(var(--square-size) * 4.5);
 }
 
 .btn {
     background-color: $canvas-default !important;
-    height: calc($square-size * 0.5);
+    height: calc(var(--square-size) * 0.5);
     border-radius: 0%;
     border: none !important;
 
