@@ -1,0 +1,20 @@
+<div
+    class="draw-offer-modal position-fixed top-0 start-0 vw-100 vh-100 d-flex align-items-center justify-content-center z-3"
+    [class.closing]="isClosing">
+    <div class="card w-100 m-3">
+        <div class="card__header d-flex align-items-center justify-content-center position-relative p-3">
+            <h4 class="m-0 fw-bold text-center">Oferta de Empate</h4>
+            <div class="col p-0 d-flex justify-content-center position-absolute end-0 top-0 p-2">
+                <button class="btn-close btn-close-white" (click)="onDecline()"></button>
+            </div>
+        </div>
+        <div class="gap-2 p-3 d-flex w-100">
+            <button type="button" class="btn btn-primary btn-lg w-100" (click)="onAccept()">
+                Aceitar
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg w-100" (click)="onDecline()">
+                Recusar
+            </button>
+        </div>
+    </div>
+</div>

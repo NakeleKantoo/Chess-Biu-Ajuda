@@ -28,6 +28,7 @@ export class Game implements OnInit, OnDestroy {
   private authService = inject(AuthService);
 
   game = this.wsService.game;
+  drawOffer = this.wsService.drawOffer;
   pendingGame = signal<IPendingGameDTO | null>(null);
   gamePlayers = signal<IGamePlayersDTO | null>(null);
   currentUser = signal<any>(null);
@@ -117,12 +118,15 @@ export class Game implements OnInit, OnDestroy {
 
   executeMove(moveRequest: IMoveRequest): void {
     const id = this.game()?.id;
-    if (id) this.wsService.sendMove(id, moveRequest);
+    if (!id) return;
+    this.drawOffer.set(null);
+    this.wsService.sendMove(id, moveRequest);
   }
 
   executeAction(action: string): void {
     const id = this.game()?.id;
-    if (id) this.wsService.sendAction(id, action);
+    if (!id) return;
+    this.wsService.sendAction(id, action);
   }
 
   ngOnDestroy(): void {

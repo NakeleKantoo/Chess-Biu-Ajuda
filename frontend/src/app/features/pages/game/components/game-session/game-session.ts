@@ -8,10 +8,11 @@ import { TimerView } from '../../../../../shared/models/chess-view.model';
 import { Clock } from '../../../../../shared/models/clock.model';
 import { GamePlayers } from '../../../../../shared/models/game-players.model';
 import { Actions } from './components/actions/actions';
+import { DrawOfferModal } from "./components/draw-offer-modal/draw-offer-modal";
 
 @Component({
   selector: 'app-game-session',
-  imports: [Board, Timer, GameResultModal, Actions],
+  imports: [Board, Timer, GameResultModal, Actions, DrawOfferModal],
   templateUrl: './game-session.html',
   styleUrl: './game-session.scss',
 })
@@ -19,13 +20,15 @@ export class GameSession {
   private router = inject(Router);
 
   gameDTO = input.required<IGameDTO>();
+  drawOffer = input<string | null>(null);
   isFlipped = input<boolean>(false);
   gamePlayers = input<IGamePlayersDTO | null>(null);
 
   move = output<IMoveRequest>();
   action = output<GameAction>();
 
-  canModalOpen = signal<boolean>(true);
+  canEndModalOpen = signal<boolean>(true);
+  canDrawOfferModalOpen = signal<boolean>(true);
 
   currentPlayer = computed<'white' | 'black'>(() => {
     const fen: string = this.gameDTO().board.fen;
@@ -59,14 +62,24 @@ export class GameSession {
 
   executeMove(moveRequest: IMoveRequest): void {
     this.move.emit(moveRequest);
+    this.canDrawOfferModalOpen.set(true);
   }
 
   executeAction(action: GameAction): void {
     this.action.emit(action);
   }
 
-  onModalClose(): void {
-    this.canModalOpen.set(false);
+  onEndModalClose(): void {
+    this.canEndModalOpen.set(false);
+  }
+
+  onDrawOfferAccept(): void {
+    this.executeAction('accept-draw');
+    this.canDrawOfferModalOpen.set(false);
+  }
+
+  onDrawOfferDecline(): void {
+    this.canDrawOfferModalOpen.set(false);
   }
 
   goHome(): void {

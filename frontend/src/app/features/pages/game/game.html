@@ -2,10 +2,11 @@
     @if (game()) {
         <app-game-session 
             [gameDTO]="game()!" 
+            [drawOffer]="drawOffer()"
             [gamePlayers]="gamePlayers()"
             [isFlipped]="isFlipped()" 
             (move)="executeMove($event)" 
-            (action)="executeAction($event)" />
+            (action)="executeAction($event)"/>
     } 
     @else if (pendingGame()) {
         <app-waiting [pendingGame]="pendingGame()!" />

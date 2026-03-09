@@ -39,10 +39,21 @@ public class GameManagerService {
         return sessionManager.getPendingGameById(gameId);
     }
 
+    public String getOpponentUsername(UUID gameId, UUID userId) {
+        GameSession session = sessionManager.getGameSessionById(gameId);
+        UUID opponentId = session.getOpponentId(userId);
+        return userService.getUsernameById(opponentId);
+    }
+
     public Game makeMove(Position from, Position to, Piece promotionPiece, UUID gameId, UUID userId) {
         GameSession session = sessionManager.getGameSessionById(gameId);
 
         return session.makeMove(from, to, promotionPiece, userId);
+    }
+
+    public Game offerDraw(UUID gameId, UUID userId) {
+        GameSession session = sessionManager.getGameSessionById(gameId);
+        return session.offerDraw(userId);
     }
 
     public Game performAction(String action, UUID gameId, UUID userId) {
@@ -50,9 +61,6 @@ public class GameManagerService {
 
         Game game;
         switch (action.toLowerCase()) {
-            case "offer-draw":
-                game = session.offerDraw(userId);
-                break;
             case "resign":
                 game = session.resign(userId);
                 break;

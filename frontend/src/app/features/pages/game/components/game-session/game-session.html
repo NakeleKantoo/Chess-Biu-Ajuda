@@ -10,8 +10,12 @@
         </div>
     </div>
 
-    @if (gameDTO().endReason && canModalOpen()) {
+    @if (gameDTO().endReason && canEndModalOpen()) {
     <app-game-result-modal [state]="gameDTO().state" [endReason]="gameDTO().endReason!" [isWhite]="!isFlipped()"
-        (close)="onModalClose()" (home)="goHome()" />
+        (close)="onEndModalClose()" (home)="goHome()" />
+    }
+
+    @if (drawOffer() && canDrawOfferModalOpen()) {
+        <app-draw-offer-modal [drawOffer]="drawOffer()!" (accept)="onDrawOfferAccept()" (decline)="onDrawOfferDecline()" />
     }
 </div>

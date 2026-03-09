@@ -60,6 +60,9 @@ public class GameSession {
     public UUID getSessionId() { return sessionId; }
     public UUID getWhitePlayerId() { return playersIDs.white(); }
     public UUID getBlackPlayerId() { return playersIDs.black(); }
+    public UUID getOpponentId(UUID playerId) {
+        return PlayerSessionValidator.getOpponentId(playerId, playersIDs);
+    }
 
     private record MoveResult(Move move, Board nextBoard) {}
 
@@ -149,11 +152,7 @@ public class GameSession {
     public Game offerDraw(UUID offeringDrawPlayerId) {
         validateActiveGame();
 
-        if (drawOfferMatchesOpponent(offeringDrawPlayerId)) {
-            acceptDraw(offeringDrawPlayerId);
-        } else {
-            this.drawOfferPlayerId = offeringDrawPlayerId;
-        }
+        this.drawOfferPlayerId = offeringDrawPlayerId;
 
         return game;
     }
