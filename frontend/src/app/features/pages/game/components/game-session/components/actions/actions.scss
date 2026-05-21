@@ -1,0 +1,18 @@
+.actions {
+    min-width: 248px;
+    height: 100%;
+
+    &__top {
+        flex: 1;
+        overflow-y: hidden;
+
+        &-title {
+            font-weight: 500;
+        }
+    }
+
+    &__history {
+        flex: 1;
+        overflow-y: auto;
+    }
+}

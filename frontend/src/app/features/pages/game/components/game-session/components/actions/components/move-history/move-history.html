@@ -1,0 +1,11 @@
+<div class="move-history p-4">
+    @for (move of moves(); track $index) {
+        <div class="move d-flex flex-row lh-lg">
+            <span>{{ ($index + 1) + '.' | sanPad:4 }}&nbsp;</span>
+            <span>{{ move.firstMove.san | sanPad:8 }}&nbsp;</span>
+            @if (move.secondMove) {
+            <span>{{ move.secondMove.san | sanPad:8 }}</span>
+            }
+        </div>
+    }
+</div>

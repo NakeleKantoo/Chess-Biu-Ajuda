@@ -1,0 +1,18 @@
+<div class="actions card w-100 h-100 d-flex flex-column align-items-center justify-content-between">
+    <div class="actions__top w-100 d-flex flex-column">
+        <p class="actions__top-title border-bottom w-100 text-center p-3 fs-5 m-0"> Histórico de Lances</p>
+        <app-move-history class="actions__history" [moveHistory]="moveHistory()" />
+    </div>
+    <span class="w-100 border-top">
+        <div class="actions__bottom p-3 container">
+            <div class="row">
+                <div class="col px-2">
+                    <button class="btn btn-primary w-100" (click)="onAction('offer-draw')">Empate</button>
+                </div>
+                <div class="col px-2">
+                    <button class="btn btn-secondary w-100" (click)="onAction('resign')">Desistir</button>
+                </div>
+            </div>
+        </div>
+    </span>
+</div>

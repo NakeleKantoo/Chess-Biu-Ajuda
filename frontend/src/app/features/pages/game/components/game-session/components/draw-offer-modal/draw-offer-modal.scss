@@ -1,0 +1,49 @@
+@use "scss/variables" as *;
+
+.draw-offer-modal {
+    background-color: rgba(0, 0, 0, 0.5);
+
+    animation: fadeIn 0.2s ease-out;
+
+    &.closing {
+        animation: fadeOut 0.2s ease-in forwards;
+        
+        & .card {
+            animation: scaleOut 0.2s ease-in forwards;
+        }
+    }
+}
+
+.card {
+    border: none;
+    max-width: 400px;
+
+    &__header {
+        background-color: rgba($secondary-bg, 0.8);
+    }
+
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// Animação de Saída do Fundo
+@keyframes fadeOut {
+    from { opacity: 1; backdrop-filter: blur(8px); }
+    to { opacity: 0; backdrop-filter: blur(0); }
+}
+
+// Animação de Saída do Card (diminuindo)
+@keyframes scaleOut {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(0.95); opacity: 0; }
+}

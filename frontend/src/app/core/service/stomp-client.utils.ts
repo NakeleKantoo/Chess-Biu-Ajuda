@@ -6,6 +6,7 @@ export const topicSettings = {
     DESTINATION_PREFIX: '/app/game/',
     TOPIC_PREFIX: '/topic/game/',
     ERROR_TOPIC: '/user/queue/errors',
+    DRAW_OFFER_TOPIC: '/user/queue/draw-offers'
 };
 
 export function createClient(socket: WebSocket, token: string): Client {
@@ -23,6 +24,13 @@ export function onGameUpdate(msg: IMessage, game: WritableSignal<IGameDTO | null
     }
 }
 
+export function onDrawOfferUpdate(msg: IMessage, drawOffer: WritableSignal<string | null>): void {
+    if (msg.body) {
+        const drawOfferData = msg.body;
+        drawOffer.set(drawOfferData);
+    }
+}
+
 export function onErrorUpdate(msg: IMessage, error: WritableSignal<string | null>): void {
     if (msg.body) {
         const errorMsg = JSON.parse(msg.body).message || 'Erro desconhecido';
@@ -31,12 +39,14 @@ export function onErrorUpdate(msg: IMessage, error: WritableSignal<string | null
     }
 }
 
-export function connectClient(stompClient: Client, gameId: string, game: WritableSignal<IGameDTO | null>, error: WritableSignal<string | null>): void {
+
+export function connectClient(stompClient: Client, gameId: string, game: WritableSignal<IGameDTO | null>, error: WritableSignal<string | null>, drawOffer: WritableSignal<string | null>): void {
     if (!stompClient) return;
 
     stompClient.onConnect = () => {
         stompClient?.subscribe(`${topicSettings.TOPIC_PREFIX}${gameId}`, (msg) => onGameUpdate(msg, game));
         stompClient?.subscribe(topicSettings.ERROR_TOPIC, (msg) => onErrorUpdate(msg, error));
+        stompClient?.subscribe(topicSettings.DRAW_OFFER_TOPIC, (msg) => onDrawOfferUpdate(msg, drawOffer));
     };
 
     stompClient.activate();

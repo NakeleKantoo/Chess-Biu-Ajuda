@@ -78,3 +78,5 @@ export interface IMoveRequest {
     to: string;
     promotion?: string;
 }
+
+export type GameAction = 'resign' | 'offer-draw' | 'accept-draw' | 'abort';

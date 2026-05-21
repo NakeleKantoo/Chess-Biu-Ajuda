@@ -1,0 +1,20 @@
+@use "scss/variables" as *;
+
+.container__game-session {
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.container__actions {
+    width: calc(var(--square-size) * 8);
+}
+
+@media (min-width: $game-session-wrap) {
+    .container__game-session {
+        gap: 1rem;
+        flex-wrap: nowrap;
+    }
+    .container__actions {
+        width: 100%;
+        height: calc(var(--square-size) * 8 + 112px + 2rem);
+    }
+}

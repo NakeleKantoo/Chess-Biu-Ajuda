@@ -1,11 +1,9 @@
 @use "scss/variables" as *;
 
-$square-size: 100px;
-
 .square {
-    width: $square-size;
-    height: $square-size;
-    font-size: $square-size * 0.2;
+    width: var(--square-size);
+    height: var(--square-size);
+    font-size: calc(var(--square-size) * 0.2);
 
     &.light {
         color: $dark-square;

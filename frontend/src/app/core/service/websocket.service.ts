@@ -11,6 +11,7 @@ export class WebSocketService {
 
     game = signal<IGameDTO | null>(null);
     error = signal<string | null>(null);
+    drawOffer = signal<string | null>(null);
 
     connect(gameId: string, token: string): void {
         disconnectClient(this.stompClient);
@@ -18,7 +19,7 @@ export class WebSocketService {
         const socket = new SockJS(appSettings.WS_URL);
         this.stompClient = createClient(socket, token);
 
-        connectClient(this.stompClient, gameId, this.game, this.error);
+        connectClient(this.stompClient, gameId, this.game, this.error, this.drawOffer);
     }
 
     disconnect(): void {
@@ -44,6 +45,7 @@ export class WebSocketService {
     clearState(): void {
         this.game.set(null);
         this.error.set(null);
+        this.drawOffer.set(null);
     }
 
 }

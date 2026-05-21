@@ -58,6 +58,22 @@ public class GameSocketController {
         gameNotificationService.notifyGameUpdate(game, gameId);
     }
 
+    @MessageMapping("/game/{gameId}/offer-draw")
+    public void handleDrawOffer(
+        @DestinationVariable UUID gameId,
+        Principal principal
+    ) {
+        if (principal == null) {
+            throw new PlayerNotInGameException(null);
+        }
+        UserDetailsImpl user = (UserDetailsImpl) ((Authentication) principal).getPrincipal();
+        
+        gameManagerService.offerDraw(gameId, user.getId());
+
+        String opponentUsername = gameManagerService.getOpponentUsername(gameId, user.getId());
+        gameNotificationService.notifyDrawOffer(opponentUsername);
+    }
+
     // Faça o mesmo ajuste para handleAction se necessário
     @MessageMapping("/game/{gameId}/{action}")
     public void handleAction(

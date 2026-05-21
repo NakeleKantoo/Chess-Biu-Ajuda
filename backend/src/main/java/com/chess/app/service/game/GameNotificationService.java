@@ -19,7 +19,11 @@ public class GameNotificationService {
         messagingTemplate.convertAndSend("/topic/game/" + gameId, dto);
     }
 
-    public void notifyError(UUID gameId, String message) {
-        messagingTemplate.convertAndSend("/topic/game/" + gameId + "/errors", message);
-    }
+    public void notifyDrawOffer(String opponentUsername) {
+    messagingTemplate.convertAndSendToUser(
+        opponentUsername, 
+        "/queue/draw-offers", 
+        "Oferta de empate recebida!"
+    );
+}
 }
