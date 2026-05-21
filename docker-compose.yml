@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      # Exemplo de variáveis de ambiente do Spring
+      - SPRING_PROFILES_ACTIVE=prod
+      # - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/chess
+    # depends_on:
+    #   - db
+    networks:
+      - chess-network
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - chess-network
+
+# Exemplo caso precise de um banco de dados relacional
+#   db:
+#     image: postgres:15-alpine
+#     environment:
+#       - POSTGRES_DB=chess
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=postgres
+#     ports:
+#       - "5432:5432"
+#     networks:
+#       - chess-network
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
+
+networks:
+  chess-network:
+    driver: bridge
+
+# volumes:
+#   pgdata:
