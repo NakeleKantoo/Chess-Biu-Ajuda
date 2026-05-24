@@ -20,7 +20,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         
         // Origem do Front-end Angular
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of("https://leonnaviegas.dev.br"));
         
         // Headers permitidos (Content-Type, Authorization, etc)
         config.setAllowedHeaders(Arrays.asList(
