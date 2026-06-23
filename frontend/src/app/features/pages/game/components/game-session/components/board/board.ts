@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { Square } from "./components/square/square";
 import { BoardSymbol, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
@@ -52,6 +52,19 @@ export class Board {
   
   promotionModal = signal<boolean>(false);
   promotionTarget = signal<Position | null>(null);
+
+  accessibilityAnnouncement = computed<string>(() => {
+    const board = this.boardDTO();
+    const color = this.currentPlayer() === 'white' ? 'Brancas' : 'Pretas';
+    
+    if (board.lastMove == null) return `Jogo iniciado. ${color} jogam.`;
+    
+    const inverseColor = this.currentPlayer() === 'white' ? 'Pretas' : 'Brancas';
+    const lastMove = board.lastMove.san;
+    const check = board.boardState === EBoardState.CHECK ? ', xeque' : '';
+
+    return `Movimento das ${inverseColor}: ${lastMove}, ${color} jogam${check}.`; ;
+  });
 
   get promotionColumn(): number {
     if (!this.promotionTarget()) return 0;
