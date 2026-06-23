@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, ElementRef, input, output, viewChild } from '@angular/core';
 
 @Component({
   selector: 'app-draw-offer-modal',
@@ -7,6 +7,13 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './draw-offer-modal.scss',
 })
 export class DrawOfferModal {
+  dialogRef = viewChild<ElementRef<HTMLDialogElement>>('dialogElement');
+
+  ngAfterViewInit() {
+    // Abre como Modal nativo. Isso BLOQUEIA todo o resto do site automaticamente!
+    this.dialogRef()?.nativeElement.showModal();
+  }
+  
   drawOffer = input.required<string>();
 
   accept = output<void>();
