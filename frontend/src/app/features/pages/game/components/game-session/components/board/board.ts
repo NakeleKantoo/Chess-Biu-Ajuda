@@ -27,6 +27,7 @@ export class Board {
       return row.map((piece, colIndex) => ({
         piece: piece,
         position: this.getPosition(rowIndex, colIndex),
+        isSelected: this.isSelected(rowIndex, colIndex),
         isMove: this.isMove(rowIndex, colIndex),
         isCapture: this.isCapture(rowIndex, colIndex),
         isLastMove: this.isLastMove(rowIndex, colIndex),
@@ -127,6 +128,11 @@ export class Board {
     };
     this.move.emit(moveRequest);
     this.currentPosition.set(null);
+  }
+
+  isSelected(row: number, col: number): boolean {
+    if (this.currentPosition() == null) return false;
+    return this.currentPosition()!.row === row && this.currentPosition()!.col === col;
   }
 
   isMove(row: number, col: number): boolean {

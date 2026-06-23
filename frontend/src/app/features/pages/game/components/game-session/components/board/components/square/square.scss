@@ -27,6 +27,10 @@
     width: 100%;
     height: 100%;
 
+    &-selected, &-last_move {
+        background-color: rgba(yellow, 0.2);
+    }
+
     &-move {
         width: calc(100% * 0.32);
         height: calc(100% * 0.32);
@@ -37,10 +41,6 @@
     &-capture {
         border-radius: 50%;
         border: 5px solid rgba(black, 0.2);
-    }
-
-    &-last_move {
-        background-color: rgba(yellow, 0.2);
     }
 
     &-check {
