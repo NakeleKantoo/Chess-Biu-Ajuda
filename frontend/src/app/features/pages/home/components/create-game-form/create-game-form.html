@@ -1,76 +1,100 @@
 <form class="create-game-form d-flex flex-column">
-    <div class="game-type py-3 px-4">
-        <small class="opacity-75 ms-2">TIPO DE PARTIDA</small>
-        <div class="row mt-2 m-0 gap-5">
+    <fieldset class="game-type py-3 px-4">
+        <legend class="opacity-75 ms-2 small" aria-label="Selecionar Tipo de Partida:">TIPO DE PARTIDA</legend>
+        <div class="row mt-2 m-0 gap-5" role="group" aria-label="Selecionar Tipo de Partida">
             <button type="button" class="btn btn-secondary col"
+                role="radio"
+                [attr.aria-checked]="selectedGameType() === 'STANDARD'"
                 [class.active]="selectedGameType() === 'STANDARD'"
-                (click)="selectGameType('STANDARD')">
+                (click)="selectGameType('STANDARD')"
+                autofocus    
+            >
                 <i class="bi bi-trophy me-2"></i> Normal
             </button>
             <button type="button" class="btn btn-secondary col btn-disabled"
-                [disabled]="true"
+                role="radio"
+                [attr.aria-checked]="selectedGameType() === 'CHESS960'"
                 [class.active]="selectedGameType() === 'CHESS960'"
-                (click)="selectGameType('CHESS960')">
+                (click)="selectGameType('CHESS960')"
+                [disabled]="true"
+                >
                 <i class="bi bi-shuffle me-2"></i> Chess960
             </button>
         </div>
-    </div>
-    <div class="time-control border-top py-3 px-4">
-        <small class="opacity-75 ms-2">CONTROLE DE TEMPO</small>
-        <div class="row gap-2 mt-2 m-0">
+    </fieldset>
+    <fieldset class="time-control border-top py-3 px-4">
+        <legend class="opacity-75 ms-2 small">CONTROLE DE TEMPO</legend>
+        <div class="row gap-2 mt-2 m-0" role="group" aria-label="Selecionar Controle de Tempo">
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedTimeControl() === 'BULLET'"
                 [class.active]="selectedTimeControl() === 'BULLET'"
                 (click)="selectTimeControl('BULLET')"
             >
                 <i class="bi bi-fire"></i> <span>Bullet</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedTimeControl() === 'BLITZ'"
                 [class.active]="selectedTimeControl() === 'BLITZ'"
                 (click)="selectTimeControl('BLITZ')"
             >
                 <i class="bi bi-lightning-charge-fill"></i> <span>Blitz</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedTimeControl() === 'RAPID'"
                 [class.active]="selectedTimeControl() === 'RAPID'"
                 (click)="selectTimeControl('RAPID')"
             >
                 <i class="bi bi-clock-history"></i> <span>Rápida</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedTimeControl() === 'CLASSICAL'"
                 [class.active]="selectedTimeControl() === 'CLASSICAL'"
                 (click)="selectTimeControl('CLASSICAL')"
             >
                 <i class="bi bi-hourglass-split"></i> <span>Clássica</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedTimeControl() === 'CUSTOM'"
                 [class.active]="selectedTimeControl() === 'CUSTOM'"
                 (click)="selectTimeControl('CUSTOM')"
+                [disabled]="true"
             >
                 <i class="bi bi-sliders"></i> <span>Custom.</span>
             </button>
         </div>
-    </div>
-    <div class="color-preference border-top py-3 px-4">
-        <small class="opacity-75 ms-2">COR</small>
-        <div class="row gap-2 mt-2 m-0">
+    </fieldset>
+    <fieldset class="color-preference border-top py-3 px-4">
+        <legend class="opacity-75 ms-2 small">COR</legend>
+        <div class="row gap-2 mt-2 m-0" role="group" aria-label="Selecionar Cor">
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedColorPreference() === 'WHITE'"
                 [class.active]="selectedColorPreference() === 'WHITE'"
                 (click)="selectColorPreference('WHITE')"
             >
                 <i class="bi bi-circle"></i> <span>Brancas</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedColorPreference() === 'RANDOM'"
                 [class.active]="selectedColorPreference() === 'RANDOM'"
                 (click)="selectColorPreference('RANDOM')"
             >
                 <i class="bi bi-circle-half"></i> <span>Aleatório</span>
             </button>
             <button type="button" class="col btn btn-secondary d-flex flex-column p-3"
+                role="radio"
+                [attr.aria-checked]="selectedColorPreference() === 'BLACK'"
                 [class.active]="selectedColorPreference() === 'BLACK'"
                 (click)="selectColorPreference('BLACK')"
             >
                 <i class="bi bi-circle-fill"></i> <span>Pretas</span>
             </button>
         </div>
-    </div>
+    </fieldset>
 </form>
