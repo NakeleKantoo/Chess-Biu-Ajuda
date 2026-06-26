@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { Header } from "../../components/header/header";
@@ -22,6 +22,15 @@ export class Home {
   private router = inject(Router);
 
   activeModal: 'create' | 'join' | null = null;
+
+  isAuthenticated: boolean = this.authService.isAuthenticated;
+
+  @ViewChild('pageTitle')
+  pageTitle!: ElementRef<HTMLHeadingElement>;
+
+  ngAfterViewInit() {
+    this.pageTitle.nativeElement.focus();
+  }
 
   createGame(gameConfig: IGameConfigDTO) {
     const pendingGameDTO: Observable<IPendingGameDTO> = this.gameService.createGame(gameConfig);
