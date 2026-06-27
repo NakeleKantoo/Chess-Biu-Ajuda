@@ -1,10 +1,11 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ETimeControl, IPendingGameDTO } from '../../../../../shared/models/create-game.model';
+import { AuthNavigateButton } from "../../../../auth/components/auth-navigate-button/auth-navigate-button";
 
 @Component({
   selector: 'app-waiting',
-  imports: [RouterLink],
+  imports: [RouterLink, AuthNavigateButton],
   templateUrl: './waiting.html',
   styleUrl: './waiting.scss',
 })
