@@ -1,10 +1,11 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { Square } from "./components/square/square";
 import { BoardSymbol, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
 import { SquareView } from '../../../../../../../shared/models/chess-view.model';
+import { AriaAnnouncerService } from '../../../../../../../core/service/announcer.service';
 
 @Component({
   selector: 'app-board',
@@ -13,6 +14,38 @@ import { SquareView } from '../../../../../../../shared/models/chess-view.model'
   styleUrl: './board.scss',
 })
 export class Board {
+  private announcer = inject(AriaAnnouncerService);
+
+  // Remove accessibilityAnnouncement = computed(...)
+  // Adiciona rastreio do último lance anunciado para evitar duplicatas
+  private lastAnnouncedMove = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const board = this.boardDTO();
+      const lastMove = board.lastMove;
+
+      // Só anuncia se houve um lance novo (evita anúncio no carregamento inicial
+      // e em re-renders sem mudança de lance)
+      if (!lastMove) return;
+
+      const moveKey = lastMove.uci; // identificador único do lance
+      if (moveKey === this.lastAnnouncedMove()) return;
+
+      this.lastAnnouncedMove.set(moveKey);
+
+      const color = this.currentPlayer() === 'white' ? 'Brancas' : 'Pretas';
+      const inverseColor = this.currentPlayer() === 'white' ? 'Pretas' : 'Brancas';
+      const check = board.boardState === EBoardState.CHECK ? ', xeque' : '';
+
+      const message = `Movimento das ${inverseColor}: ${lastMove.san}${check}. Vez das ${color}.`;
+      
+      // Lances são polite: não interrompem leitura em curso
+      this.announcer.announce(message, 'polite');
+    });
+  }
+
+
   boardDTO = input.required<IBoardDTO>();
   isFlipped = input<boolean>(false);
 
@@ -52,19 +85,6 @@ export class Board {
   
   promotionModal = signal<boolean>(false);
   promotionTarget = signal<Position | null>(null);
-
-  accessibilityAnnouncement = computed<string>(() => {
-    const board = this.boardDTO();
-    const color = this.currentPlayer() === 'white' ? 'Brancas' : 'Pretas';
-    
-    if (board.lastMove == null) return `Jogo iniciado. ${color} jogam.`;
-    
-    const inverseColor = this.currentPlayer() === 'white' ? 'Pretas' : 'Brancas';
-    const lastMove = board.lastMove.san;
-    const check = board.boardState === EBoardState.CHECK ? ', xeque' : '';
-
-    return `Movimento das ${inverseColor}: ${lastMove}, ${color} jogam${check}.`; ;
-  });
 
   get promotionColumn(): number {
     if (!this.promotionTarget()) return 0;
