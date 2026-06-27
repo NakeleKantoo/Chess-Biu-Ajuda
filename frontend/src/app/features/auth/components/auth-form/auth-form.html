@@ -1,18 +1,18 @@
 <div class="auth-form container vh-100 vw-100 d-flex flex-column justify-content-center align-items-center">
     <div class="d-flex align-items-center mb-5 animate-fade-in-up">
         <img src="/logo.png" alt="Logo" class="me-2" style="width: 30px; height: 30px;"/>
-        <a class="navbar-brand m-0 fs-4 text-white" routerLink="/">ChessHub</a>
+        <p class="navbar-brand m-0 fs-4 text-white">ChessHub</p>
     </div>
     <div class="container container__auth-form pb-5">
         <div class="animate-fade-in-up animate-delay-100">
-            <h2 class="text-center">{{ textLabel }}</h2>
+            <h2 class="text-center" tabindex="-1" #pageTitle>{{ textLabel }}</h2>
             <p class="text-center mb-4 text-muted">
                 {{ descriptionLabel }}
             </p>
         </div>
         <div class="card p-4 animate-fade-in-up animate-delay-300">
             @if (errorMessage) {
-                <div class="alert alert-danger text-center" role="alert">
+                <div class="alert alert-danger text-center" role="alert" aria-live="assertive">
                     ⓘ {{ errorMessage }}
                 </div>
             }
@@ -20,22 +20,54 @@
             <form (ngSubmit)="onFormSubmit()">
                 <fieldset>
                     <div class="mb-3">
-                        <label for="usernameInput" class="form-label ms-2">Username</label>
-                        <input type="text" class="form-control" name="usernameInput" id="usernameInput" placeholder="seu_nome" [(ngModel)]="username" required>
+                        <label for="usernameInput" class="form-label ms-2">Nome de Usuário</label>
+                        <input type="text"
+                            class="form-control"
+                            name="usernameInput"
+                            id="usernameInput"
+                            placeholder="Seu nome de usuário"
+                            [(ngModel)]="username"
+                            required
+                        >
                     </div>
                     <div class="mb-3">
                         <label for="passwordInput" class="form-label ms-2">Senha</label>
-                        <input type="password" class="form-control" name="passwordInput" id="passwordInput" placeholder="***********" [(ngModel)]="password" required>
+                        <input type="password"
+                            class="form-control"
+                            name="passwordInput"
+                            id="passwordInput"
+                            placeholder="Sua senha"
+                            [(ngModel)]="password"
+                            required
+                        >
                     </div>
                     @if(type === 'register') {
                         <div class="mb-3">
                             <label for="confirmPasswordInput" class="form-label ms-2">Confirmar senha</label>
-                            <input type="password" class="form-control" name="confirmPasswordInput" id="confirmPasswordInput" placeholder="***********" [(ngModel)]="confirmPassword" required>
+                            <input type="password"
+                                class="form-control"
+                                name="confirmPasswordInput"
+                                id="confirmPasswordInput"
+                                placeholder="Sua senha"
+                                [(ngModel)]="confirmPassword"
+                                required
+                            >
                         </div>
                     }
                 </fieldset>
                 <button type="submit" class="btn btn-primary w-100 mt-4">{{ buttonLabel }}</button>
             </form>
+            <!-- NOVA SEÇÃO DE ALTERNÂNCIA ACESSÍVEL -->
+            <hr aria-hidden="true">
+            <div class="text-center mt-2">
+                @if (type === 'login') {
+                    <span class="text-muted">Não tem uma conta? </span>
+                    <a routerLink="/register" class="fw-bold text-decoration-none">Cadastre-se aqui</a>
+                } @else {
+                    <span class="text-muted">Já possui uma conta? </span>
+                    <a routerLink="/login" class="fw-bold text-decoration-none">Faça login aqui</a>
+                }
+            </div>
         </div>
     </div>
 </div>

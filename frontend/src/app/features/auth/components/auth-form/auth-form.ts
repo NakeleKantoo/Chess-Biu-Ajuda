@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { IAuthFormData } from '../../models/auth-form.model';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -17,6 +17,13 @@ export class AuthForm {
   @Input({required: true}) type: 'login' | 'register' = 'login';
   @Input() errorMessage: string | null = null;
   @Output() onSubmit = new EventEmitter<IAuthFormData>();
+
+  @ViewChild('pageTitle')
+  pageTitle!: ElementRef<HTMLHeadingElement>;
+
+  ngAfterViewInit() {
+    this.pageTitle.nativeElement.focus();
+  }
 
   get textLabel(): string {
     return this.type === 'register' ? 'Crie uma Conta' : 'Entre na sua Conta';
