@@ -33,6 +33,7 @@ export class Square {
   pointer = input<boolean>(true);
   isFlipped = input<boolean>(false);
 
+  isFocusedInGrid = input<boolean>(false);
   squareClicked = output<Position>();
 
   colLabel = computed<file | null>(() => {
@@ -74,4 +75,25 @@ export class Square {
     return `Casa ${position}${piece}${isSelected}${isMove}${isCapture}`;
   });
 
+    // Adicione no seu square.ts
+  arrowPressed = output<{ key: string }>();
+  
+  onKeyDown(event: KeyboardEvent): void {
+    const movementKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const actionKeys = [' ', 'Enter'];
+  
+    if (!movementKeys.includes(event.key) && !actionKeys.includes(event.key)) return;
+  
+    // Bloqueia o Chrome de tentar adivinhar para onde focar
+    event.preventDefault();
+    event.stopPropagation();
+  
+    if (actionKeys.includes(event.key)) {
+      this.onSquareClick();
+      return;
+    }
+  
+    // Avisa o componente pai qual seta foi apertada
+    this.arrowPressed.emit({ key: event.key });
+  }
 }

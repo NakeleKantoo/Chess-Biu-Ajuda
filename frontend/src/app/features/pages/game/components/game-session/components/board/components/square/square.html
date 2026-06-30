@@ -3,13 +3,17 @@
     [class.dark]="isDarkSquare()"
     [class.pointer]="pointer()"
     (click)="onSquareClick()"
+    (keydown)="onKeyDown($event)"
     [attr.aria-label]="getAriaLabel()"
+    [tabindex]="isFocusedInGrid() ? 0 : -1"
+    [attr.data-pos]="squareView().position.row + '-' + squareView().position.col"
 >
-    <div class="square__label w-100 h-100 position-absolute">
+    <div class="square__label w-100 h-100 position-absolute" aria-hidden="true">
         @if (rowLabel()) {<p class="row position-absolute top-0 start-0 ps-1">{{ rowLabel() }}</p>}
         @if (colLabel()) {<p class="col position-absolute bottom-0 end-0 pe-1">{{ colLabel() }}</p>}
     </div>
-    <div class="w-100 h-100 position-absolute d-flex align-items-center justify-content-center">
+
+    <div class="w-100 h-100 position-absolute d-flex align-items-center justify-content-center" aria-hidden="true">
         @if (squareView().isCapture) {
         <div class="highlight highlight-capture position-absolute"></div>
         } @else if (squareView().isMove) {

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, HostListener, viewChildren, ElementRef } from '@angular/core';
 import { Square } from "./components/square/square";
 import { BoardSymbol, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
@@ -19,6 +19,11 @@ export class Board {
   // Remove accessibilityAnnouncement = computed(...)
   // Adiciona rastreio do último lance anunciado para evitar duplicatas
   private lastAnnouncedMove = signal<string | null>(null);
+
+  activeRow = signal<number>(0);
+  activeCol = signal<number>(0);
+
+  squares = viewChildren(Square, { read: ElementRef });
 
   constructor() {
     effect(() => {
@@ -45,6 +50,44 @@ export class Board {
     });
   }
 
+  handleArrowNavigation(key: string, currentRow: number, currentCol: number): void {
+    let row = currentRow;
+    let col = currentCol;
+    const multiplier = this.isFlipped() ? -1 : 1;
+
+    switch (key) {
+      case 'ArrowUp':    row = this.clamp(row - 1 * multiplier); break;
+      case 'ArrowDown':  row = this.clamp(row + 1 * multiplier); break;
+      case 'ArrowLeft':  col = this.clamp(col - 1 * multiplier); break;
+      case 'ArrowRight': col = this.clamp(col + 1 * multiplier); break;
+    }
+
+    this.focusActiveSquare(row, col);
+  }
+
+  private clamp(value: number): number {
+    return Math.max(0, Math.min(7, value));
+  }
+
+  focusActiveSquare(row: number, col: number): void {
+    this.activeRow.set(row);
+    this.activeCol.set(col);
+
+    // Força o Chrome a sincronizar com o ciclo de pintura da tela
+    requestAnimationFrame(() => {
+      const targetPos = `${row}-${col}`;
+      const targetSquare = this.squares().find(sq => 
+        sq.nativeElement.querySelector(`[data-pos="${targetPos}"]`)
+      );
+
+      if (targetSquare) {
+        const button = targetSquare.nativeElement.querySelector('button');
+        if (button) {
+          button.focus();
+        }
+      }
+    });
+  }
 
   boardDTO = input.required<IBoardDTO>();
   isFlipped = input<boolean>(false);
@@ -134,6 +177,10 @@ export class Board {
       this.currentPosition.set(null);
       return;
     }
+    
+    this.activeRow.set(position.row);
+    this.activeCol.set(position.col);
+    this.focusActiveSquare(position.row, position.col);
 
     const currentPositionNotation: string = currentPosition.toNotation();
     const targetPositionNotation: string = position.toNotation();
