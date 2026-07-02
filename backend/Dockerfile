@@ -5,6 +5,8 @@ WORKDIR /app
 # Copiar arquivos do wrapper e o POM
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+
+RUN chmod +x ./mvnw
 # Baixar dependências o-offline para usar cache
 RUN ./mvnw dependency:go-offline
 

@@ -13,7 +13,7 @@ export type BoardSymbol = (PieceSymbol | null)[][];
 export class Piece {
   pieceSymbol = input.required<PieceSymbol | null>();
 
-  private readonly assetPath = '/piece';
+  private readonly assetPath = 'piece';
 
   icon = computed<string | null>(() => {
     const type = this.pieceSymbol();
