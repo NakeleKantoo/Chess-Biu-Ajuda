@@ -18,6 +18,8 @@
         [pointer]="true"
         [isFlipped]="isFlipped()"
         (squareClicked)="onClick($event)"
+        [isFocusedInGrid]="activeRow() === rowIndex && activeCol() === colIndex" (squareClicked)="onClick($event)"
+        (arrowPressed)="handleArrowNavigation($event.key, rowIndex, colIndex)"
     />
     }
     </div>

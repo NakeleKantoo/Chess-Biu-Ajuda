@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
 
 @Component({
   selector: 'app-modal-wrapper',
@@ -17,6 +17,13 @@ export class ModalWrapper {
 
   title = computed<string>(() => { return this.getTitle(this.type()); });
   submitButtonText = computed<string>(() => { return this.getButtonText(this.type()); });
+
+  dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dialogElement');
+
+  ngAfterViewInit() {
+    // 1. Abre o modal nativo (bloqueia o resto da Home instantaneamente)
+    this.dialogRef().nativeElement.showModal();
+  }
 
   getTitle(type: 'join' | 'create' | null) {
     switch (type) {
@@ -47,6 +54,14 @@ export class ModalWrapper {
       this.isClosing.set(false);
       this.close.emit();
     }, 200); 
+  }
+
+  onCancel(event: Event) {
+    // Impede o fechamento imediato e seco do navegador nativo
+    event.preventDefault(); 
+    
+    // Chama o seu método existente que faz a animação suave e emite o 'close'
+    this.onClose();
   }
 
   onSubmit() {

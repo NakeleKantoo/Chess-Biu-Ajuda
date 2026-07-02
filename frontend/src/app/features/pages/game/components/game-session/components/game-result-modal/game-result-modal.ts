@@ -1,4 +1,4 @@
-import { Component, computed, EventEmitter, input, output } from '@angular/core';
+import { Component, computed, ElementRef, EventEmitter, input, output, viewChild } from '@angular/core';
 import { EGameEndReason, EGameState } from '../../../../../../../shared/models/game.model';
 
 @Component({
@@ -8,6 +8,13 @@ import { EGameEndReason, EGameState } from '../../../../../../../shared/models/g
   styleUrl: './game-result-modal.scss',
 })
 export class GameResultModal {
+  dialogRef = viewChild<ElementRef<HTMLDialogElement>>('dialogElement');
+
+  ngAfterViewInit() {
+    // Abre como Modal nativo. Isso BLOQUEIA todo o resto do site automaticamente!
+    this.dialogRef()?.nativeElement.showModal();
+  }
+
   isWhite = input.required<boolean>();
   state = input.required<EGameState>();
   endReason = input.required<EGameEndReason>();

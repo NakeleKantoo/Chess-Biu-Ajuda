@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed, effect, DestroyRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, effect, DestroyRef, SimpleChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of, tap } from 'rxjs';
@@ -11,6 +11,7 @@ import { Loading } from './components/loading/loading';
 import { Waiting } from './components/waiting/waiting';
 import { GameSession } from './components/game-session/game-session';
 import { IPendingGameDTO } from '../../../shared/models/create-game.model';
+import { AriaAnnouncerService } from '../../../core/service/announcer.service';
 
 @Component({
   selector: 'app-game',
@@ -42,23 +43,22 @@ export class Game implements OnInit, OnDestroy {
     return players.blackPlayer.name === user.username;
   });
 
+  private announcer = inject(AriaAnnouncerService); // serviço abaixo
 
   constructor() {
     effect(() => {
       const activeGame = this.game();
+      const pendingGame = this.pendingGame();
+      const playerColor = this.isFlipped() ? 'pretas' : 'brancas';
 
       if (activeGame) {
-        console.log('Jogo Ativo detectado via Signal:', activeGame);
-
-        // Só limpamos o pending se realmente tivermos um jogo para mostrar
-        if (this.pendingGame()) {
-          this.pendingGame.set(null);
-        }
-
-        // Busca jogadores apenas se necessário
-        if (!this.gamePlayers()) {
-          this.loadPlayers(activeGame.id);
-        }
+        this.announcer.announce('Partida encontrada, tabuleiro disponível. Você está jogando com as ' + playerColor + '.');
+        if (this.pendingGame()) this.pendingGame.set(null);
+        if (!this.gamePlayers()) this.loadPlayers(activeGame.id);
+      } else if (pendingGame) {
+        this.announcer.announce('Aguardando oponente. Código da sala exibido.');
+      } else {
+        this.announcer.announce('Carregando partida...');
       }
     });
   }
@@ -74,10 +74,8 @@ export class Game implements OnInit, OnDestroy {
   private loadInitialData(gameId: string) {
     this.gameService.getGameSession(gameId).pipe(
       catchError(() => {
-        console.warn('Sessão ativa não encontrada, buscando jogo pendente...');
         return this.gameService.getPendingGame(gameId).pipe(
           catchError(err => {
-            console.error('Jogo não encontrado em nenhuma base.', err);
             return of(null);
           })
         );

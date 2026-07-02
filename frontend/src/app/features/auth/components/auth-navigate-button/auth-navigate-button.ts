@@ -8,13 +8,4 @@ import { RouterLink } from "@angular/router";
   styleUrl: './auth-navigate-button.scss',
 })
 export class AuthNavigateButton {
-  @Input({required: true}) type: 'login' | 'register' = 'login';
-
-  get buttonLabel(): string {
-    return this.type === 'register' ? 'Entre na sua Conta' : 'Criar uma Conta';
-  }
-
-  get navigateLink(): string {
-    return this.type === 'register' ? '/login' : '/register';
-  }
 }

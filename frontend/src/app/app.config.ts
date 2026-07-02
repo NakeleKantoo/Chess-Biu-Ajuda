@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
   ]
 };
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'https://leonnaviegas.dev.br/xadrez';
 
 export const appSettings = {
   URL: BASE_URL,

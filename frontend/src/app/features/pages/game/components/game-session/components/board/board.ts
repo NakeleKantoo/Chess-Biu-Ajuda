@@ -1,10 +1,11 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, HostListener, viewChildren, ElementRef } from '@angular/core';
 import { Square } from "./components/square/square";
 import { BoardSymbol, PieceSymbol } from "./components/piece/piece";
 import { EBoardState, IBoardDTO, IMoveRequest } from '../../../../../../../shared/models/game.model';
 import { Position } from '../../../../../../../shared/models/position.model';
 import { Promotion } from "./components/promotion/promotion";
 import { SquareView } from '../../../../../../../shared/models/chess-view.model';
+import { AriaAnnouncerService } from '../../../../../../../core/service/announcer.service';
 
 @Component({
   selector: 'app-board',
@@ -13,6 +14,81 @@ import { SquareView } from '../../../../../../../shared/models/chess-view.model'
   styleUrl: './board.scss',
 })
 export class Board {
+  private announcer = inject(AriaAnnouncerService);
+
+  // Remove accessibilityAnnouncement = computed(...)
+  // Adiciona rastreio do último lance anunciado para evitar duplicatas
+  private lastAnnouncedMove = signal<string | null>(null);
+
+  activeRow = signal<number>(0);
+  activeCol = signal<number>(0);
+
+  squares = viewChildren(Square, { read: ElementRef });
+
+  constructor() {
+    effect(() => {
+      const board = this.boardDTO();
+      const lastMove = board.lastMove;
+
+      // Só anuncia se houve um lance novo (evita anúncio no carregamento inicial
+      // e em re-renders sem mudança de lance)
+      if (!lastMove) return;
+
+      const moveKey = lastMove.uci; // identificador único do lance
+      if (moveKey === this.lastAnnouncedMove()) return;
+
+      this.lastAnnouncedMove.set(moveKey);
+
+      const color = this.currentPlayer() === 'white' ? 'Brancas' : 'Pretas';
+      const inverseColor = this.currentPlayer() === 'white' ? 'Pretas' : 'Brancas';
+      const check = board.boardState === EBoardState.CHECK ? ', xeque' : '';
+
+      const message = `Movimento das ${inverseColor}: ${lastMove.san}${check}. Vez das ${color}.`;
+      
+      // Lances são polite: não interrompem leitura em curso
+      this.announcer.announce(message, 'polite');
+    });
+  }
+
+  handleArrowNavigation(key: string, currentRow: number, currentCol: number): void {
+    let row = currentRow;
+    let col = currentCol;
+    const multiplier = this.isFlipped() ? -1 : 1;
+
+    switch (key) {
+      case 'ArrowUp':    row = this.clamp(row - 1 * multiplier); break;
+      case 'ArrowDown':  row = this.clamp(row + 1 * multiplier); break;
+      case 'ArrowLeft':  col = this.clamp(col - 1 * multiplier); break;
+      case 'ArrowRight': col = this.clamp(col + 1 * multiplier); break;
+    }
+
+    this.focusActiveSquare(row, col);
+  }
+
+  private clamp(value: number): number {
+    return Math.max(0, Math.min(7, value));
+  }
+
+  focusActiveSquare(row: number, col: number): void {
+    this.activeRow.set(row);
+    this.activeCol.set(col);
+
+    // Força o Chrome a sincronizar com o ciclo de pintura da tela
+    requestAnimationFrame(() => {
+      const targetPos = `${row}-${col}`;
+      const targetSquare = this.squares().find(sq => 
+        sq.nativeElement.querySelector(`[data-pos="${targetPos}"]`)
+      );
+
+      if (targetSquare) {
+        const button = targetSquare.nativeElement.querySelector('button');
+        if (button) {
+          button.focus();
+        }
+      }
+    });
+  }
+
   boardDTO = input.required<IBoardDTO>();
   isFlipped = input<boolean>(false);
 
@@ -27,6 +103,7 @@ export class Board {
       return row.map((piece, colIndex) => ({
         piece: piece,
         position: this.getPosition(rowIndex, colIndex),
+        isSelected: this.isSelected(rowIndex, colIndex),
         isMove: this.isMove(rowIndex, colIndex),
         isCapture: this.isCapture(rowIndex, colIndex),
         isLastMove: this.isLastMove(rowIndex, colIndex),
@@ -100,6 +177,10 @@ export class Board {
       this.currentPosition.set(null);
       return;
     }
+    
+    this.activeRow.set(position.row);
+    this.activeCol.set(position.col);
+    this.focusActiveSquare(position.row, position.col);
 
     const currentPositionNotation: string = currentPosition.toNotation();
     const targetPositionNotation: string = position.toNotation();
@@ -127,6 +208,11 @@ export class Board {
     };
     this.move.emit(moveRequest);
     this.currentPosition.set(null);
+  }
+
+  isSelected(row: number, col: number): boolean {
+    if (this.currentPosition() == null) return false;
+    return this.currentPosition()!.row === row && this.currentPosition()!.col === col;
   }
 
   isMove(row: number, col: number): boolean {

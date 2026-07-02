@@ -1,12 +1,17 @@
 <form class="join-game-form d-flex flex-column">
-    <div class="game-type py-3 px-4 d-flex flex-column">
-        <small class="opacity-75 ms-2 mb-2">CÓDIGO DA PARTIDA</small>
+    <fieldset class="game-type py-3 px-4 d-flex flex-column">
+        <legend class="small opacity-75 ms-2 mb-2">CÓDIGO DA PARTIDA</legend>
         <small class="opacity-50">Digite o código de 6 caracteres para entrar na partida</small>
-    </div>
+    </fieldset>
 
     <input #hiddenInput type="text" maxlength="6" id="code-input"
-        class="real-input position-absolute top-0 left-0 w-100 h-100 opacity-0" (input)="onInput($event)"
-        (focus)="isFocused.set(true)" (blur)="isFocused.set(false)" autocomplete="off" autofocus />
+        class="real-input position-absolute top-0 left-0 w-100 h-100 opacity-0"
+        (input)="onInput($event)"
+        aria-label="Digite o código da partida"
+        (focus)="isFocused.set(true)"
+        (blur)="isFocused.set(false)"
+        autocomplete="off" autofocus
+    />
 
     <div class="code-display d-flex gap-2 justify-content-center pb-3" (click)="focusInput()">
         @for (i of [0,1,2,3,4,5]; track i) {

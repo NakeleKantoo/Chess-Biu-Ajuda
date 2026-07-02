@@ -1,31 +1,42 @@
-.modal-overlay {
-    // Fixa o fundo em toda a tela
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+dialog.modal-overlay {
+    // 1. Reseta os estilos agressivos de fábrica do navegador
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: white;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
 
-    // Centraliza o conteúdo (o modal-card)
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    // Fixa o fundo em toda a tela (Mantendo suas propriedades)
+    position: fixed; //
+    top: 0; //
+    left: 0; //
+    width: 100vw; //
+    height: 100vh; //
 
-    // O "borrão" e a cor escura do fundo
-    background-color: rgba(0, 0, 0, 0.5); // Escurece um pouco
-    backdrop-filter: blur(8px); // Borra o que está atrás
-    -webkit-backdrop-filter: blur(8px); // Suporte para Safari
+    // Sobrescreve o display:block injetado pelo navegador ao abrir
+    &[open] {
+        display: flex !important; //
+        align-items: center; //
+        justify-content: center; //
+    }
 
-    z-index: 1050; // Garante que fique acima de tudo
+    // Aproveita a pseudo-classe nativa para o borrão de fundo do dialog
+    &::backdrop {
+        background-color: rgba(0, 0, 0, 0.5); //
+        backdrop-filter: blur(8px); //
+        -webkit-backdrop-filter: blur(8px); //
+    }
 
     // Animação de entrada suave
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.2s ease-out; //
 
     &.closing {
-        animation: fadeOut 0.2s ease-in forwards;
+        animation: fadeOut 0.2s ease-in forwards; //
         
         .modal-card {
-            animation: scaleOut 0.2s ease-in forwards;
+            animation: scaleOut 0.2s ease-in forwards; //
         }
     }
 }

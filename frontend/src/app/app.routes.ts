@@ -14,22 +14,22 @@ export const routes: Routes = [
     {
         path: 'home',
         component: Home,
-        title: 'Home Page'
+        title: 'Página Inicial'
     },
     {
         path: 'login',
         component: Login,
-        title: 'Login Page'
+        title: 'Página de Login'
     },
     {
         path: 'register',
         component: Register,
-        title: 'Register Page'
+        title: 'Página de Cadastro'
     },
     {
         path: 'game/:id',
         component: Game,
-        title: 'Game Page',
+        title: 'Página do Jogo',
         canActivate: [authGuard]
     },
     {

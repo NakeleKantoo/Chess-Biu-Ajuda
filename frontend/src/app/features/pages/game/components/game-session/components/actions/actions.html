@@ -7,10 +7,18 @@
         <div class="actions__bottom p-3 container">
             <div class="row">
                 <div class="col px-2">
-                    <button class="btn btn-primary w-100" (click)="onAction('offer-draw')">Empate</button>
+                    <button 
+                        class="btn btn-primary w-100"
+                        (click)="onAction('offer-draw')"
+                        aria-label="Oferecer Empate"
+                    >Empate</button>
                 </div>
                 <div class="col px-2">
-                    <button class="btn btn-secondary w-100" (click)="onAction('resign')">Desistir</button>
+                    <button
+                        class="btn btn-secondary w-100"
+                        (click)="onAction('resign')"
+                        aria-label="Desistir da Partida"
+                    >Desistir</button>
                 </div>
             </div>
         </div>

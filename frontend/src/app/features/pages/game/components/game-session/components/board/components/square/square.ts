@@ -7,6 +7,21 @@ import { SquareView } from '../../../../../../../../../shared/models/chess-view.
 type file = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 type rank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 
+const mapSymbolToPieceName: Record<string, string> = {
+  'P': 'Peão Branco',
+  'R': 'Torre Branca',
+  'N': 'Cavalo Branco',
+  'B': 'Bispo Branco',
+  'Q': 'Rainha Branca',
+  'K': 'Rei Branco',
+  'p': 'Peão Preto',
+  'r': 'Torre Preta',
+  'n': 'Cavalo Preto',
+  'b': 'Bispo Preto',
+  'q': 'Rainha Preta',
+  'k': 'Rei Preto'
+};
+
 @Component({
   selector: 'app-square',
   imports: [CommonModule, Piece],
@@ -18,6 +33,7 @@ export class Square {
   pointer = input<boolean>(true);
   isFlipped = input<boolean>(false);
 
+  isFocusedInGrid = input<boolean>(false);
   squareClicked = output<Position>();
 
   colLabel = computed<file | null>(() => {
@@ -49,4 +65,35 @@ export class Square {
     this.squareClicked.emit(this.squareView().position);
   };
 
+  getAriaLabel = computed<string>(() => {
+    const position = this.squareView().position.toNotation();
+    const piece = this.squareView().piece ? `, ${mapSymbolToPieceName[this.squareView().piece!]}` : 'sem peça';
+    const isSelected = this.squareView().isSelected ? ', selecionada' : '';
+    const isMove = this.squareView().isMove ? ', movimento' : '';
+    const isCapture = this.squareView().isCapture ? ', captura' : '';
+
+    return `Casa ${position}${piece}${isSelected}${isMove}${isCapture}`;
+  });
+
+    // Adicione no seu square.ts
+  arrowPressed = output<{ key: string }>();
+  
+  onKeyDown(event: KeyboardEvent): void {
+    const movementKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const actionKeys = [' ', 'Enter'];
+  
+    if (!movementKeys.includes(event.key) && !actionKeys.includes(event.key)) return;
+  
+    // Bloqueia o Chrome de tentar adivinhar para onde focar
+    event.preventDefault();
+    event.stopPropagation();
+  
+    if (actionKeys.includes(event.key)) {
+      this.onSquareClick();
+      return;
+    }
+  
+    // Avisa o componente pai qual seta foi apertada
+    this.arrowPressed.emit({ key: event.key });
+  }
 }

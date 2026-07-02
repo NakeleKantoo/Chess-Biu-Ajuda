@@ -1,17 +1,24 @@
 <div class="game">
+    <div
+        id="announcer"
+        aria-live="assertive"
+        aria-atomic="true"
+        class="visually-hidden"
+        aria-relevant="text"
+    ></div>
+
     @if (game()) {
-        <app-game-session 
-            [gameDTO]="game()!" 
-            [drawOffer]="drawOffer()"
-            [gamePlayers]="gamePlayers()"
-            [isFlipped]="isFlipped()" 
-            (move)="executeMove($event)" 
-            (action)="executeAction($event)"/>
-    } 
-    @else if (pendingGame()) {
-        <app-waiting [pendingGame]="pendingGame()!" />
-    } 
-    @else {
-        <app-loading />
+    <app-game-session
+        [gameDTO]="game()!"
+        [drawOffer]="drawOffer()"
+        [gamePlayers]="gamePlayers()"
+        [isFlipped]="isFlipped()"
+        (move)="executeMove($event)"
+        (action)="executeAction($event)"
+    />
+    } @else if (pendingGame()) {
+    <app-waiting [pendingGame]="pendingGame()!" />
+    } @else {
+    <app-loading />
     }
 </div>

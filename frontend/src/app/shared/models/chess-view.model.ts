@@ -4,6 +4,7 @@ import { Position } from "./position.model";
 export interface SquareView {
     piece: PieceSymbol | null;
     position: Position;
+    isSelected: boolean;
     isMove: boolean;
     isCapture: boolean;
     isLastMove: boolean;

@@ -1,18 +1,15 @@
-<div class="loading container vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
-    <div class="d-flex align-items-center mb-5">
-        <img src="/logo.png" alt="Logo" class="me-2" style="width: 30px; height: 30px;"/>
-        <a class="navbar-brand m-0 fs-4 text-white" routerLink="/">ChessHub</a>
-    </div>
-
-    <div class="mini-board">
+<div class="loading container vw-100 vh-100 d-flex flex-column justify-content-center align-items-center" role="status"
+    aria-label="Carregando partida" aria-live="polite">
+    <!-- O texto já está visível; o aria-label no container é suficiente -->
+    <div class="mini-board" aria-hidden="true">
         @for (tile of miniTabuleiro; track tile) {
         <div class="square" [class.dark]="isDark(tile)"></div>
         }
     </div>
 
     <div class="loader-container">
-        <div class="minimal-spinner"></div>
-        <h5 class="mb-0">Carregando partida</h5>
-        <p class="opacity-50">Buscando informações no servidor<span class="dots"></span></p>
+        <div class="minimal-spinner" aria-hidden="true"></div>
+        <h1 class="h5 mb-0">Carregando partida</h1>
+        <p class="opacity-50">Buscando informações no servidor</p>
     </div>
 </div>

@@ -1,6 +1,10 @@
-<div
+<dialog
+    #dialogElement
     class="game-result-modal position-fixed top-0 start-0 vw-100 vh-100 d-flex align-items-center justify-content-center z-3"
-    [class.closing]="isClosing">
+    [class.closing]="isClosing"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="draw-modal-title">
     <div class="card w-100 overflow-hidden m-3">
         <div class="card__header container p-3">
             <div class="row align-items-center">
@@ -29,4 +33,4 @@
             </button>
         </div>
     </div>
-</div>
+</dialog>
